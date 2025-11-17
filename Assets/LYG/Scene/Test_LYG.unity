@@ -131,8 +131,8 @@ GameObject:
   - component: {fileID: 17341506}
   - component: {fileID: 17341511}
   - component: {fileID: 17341510}
-  - component: {fileID: 17341509}
   - component: {fileID: 17341508}
+  - component: {fileID: 17341509}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -184,12 +184,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee, type: 3}
-  m_Color: {r: 0.026922397, g: 0.038183965, b: 0.103773594, a: 1}
+  m_Sprite: {fileID: -5988476192770461513, guid: fe121d67b6e584f49b47674213efb166, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 2}
+  m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -273,11 +273,35 @@ MonoBehaviour:
     m_ActionId: e07d501f-4de3-4c76-9498-61d9d7404387
     m_ActionName: 'Player/Attack[/Mouse/leftButton]'
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 17341509}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: OnSubAttack
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 6b3b64e2-4227-475c-b8a3-6314126ec146
     m_ActionName: 'Player/SubAttack[/Mouse/rightButton]'
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 17341509}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: OnMouse
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 10321fb6-6a23-4519-8cd2-fbf7aafc5406
     m_ActionName: 'Player/New action[/Mouse/position]'
   m_NeverAutoSwitchControlSchemes: 0
@@ -299,13 +323,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arm: {fileID: 881014459}
   rigid: {fileID: 0}
+  ren: {fileID: 0}
   moveVec: {x: 0, y: 0}
+  mousePos: {x: 0, y: 0}
   groundMask:
     serializedVersion: 2
     m_Bits: 72
   speed: 5
   jumpForce: 6
   isGround: 0
+  canAirJump: 0
+  aiming: 0
 --- !u!70 &17341510
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -572,7 +600,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &881014459
 Transform:
   m_ObjectHideFlags: 0
@@ -954,7 +982,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
