@@ -269,7 +269,19 @@ MonoBehaviour:
     m_ActionId: f9889b43-b56b-41da-a9dc-649f34cb40ef
     m_ActionName: 'Player/Jump[/Keyboard/space]'
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 17341509}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: OnAttack
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: e07d501f-4de3-4c76-9498-61d9d7404387
     m_ActionName: 'Player/Attack[/Mouse/leftButton]'
   - m_PersistentCalls:
@@ -322,8 +334,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   arm: {fileID: 881014459}
+  muzzle: {fileID: 1519101520}
   rigid: {fileID: 0}
   ren: {fileID: 0}
+  mag: {fileID: 1043567017}
   moveVec: {x: 0, y: 0}
   mousePos: {x: 0, y: 0}
   groundMask:
@@ -398,37 +412,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!1 &71150531
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 71150532}
-  m_Layer: 0
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &71150532
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 71150531}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.65620285, y: -0.1571487, z: 0.08797294}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &209961916
 GameObject:
   m_ObjectHideFlags: 0
@@ -439,7 +422,7 @@ GameObject:
   m_Component:
   - component: {fileID: 209961917}
   - component: {fileID: 209961918}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Border (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -517,7 +500,7 @@ GameObject:
   m_Component:
   - component: {fileID: 298401026}
   - component: {fileID: 298401027}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Border
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -600,7 +583,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &881014459
 Transform:
   m_ObjectHideFlags: 0
@@ -615,6 +598,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1348631211}
+  - {fileID: 1519101520}
   m_Father: {fileID: 17341507}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1034520604
@@ -627,7 +611,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1034520605}
   - component: {fileID: 1034520606}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Border (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -695,6 +679,54 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 13.066175}
   m_EdgeRadius: 0
+--- !u!1 &1043567016
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1043567018}
+  - component: {fileID: 1043567017}
+  m_Layer: 0
+  m_Name: PlayerMagazine
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1043567017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1043567016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7aa75237b89d9d2439e4734714866693, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bullet: {fileID: 4426512859898953349, guid: 9f15f9a364ffc3640a7bd5e5e27b6d61, type: 3}
+  pools: []
+  size: 50
+  index: 0
+--- !u!4 &1043567018
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1043567016}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1091755416
 GameObject:
   m_ObjectHideFlags: 0
@@ -839,7 +871,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1332948471}
   - component: {fileID: 1332948472}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Border (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -994,6 +1026,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &1519101519
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1519101520}
+  m_Layer: 0
+  m_Name: Muzzle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1519101520
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1519101519}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.01, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 881014459}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1651391986
 GameObject:
   m_ObjectHideFlags: 0
@@ -1141,5 +1204,5 @@ SceneRoots:
   m_Roots:
   - {fileID: 1651391989}
   - {fileID: 1091755419}
-  - {fileID: 71150532}
   - {fileID: 17341507}
+  - {fileID: 1043567018}

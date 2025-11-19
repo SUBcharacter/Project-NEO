@@ -1,3 +1,4 @@
+using System.Collections;
 using System.ComponentModel.Design.Serialization;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -5,11 +6,14 @@ using UnityEngine.InputSystem;
 public class Player : MonoBehaviour
 {
     [SerializeField] Transform arm;
+    [SerializeField] Transform muzzle;
     [SerializeField] Rigidbody2D rigid;
     [SerializeField] SpriteRenderer ren;
+    [SerializeField] Magazine mag;
     [SerializeField] Vector2 moveVec;
     [SerializeField] Vector2 mousePos;
     [SerializeField] LayerMask groundMask;
+    Coroutine fire;
 
     [SerializeField] float speed;
     [SerializeField] float jumpForce;
@@ -102,6 +106,15 @@ public class Player : MonoBehaviour
         arm.rotation = Quaternion.Euler(0, 0, angle);
     }
 
+    void Launch()
+    {
+        Vector2 dir = (mousePos - (Vector2)muzzle.position).normalized;
+
+        mag.Fire(dir,muzzle.position);
+    }
+
+    
+
     #region Input System
     public void OnMove(InputAction.CallbackContext context)
     {
@@ -139,6 +152,19 @@ public class Player : MonoBehaviour
         mousePos = Camera.main.ScreenToWorldPoint(inputVec);
     }
 
+    public void OnAttack(InputAction.CallbackContext context)
+    {
+        if(context.performed)
+        {
+            Launch();
+        }
+        else if(context.canceled)
+        {
+
+        }
+        
+    }
+
     public void OnSubAttack(InputAction.CallbackContext context)
     {
         if(context.performed)
@@ -166,5 +192,13 @@ public class Player : MonoBehaviour
 
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(bottomCenter + Vector2.down * 0.05f, radius);
+    }
+
+    IEnumerator Fire()
+    {
+        while(true)
+        {
+            yield return CoroutineCasher.Wait()
+        }
     }
 }
