@@ -3,6 +3,11 @@ using System.ComponentModel.Design.Serialization;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+public enum WeaponState
+{
+    Melee,Ranged
+};
+
 public class Player : MonoBehaviour
 {
     [SerializeField] Transform arm;
@@ -14,13 +19,18 @@ public class Player : MonoBehaviour
     [SerializeField] Vector2 mousePos;
     [SerializeField] LayerMask groundMask;
     Coroutine fire;
+    public PlayerState[] states = new PlayerState[3];
+    PlayerState currentState;
+    WeaponState currentWeapon;
 
     [SerializeField] float speed;
     [SerializeField] float jumpForce;
 
+    [SerializeField] int weaponIndex;
+
     [SerializeField] bool isGround;
     [SerializeField] bool canAirJump;
-    [SerializeField] bool aiming;
+    [SerializeField] public bool aiming;
 
     private void Awake()
     {
@@ -28,11 +38,16 @@ public class Player : MonoBehaviour
         ren = GetComponent<SpriteRenderer>();
         Cursor.lockState = CursorLockMode.Confined;
         arm.gameObject.SetActive(false);
+        weaponIndex = 0;
+        states[0] = new IdleState();
+        states[1] = new AttackState();
+        states[2] = new SubAttackState();
+        ChangeState(states[0]);
     }
 
     private void Update()
     {
-        RotateArm();
+        currentState?.Update(this);
         SpriteControl();
     }
 
@@ -94,11 +109,8 @@ public class Player : MonoBehaviour
         }
     }
 
-    void RotateArm()
+    public void RotateArm()
     {
-        if (!aiming)
-            return;
-
         Vector2 dir = (mousePos - (Vector2)arm.position).normalized;
 
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
@@ -110,10 +122,22 @@ public class Player : MonoBehaviour
     {
         Vector2 dir = (mousePos - (Vector2)muzzle.position).normalized;
 
+        if(!aiming)
+        {
+            float rand = Random.Range(-5f, 5f);
+
+            dir = Quaternion.Euler(0, 0, rand) * dir;
+        }
+
         mag.Fire(dir,muzzle.position);
     }
 
-    
+    public void ChangeState(PlayerState state)
+    {
+        currentState?.Exit(this);
+        currentState = state;
+        currentState?.Start(this);
+    }
 
     #region Input System
     public void OnMove(InputAction.CallbackContext context)
@@ -156,26 +180,84 @@ public class Player : MonoBehaviour
     {
         if(context.performed)
         {
-            Launch();
+            if(aiming)
+            {
+                ChangeState(states[2]);
+            }
+            else
+            {
+                ChangeState(states[1]);
+            }
+            switch (currentWeapon)
+            {
+                case WeaponState.Melee:
+                    break;
+
+                case WeaponState.Ranged:
+                    if (fire == null)
+                    {
+                        fire = StartCoroutine(AimFire());
+                    }
+                    break;
+            }
+
         }
         else if(context.canceled)
         {
-
+            switch(currentWeapon)
+            {
+                case WeaponState.Melee:
+                    break;
+                case WeaponState.Ranged:
+                    if (fire != null)
+                    {
+                        StopCoroutine(fire);
+                        fire = null;
+                    }
+                    break;
+            }
         }
-        
     }
 
     public void OnSubAttack(InputAction.CallbackContext context)
     {
         if(context.performed)
         {
-            aiming = true;
-            arm.gameObject.SetActive(aiming);
+            switch(currentWeapon)
+            {
+                case WeaponState.Melee:
+                    break;
+                case WeaponState.Ranged:
+                    ChangeState(states[2]);
+                    arm.gameObject.SetActive(aiming);
+                    break;
+            }
+            
         }
         else if(context.canceled)
         {
+            switch (currentWeapon)
+            {
+                case WeaponState.Melee:
+                    break;
+                case WeaponState.Ranged:
+                    ChangeState(states[0]);
+                    arm.gameObject.SetActive(aiming);
+                    break;
+            }
+            
+        }
+    }
+
+    public void OnSwitch(InputAction.CallbackContext context)
+    {
+        if(context.performed)
+        {
+            arm.gameObject.SetActive(false);
             aiming = false;
-            arm.gameObject.SetActive(aiming);
+            if (fire != null)
+                StopCoroutine(fire);
+            weaponIndex = (weaponIndex + 1) % 2;
         }
     }
 
@@ -194,11 +276,14 @@ public class Player : MonoBehaviour
         Gizmos.DrawWireSphere(bottomCenter + Vector2.down * 0.05f, radius);
     }
 
-    IEnumerator Fire()
+    IEnumerator AimFire()
     {
-        while(true)
+        while(aiming)
         {
-            yield return CoroutineCasher.Wait()
+            Launch();
+            yield return CoroutineCasher.Wait(0.1f);
         }
     }
+
+    
 }

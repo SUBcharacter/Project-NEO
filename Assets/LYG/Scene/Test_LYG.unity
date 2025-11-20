@@ -316,6 +316,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 10321fb6-6a23-4519-8cd2-fbf7aafc5406
     m_ActionName: 'Player/New action[/Mouse/position]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 17341509}
+        m_TargetAssemblyTypeName: Player, Assembly-CSharp
+        m_MethodName: OnSwitch
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 13616a17-477e-4e84-814f-c90a108db503
+    m_ActionName: 'Player/SwitchWeapon[/Keyboard/1,/Keyboard/2]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -345,6 +361,7 @@ MonoBehaviour:
     m_Bits: 72
   speed: 5
   jumpForce: 6
+  weaponIndex: 0
   isGround: 0
   canAirJump: 0
   aiming: 0
@@ -400,7 +417,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 2.5
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
