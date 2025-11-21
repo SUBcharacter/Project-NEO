@@ -16,6 +16,15 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "Mouse",
+                    "type": "Value",
+                    "id": "10321fb6-6a23-4519-8cd2-fbf7aafc5406",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
                     "name": "Jump",
                     "type": "Button",
                     "id": "f9889b43-b56b-41da-a9dc-649f34cb40ef",
@@ -43,18 +52,18 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Mouse",
-                    "type": "Value",
-                    "id": "10321fb6-6a23-4519-8cd2-fbf7aafc5406",
-                    "expectedControlType": "Vector2",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
                     "name": "SwitchWeapon",
                     "type": "Button",
                     "id": "13616a17-477e-4e84-814f-c90a108db503",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Dodge",
+                    "type": "Button",
+                    "id": "92c8eea1-0bce-497c-8a3a-d79d026d68a9",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -158,6 +167,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "SwitchWeapon",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "58d4aeef-62ef-4edc-996c-1ffa0c233115",
+                    "path": "<Keyboard>/shift",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Dodge",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
