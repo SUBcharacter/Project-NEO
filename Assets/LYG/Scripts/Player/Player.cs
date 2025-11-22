@@ -457,6 +457,7 @@ public class Player : MonoBehaviour
         {
             Debug.Log("패링");
         }
+        
     }
 
     public void OnDodge(InputAction.CallbackContext context)
@@ -516,13 +517,11 @@ public class Player : MonoBehaviour
     IEnumerator Fire()
     {
         // 사격 코루틴
-        while(true)
-        {
-            // 입력 있을 시 계속해서 사격 상태 갱신
-            ChangeState(states[1]);
-            Launch();
-            yield return CoroutineCasher.Wait(0.1f);
-        }
+        // 입력 있을 시 계속해서 사격 상태 갱신
+        ChangeState(states[1]);
+        Launch();
+        yield return CoroutineCasher.Wait(0.1f);
+        
     }
 
     
