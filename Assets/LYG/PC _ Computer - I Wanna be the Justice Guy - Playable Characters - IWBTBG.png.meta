@@ -1,0 +1,1144 @@
+fileFormatVersion: 2
+guid: fe121d67b6e584f49b47674213efb166
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -9209253713697579882
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_0
+  - first:
+      213: 4347594639130237859
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_1
+  - first:
+      213: -5051266649865600376
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_2
+  - first:
+      213: -1868776644940073188
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_3
+  - first:
+      213: -5988476192770461513
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_4
+  - first:
+      213: -7590087154132695520
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_5
+  - first:
+      213: -5709201431539252084
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_6
+  - first:
+      213: 7947477878743430684
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_7
+  - first:
+      213: -1835826055445191989
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_8
+  - first:
+      213: 8504534389580262648
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_9
+  - first:
+      213: 7178992273513665420
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_10
+  - first:
+      213: -9165980192550097794
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_11
+  - first:
+      213: -7107598882750428871
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_12
+  - first:
+      213: 1747721849426435098
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_13
+  - first:
+      213: -3658948146666605749
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_14
+  - first:
+      213: -8156116005269528725
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_15
+  - first:
+      213: -1747306716341081505
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_16
+  - first:
+      213: -6680826195379244203
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_17
+  - first:
+      213: -1546330714575309233
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_18
+  - first:
+      213: -7272952275958390969
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_19
+  - first:
+      213: 6852116959578710553
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_20
+  - first:
+      213: -8998569960066328087
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_21
+  - first:
+      213: -8902006977673705144
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_22
+  - first:
+      213: -5768240005992475050
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_23
+  - first:
+      213: 4078727511223734423
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_24
+  - first:
+      213: -4224619619283250096
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_25
+  - first:
+      213: -2500906588750395530
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_26
+  - first:
+      213: 895724649203281384
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_27
+  - first:
+      213: 5350273423576087043
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_28
+  - first:
+      213: -4277516074446576535
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_29
+  - first:
+      213: 726488583369503457
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_30
+  - first:
+      213: 3146116515650477595
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_31
+  - first:
+      213: -3921121928142256618
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_32
+  - first:
+      213: 5222034409185223756
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_33
+  - first:
+      213: -4779415509896153595
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_34
+  - first:
+      213: -8630505045375350555
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_35
+  - first:
+      213: 8273721345764449557
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_36
+  - first:
+      213: -2685638640255667419
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_37
+  - first:
+      213: 8625097665267038233
+    second: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_38
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 28
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_0
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 250
+        width: 21
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 69cdb944a88223080800000000000000
+      internalID: -9209253713697579882
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_1
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 250
+        width: 24
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ab10cc2a42c55c30800000000000000
+      internalID: 4347594639130237859
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_2
+      rect:
+        serializedVersion: 2
+        x: 70
+        y: 250
+        width: 26
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 882cbf4aebb46e9b0800000000000000
+      internalID: -5051266649865600376
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_3
+      rect:
+        serializedVersion: 2
+        x: 103
+        y: 250
+        width: 26
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c17fcc9ea85c016e0800000000000000
+      internalID: -1868776644940073188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_4
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 217
+        width: 28
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7b0780881a8a4eca0800000000000000
+      internalID: -5988476192770461513
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_5
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 217
+        width: 27
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0264aa382f79aa690800000000000000
+      internalID: -7590087154132695520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_6
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 217
+        width: 28
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c8483f1fb87d4c0b0800000000000000
+      internalID: -5709201431539252084
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_7
+      rect:
+        serializedVersion: 2
+        x: 100
+        y: 217
+        width: 29
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c16f6cee50d1b4e60800000000000000
+      internalID: 7947477878743430684
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_8
+      rect:
+        serializedVersion: 2
+        x: 133
+        y: 217
+        width: 29
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc268cfdde5d586e0800000000000000
+      internalID: -1835826055445191989
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_9
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 184
+        width: 28
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8fc6607e7fc260670800000000000000
+      internalID: 8504534389580262648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_10
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 185
+        width: 27
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c835e04df67e0a360800000000000000
+      internalID: 7178992273513665420
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_11
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 184
+        width: 30
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e7ce8cc0495ebc080800000000000000
+      internalID: -9165980192550097794
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_12
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 184
+        width: 30
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 93982bb497cbc5d90800000000000000
+      internalID: -7107598882750428871
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_13
+      rect:
+        serializedVersion: 2
+        x: 136
+        y: 184
+        width: 28
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a1c504123c7214810800000000000000
+      internalID: 1747721849426435098
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_14
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 151
+        width: 29
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b43fc5aeb0ec83dc0800000000000000
+      internalID: -3658948146666605749
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_15
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 151
+        width: 28
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6f1807c4b7afce80800000000000000
+      internalID: -8156116005269528725
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_16
+      rect:
+        serializedVersion: 2
+        x: 69
+        y: 151
+        width: 29
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f5ae5d29cc150c7e0800000000000000
+      internalID: -1747306716341081505
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_17
+      rect:
+        serializedVersion: 2
+        x: 102
+        y: 151
+        width: 29
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 553bb4ac8ffe843a0800000000000000
+      internalID: -6680826195379244203
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_18
+      rect:
+        serializedVersion: 2
+        x: 135
+        y: 151
+        width: 29
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f46767c68645a8ae0800000000000000
+      internalID: -1546330714575309233
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_19
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 118
+        width: 24
+        height: 22
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 74f91235078411b90800000000000000
+      internalID: -7272952275958390969
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_20
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 118
+        width: 24
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9126e17121c971f50800000000000000
+      internalID: 6852116959578710553
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_21
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 118
+        width: 24
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e9debb3c48ae1380800000000000000
+      internalID: -8998569960066328087
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_22
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 118
+        width: 24
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 849c5b391d7b57480800000000000000
+      internalID: -8902006977673705144
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_23
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 118
+        width: 24
+        height: 20
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6561f97a64813ffa0800000000000000
+      internalID: -5768240005992475050
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_24
+      rect:
+        serializedVersion: 2
+        x: 170
+        y: 118
+        width: 24
+        height: 21
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7909a1abf0d8a9830800000000000000
+      internalID: 4078727511223734423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_25
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 85
+        width: 25
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 054d979d6d22f55c0800000000000000
+      internalID: -4224619619283250096
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_26
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 85
+        width: 24
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 677491935befa4dd0800000000000000
+      internalID: -2500906588750395530
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_27
+      rect:
+        serializedVersion: 2
+        x: 69
+        y: 85
+        width: 24
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8eda25c92d04e6c00800000000000000
+      internalID: 895724649203281384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_28
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 85
+        width: 25
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 30a377fe45dff3a40800000000000000
+      internalID: 5350273423576087043
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_29
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 85
+        width: 25
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 964a6952bc533a4c0800000000000000
+      internalID: -4277516074446576535
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_30
+      rect:
+        serializedVersion: 2
+        x: 167
+        y: 85
+        width: 25
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1e2bd197481051a00800000000000000
+      internalID: 726488583369503457
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_31
+      rect:
+        serializedVersion: 2
+        x: 200
+        y: 85
+        width: 25
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b1e16595d4049ab20800000000000000
+      internalID: 3146116515650477595
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_32
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 52
+        width: 25
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6160610a1606599c0800000000000000
+      internalID: -3921121928142256618
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_33
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 52
+        width: 24
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c442a5ca0a4687840800000000000000
+      internalID: 5222034409185223756
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_34
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 52
+        width: 25
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 506b5aa8aea1cadb0800000000000000
+      internalID: -4779415509896153595
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_35
+      rect:
+        serializedVersion: 2
+        x: 101
+        y: 52
+        width: 25
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e88f2a33694a3880800000000000000
+      internalID: -8630505045375350555
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_36
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 52
+        width: 25
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 51d5bd85ab922d270800000000000000
+      internalID: 8273721345764449557
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_37
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 19
+        width: 26
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5237f74c2e1babad0800000000000000
+      internalID: -2685638640255667419
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_38
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 1
+        width: 50
+        height: 50
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 918fa4bf0a082b770800000000000000
+      internalID: 8625097665267038233
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 1a281e7097a3f10449d9d3a00d013fe6
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_0: -9209253713697579882
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_1: 4347594639130237859
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_10: 7178992273513665420
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_11: -9165980192550097794
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_12: -7107598882750428871
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_13: 1747721849426435098
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_14: -3658948146666605749
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_15: -8156116005269528725
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_16: -1747306716341081505
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_17: -6680826195379244203
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_18: -1546330714575309233
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_19: -7272952275958390969
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_2: -5051266649865600376
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_20: 6852116959578710553
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_21: -8998569960066328087
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_22: -8902006977673705144
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_23: -5768240005992475050
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_24: 4078727511223734423
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_25: -4224619619283250096
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_26: -2500906588750395530
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_27: 895724649203281384
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_28: 5350273423576087043
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_29: -4277516074446576535
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_3: -1868776644940073188
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_30: 726488583369503457
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_31: 3146116515650477595
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_32: -3921121928142256618
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_33: 5222034409185223756
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_34: -4779415509896153595
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_35: -8630505045375350555
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_36: 8273721345764449557
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_37: -2685638640255667419
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_38: 8625097665267038233
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_4: -5988476192770461513
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_5: -7590087154132695520
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_6: -5709201431539252084
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_7: 7947477878743430684
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_8: -1835826055445191989
+      PC _ Computer - I Wanna be the Justice Guy - Playable Characters - IWBTBG_9: 8504534389580262648
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
