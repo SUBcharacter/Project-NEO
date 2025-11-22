@@ -27,5 +27,18 @@ public class Boss : MonoBehaviour
         if(isDead) return;
 
         isDead = true;
+
+        Debug.Log("Boss dead");
+        gameObject.SetActive(false);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("PlayerAttack"))
+        {
+            Debug.Log("Boss taked Damage");
+            Damage(25);
+            Debug.Log("Boss HP : " + currentHP);
+        }
     }
 }
