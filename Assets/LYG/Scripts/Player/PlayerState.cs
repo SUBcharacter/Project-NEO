@@ -8,7 +8,7 @@ public abstract class PlayerState
     public abstract void Exit(Player player);
 }
 
-public class IdleState : PlayerState
+public class PlayerIdleState : PlayerState
 {
     public override void Start(Player player)
     {
@@ -29,7 +29,7 @@ public class IdleState : PlayerState
     }
 }
 
-public class MeleeAttackState : PlayerState
+public class PlayerMeleeAttackState : PlayerState
 {
     // 근접 공격 상태 - 제작 중
     float timer;
@@ -44,7 +44,7 @@ public class MeleeAttackState : PlayerState
         timer += Time.deltaTime;
         if(timer >= relaxTime)
         {
-            player.ChangeState(player.states[0]);
+            player.ChangeState(player.states["Idle"]);
         }
     }
 
@@ -54,7 +54,7 @@ public class MeleeAttackState : PlayerState
     }
 }
 
-public class RangeAttackState : PlayerState
+public class PlayerRangeAttackState : PlayerState
 {
     // 사격 상태
 
@@ -79,7 +79,7 @@ public class RangeAttackState : PlayerState
         timer += Time.deltaTime;
         if (timer >= RelaxTimer)
         {
-            player.ChangeState(player.states[0]);
+            player.ChangeState(player.states["Idle"]);
         }
     }
 
@@ -89,7 +89,7 @@ public class RangeAttackState : PlayerState
     }
 }
 
-public class ParryingState : PlayerState
+public class PlayerParryingState : PlayerState
 {
     public override void Start(Player player)
     {
@@ -107,11 +107,10 @@ public class ParryingState : PlayerState
     }
 }
 
-public class DodgeState : PlayerState
+public class PlayerDodgeState : PlayerState
 {
     // 회피 상태
     float currentVel;
-    float Yvelocity;
     float gravityScale;
 
     public override void Start(Player player)
@@ -119,7 +118,6 @@ public class DodgeState : PlayerState
         // 중력 계수 저장 및 제거 
         // Y축 속도 제거
         gravityScale = player.rigid.gravityScale;
-        Yvelocity = player.rigid.linearVelocityY;
         player.dodging = true;
         player.rigid.gravityScale = 0f;
         player.rigid.linearVelocityY = 0f;
@@ -139,7 +137,7 @@ public class DodgeState : PlayerState
         if(Mathf.Abs(currentVel) <= 3f)
         {
             player.rigid.gravityScale = gravityScale;
-            player.ChangeState(player.states[0]);
+            player.ChangeState(player.states["Idle"]);
         }
     }
 
@@ -149,5 +147,59 @@ public class DodgeState : PlayerState
         // 중력 계수 복귀
         player.dodging = false;
         player.rigid.gravityScale = gravityScale;
+    }
+}
+
+public class PlayerClimbState : PlayerState
+{
+    float gravityScale;
+    public override void Start(Player player)
+    {
+        player.onWall = true;
+        player.canWallJump = true;
+        gravityScale = player.rigid.gravityScale;
+        player.rigid.linearVelocityY = 0f;
+        player.rigid.gravityScale = 0f;
+    }
+
+    public override void Update(Player player)
+    {
+        if(player.isGround)
+        {
+            player.ChangeState(player.states["Idle"]);
+        }
+
+        player.rigid.linearVelocityY = -1;
+    }
+
+    public override void Exit(Player player)
+    {
+        player.onWall = false;
+        player.canWallJump = false;
+        player.rigid.gravityScale = gravityScale;
+    }
+}
+
+public class PlayerWallJumpState : PlayerState
+{
+    float timer;
+    float duration = 0.3f;
+    public override void Start(Player player)
+    {
+        timer = 0;
+    }
+
+    public override void Update(Player player)
+    {
+        timer += Time.deltaTime;
+        if(timer > 0.15f)
+        {
+            player.ChangeState(player.states["Idle"]);
+        }
+    }
+
+    public override void Exit(Player player)
+    {
+        
     }
 }

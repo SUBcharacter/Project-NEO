@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel.Design.Serialization;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -24,9 +25,10 @@ public class Player : MonoBehaviour
     [SerializeField] Vector2 mousePos;
     [SerializeField] Vector2 mouseInputVec;
     [SerializeField] Vector2 groundNormal;
+    [SerializeField] Vector2 currentVelocity;
     [SerializeField] LayerMask groundMask;
     Coroutine fire;
-    public PlayerState[] states = new PlayerState[5];
+    public Dictionary<string,PlayerState> states = new();
     PlayerState currentState;
     WeaponState currentWeapon;
 
@@ -35,7 +37,7 @@ public class Player : MonoBehaviour
 
     float slopeAngle;
     float maxSlopeAngle = 45f;
-    float slopeRayLength = 1.5f;
+    float slopeRayLength = 2f;
     float slopeLostTimer;
     float slopeLostDuration = 0.1f;
 
@@ -44,12 +46,16 @@ public class Player : MonoBehaviour
 
     [SerializeField] bool isDead;
     [SerializeField] bool canAirJump;
+    [SerializeField] bool canDodge;
+    [SerializeField] bool wallLeft;
+    [SerializeField] bool wallRight;
     [SerializeField] public bool isGround;
     [SerializeField] public bool aiming;
     [SerializeField] public bool dodging;
-    [SerializeField] bool canDodge;
+    [SerializeField] public bool onWall;
+    [SerializeField] public bool canWallJump;
 
-    bool onSlope;
+    [SerializeField] bool onSlope;
 
     private void Awake()
     {
@@ -67,27 +73,30 @@ public class Player : MonoBehaviour
         Cursor.visible = false;
         arm.gameObject.SetActive(false);
         health = maxHealth;
-        states[0] = new IdleState();
-        states[1] = new RangeAttackState();
-        states[2] = new MeleeAttackState();
-        states[3] = new ParryingState();
-        states[4] = new DodgeState();
+        states["Idle"] = new PlayerIdleState();
+        states["RangeAttack"] = new PlayerRangeAttackState();
+        states["MeleeAttack"] = new PlayerMeleeAttackState();
+        states["Parrying"] = new PlayerParryingState();
+        states["Dodge"] = new PlayerDodgeState();
+        states["Climb"] = new PlayerClimbState();
+        states["WallJump"] = new PlayerWallJumpState();
         currentWeapon = WeaponState.Melee;
-        ChangeState(states[0]);
+        ChangeState(states["Idle"]);
     }
 
     private void Update()
     {
         currentState?.Update(this);
         SpriteControl();
-        
+        currentVelocity = rigid.linearVelocity;
     }
 
     private void FixedUpdate()
     {
         Move();
         GroundCheck();
-        SlopeCheck();
+        
+        WallCheck();
         MouseConvert();
     }
 
@@ -111,11 +120,11 @@ public class Player : MonoBehaviour
         else
         {
             // 기본 상태 및 근접 공격 상태
-            if(moveVec.x < 0)
+            if(rigid.linearVelocityX < -0.0001f)
             {
                 ren.flipX = true;
             }
-            else if(moveVec.x > 0)
+            else if(rigid.linearVelocityX > 0.0001f)
             {
                 ren.flipX = false;
             }
@@ -131,11 +140,19 @@ public class Player : MonoBehaviour
         // 기본 속도
         Vector2 moveVelocity = moveVec * speed;
 
-        // 공중 상태
-        if (!isGround) 
-        { 
-            rigid.linearVelocity = new Vector2(moveVelocity.x, rigid.linearVelocityY); 
-            return; 
+        SlopeCheck();
+
+        if (currentState is PlayerWallJumpState)
+        {
+            rigid.linearVelocity = new Vector2(rigid.linearVelocity.x, rigid.linearVelocity.y);
+            return;
+        }
+
+        if(!isGround)
+        {
+            float newX = Mathf.Lerp(rigid.linearVelocityX, moveVelocity.x, 1f);
+            rigid.linearVelocity = new Vector2(newX, rigid.linearVelocityY);
+            return;
         }
 
         // 경사면 및 일반 지형
@@ -155,7 +172,8 @@ public class Player : MonoBehaviour
         else
         {
             // 일반 지형
-            rigid.linearVelocity = new Vector2(moveVelocity.x, rigid.linearVelocityY);
+            float newX = Mathf.Lerp(rigid.linearVelocityX, moveVelocity.x, 1f);
+            rigid.linearVelocity = new Vector2(newX, rigid.linearVelocityY);
         }
     }
 
@@ -181,13 +199,32 @@ public class Player : MonoBehaviour
         // 서클캐스트(Gizmo 옵션 적용)       
         RaycastHit2D hit = Physics2D.CircleCast(bottomCenter, radius, Vector2.down, 0.05f, groundMask);
 
-        isGround = hit.collider != null;
+        if(hit.collider != null)
+        {
+            Vector2 nor = hit.normal;
+
+            bool isVerticalWall = Mathf.Abs(nor.x) >= 1f && Mathf.Abs(nor.y) <= 0f;
+
+            if(isVerticalWall)
+            {
+                isGround = false;
+            }
+            else
+            {
+                isGround = true;
+            }
+        }
+        else
+        {
+            isGround = false;
+        }
 
         // 착지 상태 일시 초기화
         if(isGround)
         {
             canAirJump = isGround;
             canDodge = isGround;
+            onWall = false;
         }
     }
 
@@ -197,14 +234,17 @@ public class Player : MonoBehaviour
         // 수직, 수평을 레이캐스트로 검사 해서, 법선 벡터와, 경사각을 구해 Move함수에서 적용
 
         // 발사 위치는 GroundCheck의 Origin
+
         CapsuleCollider2D col = GetComponent<CapsuleCollider2D>();
 
         float radius = col.size.x / 2f;
-        float bottomY = -col.size.y / 2f + radius + 0.2f;
+        float bottomY = -col.size.y / 2f + radius - 0.2f;
 
         Vector2 bottomCenter = (Vector2)transform.position + new Vector2(0, bottomY);
 
         HorizontalSlopeCheck(bottomCenter);
+        if (!onSlope)
+            return;
         VerticalSlopeCheck(bottomCenter);
     }
 
@@ -212,7 +252,7 @@ public class Player : MonoBehaviour
     {
         // 수직 검사
         // 레이캐스트 지속 검사로 인한 연산부담 완화
-        if(!isGround || Mathf.Abs(rigid.linearVelocityY) > 0.01f)
+        if(!isGround)
         {
             onSlope = false;
             slopeAngle = 0f;
@@ -222,13 +262,14 @@ public class Player : MonoBehaviour
 
         // 아래 방향으로 slopeRayLength(1.5f) 만큼 레이캐스트
         RaycastHit2D hit = Physics2D.Raycast(bottomCenter, Vector2.down, slopeRayLength, groundMask);
-
+        Debug.DrawRay(bottomCenter, Vector2.down * slopeRayLength, Color.green);
         if (hit)
         {
             // 히트시 해당 지형의 법선 벡터 저장
             // 경사각 저장
             // 경사각에 따른 onSlope 값 최신화
             // slopeLostTimer -> 해당 경사의 끝에서 튕겨져 나가는 현상 억제(해결 힘듬....)
+
             groundNormal = hit.normal;
             slopeAngle = Vector2.Angle(groundNormal, Vector2.up);
             onSlope = slopeAngle > 0f && slopeAngle <= maxSlopeAngle;
@@ -274,24 +315,86 @@ public class Player : MonoBehaviour
         RaycastHit2D leftHit = Physics2D.Raycast(bottomCenter, Vector2.left, slopeRayLength, groundMask);
         RaycastHit2D rightHit = Physics2D.Raycast(bottomCenter, Vector2.right, slopeRayLength, groundMask);
 
+        Debug.DrawRay(bottomCenter, Vector2.left * slopeRayLength, Color.magenta);
+        Debug.DrawRay(bottomCenter, Vector2.right * slopeRayLength, Color.green);
         // 어느쪽을 맞든 상관 없이 똑같이 최신화
         // 법선 벡터, 경사각 최신화
-        if(leftHit)
+        if (leftHit)
         {
             groundNormal = leftHit.normal;
             slopeAngle = Vector2.Angle(groundNormal, Vector2.up);
+            onSlope = true;
             Debug.DrawRay(leftHit.point, groundNormal, Color.blue);
         }
         else if (rightHit)
         {
             groundNormal = rightHit.normal;
             slopeAngle = Vector2.Angle(groundNormal, Vector2.up);
+            onSlope = true;
             Debug.DrawRay(rightHit.point, groundNormal, Color.red);
         }
         else
         {
             groundNormal = Vector2.zero;
             slopeAngle = 0f;
+            onSlope = false;
+        }
+
+        if (onSlope)
+        {
+            rigid.sharedMaterial = fullFriction;
+        }
+        else
+        {
+            rigid.sharedMaterial = noFriction;
+        }
+    }
+
+    void WallCheck()
+    {
+        if ((currentState is PlayerWallJumpState) || isGround || dodging)
+            return;
+
+        CapsuleCollider2D col = GetComponent<CapsuleCollider2D>();
+
+        float radius = col.size.x / 2f;
+        float bottomY = -col.size.y / 2f + radius - 0.2f;
+
+        Vector2 origin = (Vector2)transform.position + new Vector2(0, bottomY);
+        float rayDistance = (col.size.x / 2f) + 0.02f;
+
+        RaycastHit2D hitRight = Physics2D.Raycast(origin, Vector2.right, rayDistance, groundMask);
+        RaycastHit2D hitLeft = Physics2D.Raycast(origin, Vector2.left, rayDistance, groundMask);
+
+        Debug.DrawRay(origin, Vector2.right * rayDistance, Color.red);
+        Debug.DrawRay(origin, Vector2.left * rayDistance, Color.blue);
+
+        if(hitRight)
+        {
+            wallLeft = true;
+            if(!(currentState is PlayerClimbState))
+            {
+                canWallJump = true;
+                ChangeState(states["Climb"]);
+            }
+        }
+        else if(hitLeft)
+        {
+            wallRight = true;
+            if (!(currentState is PlayerClimbState))
+            {
+                canWallJump = true;
+                ChangeState(states["Climb"]);
+            }
+        }
+        else
+        {
+            wallLeft = false;
+            wallRight = false;
+            if(!(currentState is PlayerIdleState))
+            {
+                ChangeState(states["Idle"]);
+            }
         }
     }
 
@@ -302,7 +405,7 @@ public class Player : MonoBehaviour
         // 회피 상태 전환
         // 회피 속도 -> 입력 방향 * 속도
         canDodge = false;
-        ChangeState(states[4]);
+        ChangeState(states["Dodge"]);
         rigid.linearVelocityX = moveVec.x * 30f;
     }
 
@@ -380,7 +483,6 @@ public class Player : MonoBehaviour
         else if(context.canceled)
         {
             moveVec = Vector2.zero;
-            rigid.linearVelocity = Vector2.zero;
         }
     }
 
@@ -395,6 +497,23 @@ public class Player : MonoBehaviour
             {
                 rigid.linearVelocityY = 0;
                 rigid.linearVelocityY = jumpForce;
+            }
+            else if(canWallJump)
+            {
+                Debug.Log("벽점프");
+                
+                if(wallLeft)
+                {
+                    rigid.linearVelocity = new Vector2(-5f, 10);
+                }
+                else if(wallRight)
+                {
+                    rigid.linearVelocity = new Vector2(5f, 10);
+                }
+
+                ChangeState(states["WallJump"]);
+
+                canWallJump = false;
             }
             else if(canAirJump)
             {
@@ -483,7 +602,7 @@ public class Player : MonoBehaviour
             // 사격 상태 해제 -> 일반 상태 진입
             // 사격 코루틴 중단
             arm.gameObject.SetActive(false);
-            ChangeState(states[0]);
+            ChangeState(states["Idle"]);
             if (fire != null)
                 StopCoroutine(fire);
             switch(currentWeapon)
@@ -504,12 +623,12 @@ public class Player : MonoBehaviour
     {
         // 레이캐스트 시각화
         CapsuleCollider2D col = GetComponent<CapsuleCollider2D>();
-
+    
         float radius = col.size.x / 2f;
         float bottomY = -col.size.y / 2f + radius;
-
+    
         Vector2 bottomCenter = (Vector2)transform.position + new Vector2(0, bottomY);
-
+    
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(bottomCenter + Vector2.down * 0.05f, radius);
     }
@@ -518,7 +637,7 @@ public class Player : MonoBehaviour
     {
         // 사격 코루틴
         // 입력 있을 시 계속해서 사격 상태 갱신
-        ChangeState(states[1]);
+        ChangeState(states["RangeAttack"]);
         Launch();
         yield return CoroutineCasher.Wait(0.1f);
         
