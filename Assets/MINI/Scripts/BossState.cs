@@ -150,7 +150,7 @@ public class AttackingState : BossState
         if (candidatePatterns == null || candidatePatterns.Count == 0) // 혹시 모를 예외처리
             candidatePatterns = boss.CurrentPhase.shortPattern;
 
-        int index = 0;//Random.Range(0, candidatePatterns.Count);
+        int index = Random.Range(0, candidatePatterns.Count);
         currentPattern = candidatePatterns[index];
 
 

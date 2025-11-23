@@ -82,7 +82,7 @@ public class BossAI : MonoBehaviour
             phaseName = "Phase 1"
         };
         p1.shortPattern.Add(new SmashPattern(this));
-        //p1.middlePattern.Add(여기다 패턴);
+        p1.middlePattern.Add(new GrabPattern(this));
         //p1.longPattern.Add(여기다 패턴);
         allPhases.Add(p1);
 

@@ -1,16 +1,16 @@
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngineInternal;
 
 public abstract class BossPattern
 {
     protected BossAI boss;
+    protected Rigidbody2D rb;
     protected Animator animator;
 
     public BossPattern(BossAI boss)
     {
         this.boss = boss;
         this.animator = boss.animator;
+        this.rb = boss.GetComponent<Rigidbody2D>();
     }
 
     public abstract void Start();           // 패턴 시작 할 때 초기화나 애니매이션 재생하는 곳으로 쓰셈
