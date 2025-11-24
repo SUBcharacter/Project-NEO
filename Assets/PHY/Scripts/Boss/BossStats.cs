@@ -1,9 +1,9 @@
 using UnityEngine;
 
-public class Boss : MonoBehaviour
+public class BossStats : MonoBehaviour
 {
-    [SerializeField] private int maxHP = 500;
-    private int currentHP;
+    [SerializeField] private float maxHP = 500;
+    private float currentHP;
     private bool isDead = false;
 
     private void Start()
