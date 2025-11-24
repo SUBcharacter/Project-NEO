@@ -33,7 +33,7 @@ public class PlayerMeleeAttackState : PlayerState
 {
     // 근접 공격 상태 - 제작 중
     float timer;
-    float relaxTime = 3f;
+
     public override void Start(Player player)
     {
         timer = 0;
@@ -42,7 +42,7 @@ public class PlayerMeleeAttackState : PlayerState
     public override void Update(Player player)
     {
         timer += Time.deltaTime;
-        if(timer >= relaxTime)
+        if(timer >= player.stats.relaxTime)
         {
             player.ChangeState(player.states["Idle"]);
         }
@@ -59,7 +59,7 @@ public class PlayerRangeAttackState : PlayerState
     // 사격 상태
 
     float timer;
-    float RelaxTimer = 3f;
+    float relaxTime = 3f;
 
     public override void Start(Player player)
     {
@@ -77,7 +77,7 @@ public class PlayerRangeAttackState : PlayerState
         // 입력 없으면 진정 타이머 갱신
         player.RotateArm();
         timer += Time.deltaTime;
-        if (timer >= RelaxTimer)
+        if (timer >= player.stats.relaxTime)
         {
             player.ChangeState(player.states["Idle"]);
         }
@@ -112,11 +112,14 @@ public class PlayerDodgeState : PlayerState
     // 회피 상태
     float currentVel;
     float gravityScale;
+    LayerMask maskOrigin;
 
     public override void Start(Player player)
     {
         // 중력 계수 저장 및 제거 
         // Y축 속도 제거
+        maskOrigin = player.gameObject.layer;
+        player.gameObject.layer = LayerMask.NameToLayer("Invincible");
         gravityScale = player.rigid.gravityScale;
         player.dodging = true;
         player.rigid.gravityScale = 0f;
@@ -134,7 +137,7 @@ public class PlayerDodgeState : PlayerState
         player.rigid.linearVelocityX = currentVel;
 
         // 자연스러운 상태 복귀(극한점 튜닝)
-        if(Mathf.Abs(currentVel) <= 3f)
+        if(Mathf.Abs(currentVel) <= player.stats.returnVelocity)
         {
             player.rigid.gravityScale = gravityScale;
             player.ChangeState(player.states["Idle"]);
@@ -145,6 +148,7 @@ public class PlayerDodgeState : PlayerState
     {
         // 회피 상태 해제
         // 중력 계수 복귀
+        player.gameObject.layer = maskOrigin;
         player.dodging = false;
         player.rigid.gravityScale = gravityScale;
     }
@@ -183,16 +187,17 @@ public class PlayerClimbState : PlayerState
 public class PlayerWallJumpState : PlayerState
 {
     float timer;
-    float duration = 0.3f;
+
     public override void Start(Player player)
     {
         timer = 0;
+
     }
 
     public override void Update(Player player)
     {
         timer += Time.deltaTime;
-        if(timer > 0.15f)
+        if(timer > player.stats.wallJumpDuration)
         {
             player.ChangeState(player.states["Idle"]);
         }

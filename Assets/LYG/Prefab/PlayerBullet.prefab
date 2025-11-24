@@ -283,8 +283,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rigid: {fileID: 0}
-  attackMask:
-    serializedVersion: 2
-    m_Bits: 712
-  speed: 200
-  damage: 0
+  stats: {fileID: 11400000, guid: e709c6e31c919a146a6385c3ae519851, type: 2}

@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 17341510}
   - component: {fileID: 17341508}
   - component: {fileID: 17341509}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -371,10 +371,9 @@ MonoBehaviour:
   crosshair: {fileID: 1351062473}
   ren: {fileID: 0}
   mag: {fileID: 1043567017}
-  fullFriction: {fileID: 6200000, guid: b993068c5ec364143971c3b87f05e2eb, type: 2}
-  noFriction: {fileID: 6200000, guid: 8f1d0ba2b3f662246977982ce974a96b, type: 2}
-  arm: {fileID: 881014459}
   rigid: {fileID: 0}
+  arm: {fileID: 881014459}
+  col: {fileID: 0}
   moveVec: {x: 0, y: 0}
   mousePos: {x: 0, y: 0}
   mouseInputVec: {x: 0, y: 0}
@@ -383,21 +382,22 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 72
-  speed: 5
-  jumpForce: 8.5
+  stats: {fileID: 11400000, guid: bb8da319162126e4b851e703cd9f59cb, type: 2}
   health: 0
-  maxHealth: 0
-  isDead: 0
+  bulletCount: 0
+  stamina: 0
   canAirJump: 0
   canDodge: 0
   wallLeft: 0
   wallRight: 0
+  onSlope: 0
+  jumped: 0
+  isDead: 0
   isGround: 0
   aiming: 0
   dodging: 0
   onWall: 0
   canWallJump: 0
-  onSlope: 0
 --- !u!70 &17341510
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -1920,6 +1920,68 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
+--- !u!1 &1674002506
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1674002509}
+  - component: {fileID: 1674002508}
+  - component: {fileID: 1674002507}
+  m_Layer: 0
+  m_Name: SkillManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1674002507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1674002506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7fb3b36f532d6f4fa4d723c8ecab5b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  knifePool: {fileID: 0}
+--- !u!114 &1674002508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1674002506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7aa75237b89d9d2439e4734714866693, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bullet: {fileID: 3692823370828892085, guid: c99ddccd9df36c64e87ae5f1c311dbca, type: 3}
+  pools: []
+  size: 10
+  index: 0
+--- !u!4 &1674002509
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1674002506}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 12.586603, y: 0.64627135, z: -9.949855}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1810131474
 GameObject:
   m_ObjectHideFlags: 0
@@ -2225,3 +2287,4 @@ SceneRoots:
   - {fileID: 1043567018}
   - {fileID: 1038145547}
   - {fileID: 2048273124}
+  - {fileID: 1674002509}

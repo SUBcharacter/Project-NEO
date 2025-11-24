@@ -2,14 +2,12 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    // stats은 Scriptable Object화 되었음
+    // 각 총알에 맞게끔 Scriptable Object를 만들어 사용할 것
     [SerializeField] Rigidbody2D rigid;
-    [SerializeField] LayerMask attackMask;
-
-    [SerializeField] float speed;
-    float timer;
-    float lifeTime = 3.5f;
+    [SerializeField] BulletStat stats;
     
-    [SerializeField] int damage;
+    float timer;
 
     private void Awake()
     {
@@ -19,7 +17,7 @@ public class Bullet : MonoBehaviour
     private void Update()
     {
         timer += Time.deltaTime;
-        if(timer >= lifeTime)
+        if(timer >= stats.lifeTime)
         {
             gameObject.SetActive(false);
         }
@@ -30,19 +28,35 @@ public class Bullet : MonoBehaviour
         timer = 0;
         transform.position = pos;
         gameObject.SetActive(true); 
-        rigid.linearVelocity = dir * speed;
+        rigid.linearVelocity = dir * stats.speed;
     }
 
     void Triggered(Collider2D collision)
     {
-
+        // 각 레이어에 맞게 작용하게끔 작성할 것
+        if (((1 << collision.gameObject.layer) & stats.attackable) == 0)
+            return;
+        switch(collision.gameObject.layer)
+        {
+            case (int)Layers.terrain:
+                break;
+            case (int)Layers.enviroment:
+                break;
+            case (int)Layers.enemy:
+                break;
+            case (int)Layers.player:
+                break;
+            case (int)Layers.border:
+                gameObject.SetActive(false);
+                break;
+            case (int)Layers.invincible:
+                gameObject.SetActive(false);
+                break;
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (((1 << collision.gameObject.layer) & attackMask) == 0)
-            return;
-
-        gameObject.SetActive(false);
+        Triggered(collision);
     }
 }

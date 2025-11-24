@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02ead43f1995f684983f305269af1512, type: 3}
+  m_Name: PlayerStats
+  m_EditorClassIdentifier: 
+  noFriction: {fileID: 6200000, guid: 8f1d0ba2b3f662246977982ce974a96b, type: 2}
+  fullFriction: {fileID: 6200000, guid: b993068c5ec364143971c3b87f05e2eb, type: 2}
+  maxHealth: 10
+  maxStamina: 0
+  speed: 7
+  dodgeForce: 30
+  jumpForce: 13.5
+  airJumpForce: 8.5
+  wallJumpX: 5
+  wallJumpY: 10
+  maxSlopeAngle: 45
+  slopeRayLength: 2
+  slopeLostDuration: 0.1
+  wallJumpDuration: 0.15
+  relaxTime: 3
+  returnVelocity: 3
