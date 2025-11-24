@@ -15,9 +15,8 @@ public class BossAI : MonoBehaviour
 
     [Header("실 사용 변수")]
     [SerializeField] public Transform player;
-    [SerializeField] public float maxHp = 10000f; // 임시 체력
-    [SerializeField] public float currentHp;
-    [SerializeField] private List<BossPhase> allPhases = new();
+    [SerializeField] public List<BossPhase> allPhases = new();
+    private BossStats bossStats;
 
 
     // 비동기 작업 취소용 토큰
@@ -29,11 +28,10 @@ public class BossAI : MonoBehaviour
         _cts = new CancellationTokenSource();
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
+        bossStats = GetComponent<BossStats>();
     }
     void Start()
-    {
-        currentHp = maxHp;
-
+    { 
         InitializePhase();
         SetPhase(0);
 
@@ -49,17 +47,16 @@ public class BossAI : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        currentHp -= damage;
         CheckPhaseTransition();
 
     }
-    void CheckPhaseTransition()     // 페이즈 체크 함수
+    public void CheckPhaseTransition()     // 페이즈 체크 함수
     {
-        float hpRatio = currentHp / maxHp;
+        float hpRatio = bossStats.currentHP / bossStats.maxHP;
         if (hpRatio <= 0.1f && currentPhase != allPhases[2]) SetPhase(2);           //10퍼 이하 광폭
         else if (hpRatio <= 0.6f && currentPhase != allPhases[1]) SetPhase(1);      //60퍼 이하 2페이즈
     }
-    void SetPhase(int index)
+    public void SetPhase(int index)
     {
         currentPhase = allPhases[index];
         animator.speed = currentPhase.speedMultiplier;
