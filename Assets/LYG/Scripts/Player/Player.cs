@@ -42,7 +42,7 @@ public class Player : MonoBehaviour
     [SerializeField] int health;
     [SerializeField] int maxHealth;
 
-    [SerializeField] bool isDead;
+    [SerializeField] private bool isDead;
     [SerializeField] bool canAirJump;
     [SerializeField] public bool isGround;
     [SerializeField] public bool aiming;
