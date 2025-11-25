@@ -45,17 +45,17 @@ public class BossAI : MonoBehaviour
         currentState?.Update();
     }
 
-    public void TakeDamage(float damage)
-    {
-        CheckPhaseTransition();
-
-    }
-    public void CheckPhaseTransition()     // 페이즈 체크 함수
-    {
-        float hpRatio = bossStats.currentHP / bossStats.maxHP;
-        if (hpRatio <= 0.1f && currentPhase != allPhases[2]) SetPhase(2);           //10퍼 이하 광폭
-        else if (hpRatio <= 0.6f && currentPhase != allPhases[1]) SetPhase(1);      //60퍼 이하 2페이즈
-    }
+    //public void TakeDamage(float damage)
+    //{
+    //    CheckPhaseTransition();
+    //
+    //}
+    //public void CheckPhaseTransition()     // 페이즈 체크 함수
+    //{
+    //    float hpRatio = bossStats.currentHP / bossStats.maxHP;
+    //    if (hpRatio <= 0.1f && currentPhase != allPhases[2]) SetPhase(2);           //10퍼 이하 광폭
+    //    else if (hpRatio <= 0.6f && currentPhase != allPhases[1]) SetPhase(1);      //60퍼 이하 2페이즈
+    //}
     public void SetPhase(int index)
     {
         currentPhase = allPhases[index];

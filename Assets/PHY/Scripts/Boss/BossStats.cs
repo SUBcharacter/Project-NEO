@@ -35,7 +35,7 @@ public class BossStats : MonoBehaviour
     }
 
     // 보스 데미지 입는 함수
-    public void Damage(float damage)
+    public void TakeDamage(float damage)
     {
         if (isDead) return;
 
@@ -48,6 +48,25 @@ public class BossStats : MonoBehaviour
             Dead();
         }
     }
+
+    /// <summary>
+    /// 2025-11-25 PHY
+    /// 플레이어가 스킬을 쓰면 보스가 받는 딜을 어떻게 해야하지
+    /// TakeDamage에서 같이 처리해야하는건가?
+    /// 아님 따로 스킬 딜 들어오는 관련 함수를 만들어서 처리를 해야할까?
+    /// 스킬 딜이 얼마나 될진 모르겠는데 혹시나 보스 전체 체력의 절반을 날리는 그런 스킬이 있으면
+    /// 페이즈 전환도 고려해야하는데 큰일났네 이거 우짜노;;;;
+    /// </summary>
+    /// 
+
+    // 플레이어가 스킬을 쓸 때 보스가 받는 딜 관련 함수
+    public float AttackedDamage()
+    {
+        // 근데 이게 필요한가 싶은 생각이 듦.. 필요한가? 
+        // skill.GetSkillDamage() <- 이런 함수로 받아와야하나? ㅎr....
+        return 0.0f;
+    }
+
     public void CheckPhase()
     {
         float hpRatio = currentHP / maxHP;
@@ -61,6 +80,10 @@ public class BossStats : MonoBehaviour
 
         if (phaseIndex == -1) return;
 
+        // Todo
+        // 발생한 문제 : Trigger로 처리하면 연사가 되지만 딜이 동시에 많이 들어가 60% 이하로 떨어질 때 2페이즈로 넘어가는 인덱스 에러가
+        // 나와야하는데 피가 절반 깎여야 2페이즈로 넘어가는 문제가 발생함. tlqkf 
+
         // 페이즈 중복 전환 방지를 위한 방어 코드
         if (bossAI.CurrentPhase != bossAI.allPhases[phaseIndex])
         {
@@ -69,6 +92,7 @@ public class BossStats : MonoBehaviour
         }
     }
 
+    // 딜레이(경직)도 일단 보류
     public void Delay()
     {
         if (isHit)
@@ -95,11 +119,11 @@ public class BossStats : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.name.Contains("PlayerBullet"))     // 프리팹 이름으로 보스 데미지 입히기 (임시방편임)
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Default"))     // 레이어 이름으로 비교
         {
-            Debug.Log("Boss taked Damage");
+            Debug.Log("Boss taked TakeDamage");
 
-            Damage(25.0f);       // 임시 딜 
+            TakeDamage(25.0f);       // 임시 딜 
 
             Debug.Log("Boss HP : " + currentHP);
 
@@ -107,4 +131,5 @@ public class BossStats : MonoBehaviour
 
         }
     }
+
 }

@@ -285,6 +285,6 @@ MonoBehaviour:
   rigid: {fileID: 0}
   attackMask:
     serializedVersion: 2
-    m_Bits: 712
+    m_Bits: 2760
   speed: 200
   damage: 0
