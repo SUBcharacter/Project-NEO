@@ -14,25 +14,27 @@ public enum WeaponState
 public class Player : MonoBehaviour
 {
     [SerializeField] Transform muzzle;
+    [SerializeField] Transform[] knifeSpawnPointUpper;
+    [SerializeField] Transform[] knifeSpawnPoint;
     [SerializeField] GameObject crosshair;
     [SerializeField] SpriteRenderer ren;
     [SerializeField] Magazine mag;
+    [SerializeField] SkillManager skillManager;
     public Rigidbody2D rigid;
     public Transform arm;
     public CapsuleCollider2D col;
 
     [SerializeField] Vector2 moveVec;
-    [SerializeField] Vector2 mousePos;
     [SerializeField] Vector2 mouseInputVec;
     [SerializeField] Vector2 groundNormal;
     [SerializeField] Vector2 currentVelocity;
     [SerializeField] LayerMask groundMask;
+    [SerializeField] public Vector2 mousePos;
 
     public PlayerStats stats;
 
     [SerializeField] int health;
-    [SerializeField] int bulletCount;
-    [SerializeField] int stamina;
+    public int bulletCount;
 
     [SerializeField] bool canAirJump;
     [SerializeField] bool canDodge;
@@ -46,14 +48,19 @@ public class Player : MonoBehaviour
     public bool dodging;
     public bool onWall;
     public bool canWallJump;
+    public bool casting;
 
     Coroutine fire;
+    Coroutine skill;
     PlayerState currentState;
     WeaponState currentWeapon;
     public Dictionary<string,PlayerState> states = new();
 
     float slopeAngle;
     float slopeLostTimer;
+    public float stamina;
+
+    float staminaTimer;
 
     private void Awake()
     {
@@ -68,6 +75,7 @@ public class Player : MonoBehaviour
         rigid = GetComponent<Rigidbody2D>();
         ren = GetComponent<SpriteRenderer>();
         col = GetComponent<CapsuleCollider2D>();
+        skillManager = GetComponentInChildren<SkillManager>();
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = false;
         StateInit();
@@ -79,9 +87,11 @@ public class Player : MonoBehaviour
     {
         if (isDead)
             return;
+        
         currentState?.Update(this);
         SpriteControl();
         currentVelocity = rigid.linearVelocity;
+        Stamina();
     }
 
     private void FixedUpdate()
@@ -109,9 +119,28 @@ public class Player : MonoBehaviour
         arm.gameObject.SetActive(false);
         health = stats.maxHealth;
         bulletCount = 30;
+        stamina = stats.maxStamina;
         isDead = false;
         currentWeapon = WeaponState.Melee;
         ChangeState(states["Idle"]);
+    }
+
+    void Stamina()
+    {
+        if (isDead)
+            return;
+        staminaTimer += Time.deltaTime;
+
+        if(staminaTimer > stats.staminaRecoveryDuration)
+        {
+            staminaTimer = 0;
+            stamina += stats.staminaRecoveryAmount;
+            if(stamina >= stats.maxStamina)
+            {
+                stamina = stats.maxStamina;
+            }
+        }
+
     }
 
     void SpriteControl()
@@ -450,6 +479,25 @@ public class Player : MonoBehaviour
         Vector2 dir = (mousePos - (Vector2)muzzle.position).normalized;
     }
 
+    void PhantomBlade()
+    {
+        if (casting)
+            return;
+
+        Vector2 dir = (mousePos - (Vector2)transform.position).normalized;
+        if (skill == null)
+        {
+            if(isGround)
+            {
+                skillManager.InitiatingPhantomBlade(knifeSpawnPointUpper, dir);
+            }
+            else
+            {
+                skillManager.InitiatingPhantomBlade(knifeSpawnPoint, dir);
+            }
+        }
+    }
+
     #region public Function
 
     public void ChangeState(PlayerState state)
@@ -627,6 +675,40 @@ public class Player : MonoBehaviour
                     break;
                 case WeaponState.Ranged:
                     currentWeapon = WeaponState.Melee;
+                    break;
+            }
+        }
+    }
+
+    public void OnSkill1(InputAction.CallbackContext context)
+    {
+        if (casting)
+            return;
+
+        if(context.performed)
+        {
+            switch (currentWeapon)
+            {
+                case WeaponState.Melee:
+                    PhantomBlade();
+                    break;
+                case WeaponState.Ranged:
+                    break;
+            }
+        }
+    }
+
+    public void Onskill2(InputAction.CallbackContext context)
+    {
+        if (casting)
+            return;
+        if (context.performed)
+        {
+            switch (currentWeapon)
+            {
+                case WeaponState.Melee:
+                    break;
+                case WeaponState.Ranged:
                     break;
             }
         }

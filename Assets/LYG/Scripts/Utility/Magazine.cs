@@ -1,11 +1,11 @@
 using System.Collections.Generic;
-using System.Drawing;
 using UnityEngine;
 
 public class Magazine : MonoBehaviour
 {
     [SerializeField] GameObject bullet;
     [SerializeField] List<GameObject> pools;
+    [SerializeField] Dictionary<string, GameObject> dict;
 
     [SerializeField] int size;
     [SerializeField] int index;
@@ -22,9 +22,13 @@ public class Magazine : MonoBehaviour
         }
     }
 
-    public void Fire(Vector2 dir, Vector3 pos)
+    public GameObject Fire(Vector2 dir, Vector3 pos)
     {
+        
         pools[index].GetComponent<Bullet>().Init(dir, pos);
+        GameObject returnValue = pools[index];
         index = (index + 1) % size;
+
+        return returnValue;
     }
 }

@@ -9,12 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd3645f468a289f4cb9a70b8bd3125ee, type: 3}
-  m_Name: Knife
+  m_Script: {fileID: 11500000, guid: 4cc69c584d200c74bb11382c26bdb989, type: 3}
+  m_Name: PhantomBlade
   m_EditorClassIdentifier: 
-  attackable:
-    serializedVersion: 2
-    m_Bits: 712
-  speed: 50
-  damage: 13
-  lifeTime: 3.5
+  staminaCost: 8
+  coolTime: 4
+  attackCount: 3
+  bulletCost: 0

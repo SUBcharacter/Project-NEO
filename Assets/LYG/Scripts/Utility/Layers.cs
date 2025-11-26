@@ -10,5 +10,6 @@ public enum Layers
     enemy = 7,
     player = 8,
     border = 9,
-    invincible = 10
+    invincible = 10,
+    boss = 11
 }
