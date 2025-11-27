@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Xml.Schema;
 using UnityEngine;
 using UnityEngine.XR;
 
@@ -14,8 +16,7 @@ public class PlayerIdleState : PlayerState
     {
         // 모든 공격 상태 해제
         // 팔 비활성화
-        player.aiming = false;
-        player.arm.gameObject.SetActive(false);
+        
     }
 
     public override void Update(Player player)
@@ -85,7 +86,8 @@ public class PlayerRangeAttackState : PlayerState
 
     public override void Exit(Player player)
     {
-        
+        player.aiming = false;
+        player.arm.gameObject.SetActive(false);
     }
 }
 
@@ -206,5 +208,46 @@ public class PlayerWallJumpState : PlayerState
     public override void Exit(Player player)
     {
         
+    }
+
+}
+
+public class PlayerHitState : PlayerState
+{
+    float timer;
+
+    public override void Start(Player player)
+    {
+        timer = 0;
+        player.hit = true;
+        player.rigid.linearVelocity = Vector2.zero;
+        player.KnockBack();
+        player.StartCoroutine(InvincibleTime(player));
+    }
+
+    public override void Update(Player player)
+    {
+        timer += Time.deltaTime;
+        if(timer > player.stats.hitLimit)
+        {
+            player.ChangeState(player.states["Idle"]);
+        }
+    }
+
+    public override void Exit(Player player)
+    {
+        player.hit = false;
+        player.rigid.linearVelocity = Vector2.zero;
+    }
+
+    IEnumerator InvincibleTime(Player player)
+    {
+        LayerMask originMask = player.gameObject.layer;
+
+        player.gameObject.layer = LayerMask.NameToLayer("Invincible");
+
+        yield return CoroutineCasher.Wait(player.stats.invincibleTime);
+
+        player.gameObject.layer = originMask;
     }
 }

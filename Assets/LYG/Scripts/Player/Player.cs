@@ -36,6 +36,7 @@ public class Player : MonoBehaviour
     [SerializeField] int health;
     public int bulletCount;
 
+    [SerializeField] bool facingRight;
     [SerializeField] bool canAirJump;
     [SerializeField] bool canDodge;
     [SerializeField] bool wallLeft;
@@ -46,9 +47,10 @@ public class Player : MonoBehaviour
     public bool isGround;
     public bool aiming;
     public bool dodging;
+    public bool charging;
     public bool onWall;
     public bool canWallJump;
-    public bool casting;
+    public bool hit;
 
     Coroutine fire;
     Coroutine skill;
@@ -80,28 +82,34 @@ public class Player : MonoBehaviour
         Cursor.visible = false;
         StateInit();
         PlayerStatInit();
-        
     }
 
     private void Update()
     {
         if (isDead)
             return;
-        
+        if(Input.GetKeyDown(KeyCode.K))
+        {
+            Hit(1);
+        }
         currentState?.Update(this);
-        SpriteControl();
-        currentVelocity = rigid.linearVelocity;
         Stamina();
+        currentVelocity = rigid.linearVelocity;
+        if (hit)
+            return;
+        SpriteControl();
     }
 
     private void FixedUpdate()
     {
         if (isDead)
             return;
+        MouseConvert();
+        if (hit)
+            return;
         Move();
         GroundCheck();
         WallCheck();
-        MouseConvert();
     }
     void StateInit()
     {
@@ -112,6 +120,7 @@ public class Player : MonoBehaviour
         states["Dodge"] = new PlayerDodgeState();
         states["Climb"] = new PlayerClimbState();
         states["WallJump"] = new PlayerWallJumpState();
+        states["Hit"] = new PlayerHitState();
     }
 
     void PlayerStatInit()
@@ -145,6 +154,8 @@ public class Player : MonoBehaviour
 
     void SpriteControl()
     {
+        if (currentState is PlayerHitState)
+            return;
         // 마우스 위치와 입력에 따른 스프라이트 변화 - 수정 예정
         if(aiming)
         {
@@ -171,13 +182,17 @@ public class Player : MonoBehaviour
             {
                 ren.flipX = false;
             }
+
+            facingRight = !ren.flipX;
         }
     }
 
     void Move()
     {
+        if (currentState is PlayerHitState)
+            return;
         // 회피 중 예외 처리
-        if (dodging)
+        if (dodging || charging)
             return;
 
         // 기본 속도
@@ -229,6 +244,8 @@ public class Player : MonoBehaviour
 
     void GroundCheck()
     {
+        if (currentState is PlayerHitState)
+            return;
         // 지형 체크
 
         // 캡슐 콜라이더의 하단 반원부분 중심위치 계산
@@ -272,6 +289,8 @@ public class Player : MonoBehaviour
 
     void SlopeCheck()
     {
+        if (currentState is PlayerHitState || charging)
+            return;
         // 경사면 물리 연산
         // 수직, 수평을 레이캐스트로 검사 해서, 법선 벡터와, 경사각을 구해 Move함수에서 적용
 
@@ -392,7 +411,9 @@ public class Player : MonoBehaviour
 
     void WallCheck()
     {
-        if ((currentState is PlayerWallJumpState) || isGround || dodging)
+        if (currentState is PlayerHitState)
+            return;
+        if ((currentState is PlayerWallJumpState) || isGround || dodging || charging)
             return;
 
         CapsuleCollider2D col = GetComponent<CapsuleCollider2D>();
@@ -440,6 +461,8 @@ public class Player : MonoBehaviour
 
     void Dodge()
     {
+        if (currentState is PlayerHitState || charging)
+            return;
         // 회피 함수
         // 회피 기회 소모
         // 회피 상태 전환
@@ -451,6 +474,8 @@ public class Player : MonoBehaviour
 
     void Launch()
     {
+        if (currentState is PlayerHitState || charging)
+            return;
         if (bulletCount <= 0)
             return;
         // 사격 함수
@@ -466,36 +491,49 @@ public class Player : MonoBehaviour
         bulletCount--;
     }
 
+    
+
     void Death()
     {
         // 제작 중
-        health = 0;
         isDead = true;
+        health = 0;
+        rigid.linearVelocity = Vector2.zero;
+        rigid.gravityScale = 0;
     }
 
     void MeleeAttack()
     {
+        if (currentState is PlayerHitState || charging)
+            return;
         // 제작 중
         Vector2 dir = (mousePos - (Vector2)muzzle.position).normalized;
     }
 
     void PhantomBlade()
     {
-        if (casting)
+        if (skillManager.casting)
             return;
 
         Vector2 dir = (mousePos - (Vector2)transform.position).normalized;
-        if (skill == null)
+        if (isGround)
         {
-            if(isGround)
-            {
-                skillManager.InitiatingPhantomBlade(knifeSpawnPointUpper, dir);
-            }
-            else
-            {
-                skillManager.InitiatingPhantomBlade(knifeSpawnPoint, dir);
-            }
+            skillManager.InitiatingPhantomBlade(knifeSpawnPointUpper, dir);
         }
+        else
+        {
+            skillManager.InitiatingPhantomBlade(knifeSpawnPoint, dir);
+        }
+    }
+
+    void ChargeAttack()
+    {
+        if (skillManager.casting)
+            return;
+        Debug.Log("차지어택");
+
+        Vector2 dir = (mousePos - (Vector2)transform.position).normalized;
+        skillManager.InitiatingChargeAttack(dir);
     }
 
     #region public Function
@@ -526,10 +564,23 @@ public class Player : MonoBehaviour
         // 피격 함수
 
         health -= damage;
-
         if(health <= 0)
         {
             Death();
+            return;
+        }
+        ChangeState(states["Hit"]);
+    }
+
+    public void KnockBack()
+    {
+        if (facingRight)
+        {
+            rigid.linearVelocity = new Vector2(-stats.knockBackForce.x, stats.knockBackForce.y);
+        }
+        else
+        {
+            rigid.linearVelocity = stats.knockBackForce;
         }
     }
 
@@ -550,6 +601,8 @@ public class Player : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
+        if (currentState is PlayerHitState || charging)
+            return;
         if (dodging)
             return;
 
@@ -594,8 +647,10 @@ public class Player : MonoBehaviour
 
     public void OnAttack(InputAction.CallbackContext context)
     {
+        if (currentState is PlayerHitState)
+            return;
         // 회피 상태에서는 공격 불가
-        if (dodging)
+        if (dodging || charging)
             return;
 
         // 무기 상태에 따른 분기
@@ -633,9 +688,11 @@ public class Player : MonoBehaviour
     }
 
     public void OnSubAttack(InputAction.CallbackContext context)
-    { 
+    {
+        if (currentState is PlayerHitState || charging)
+            return;
         // 제작 중
-        if(context.performed)
+        if (context.performed)
         {
             Debug.Log("패링");
         }
@@ -644,6 +701,8 @@ public class Player : MonoBehaviour
 
     public void OnDodge(InputAction.CallbackContext context)
     {
+        if (currentState is PlayerHitState || charging)
+            return;
         // 회피 상태 or 회피 기회 소모시 불가
         if (dodging || !canDodge)
             return;
@@ -655,6 +714,8 @@ public class Player : MonoBehaviour
 
     public void OnSwitch(InputAction.CallbackContext context)
     {
+        if (currentState is PlayerHitState || charging)
+            return;
         // 회피 상태시 전환 불가
         if (dodging)
             return;
@@ -682,7 +743,10 @@ public class Player : MonoBehaviour
 
     public void OnSkill1(InputAction.CallbackContext context)
     {
-        if (casting)
+        Debug.Log("스킬 1");
+        if (currentState is PlayerHitState)
+            return;
+        if (skillManager.casting)
             return;
 
         if(context.performed)
@@ -698,15 +762,19 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void Onskill2(InputAction.CallbackContext context)
+    public void OnSkill2(InputAction.CallbackContext context)
     {
-        if (casting)
+        Debug.Log("스킬 2");
+        if (currentState is PlayerHitState)
+            return;
+        if (skillManager.casting)
             return;
         if (context.performed)
         {
             switch (currentWeapon)
             {
                 case WeaponState.Melee:
+                    ChargeAttack();
                     break;
                 case WeaponState.Ranged:
                     break;
@@ -738,6 +806,4 @@ public class Player : MonoBehaviour
         Launch();
         yield return null;
     }
-
-    
 }

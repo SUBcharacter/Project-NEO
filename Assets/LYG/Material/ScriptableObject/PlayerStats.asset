@@ -30,3 +30,6 @@ MonoBehaviour:
   wallJumpDuration: 0.15
   relaxTime: 3
   returnVelocity: 3
+  knockBackForce: {x: 5, y: 4}
+  hitLimit: 0.3
+  invincibleTime: 1

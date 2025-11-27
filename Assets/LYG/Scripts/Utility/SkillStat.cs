@@ -1,10 +1,19 @@
+using System;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "SkillStat", menuName = "Scriptable Objects/SkillStat")]
 public class SkillStat : ScriptableObject
 {
+    [Header("Common Parameter")]
     public float staminaCost;
     public float coolTime;
-    public int attackCount;
     public int bulletCost;
+
+    [Header("Phantom Blade Parameter")]
+    public int attackCount;
+
+    [Header("Charge Attack Parameter")]
+    public float chargeSpeed;
+    public float chargeAccel;
+    public float knockBackForce;
 }

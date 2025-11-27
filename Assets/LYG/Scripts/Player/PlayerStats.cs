@@ -29,4 +29,8 @@ public class PlayerStats : ScriptableObject
     public float relaxTime;
 
     public float returnVelocity;
+
+    public Vector2 knockBackForce = new Vector2(5f, 4f);
+    public float hitLimit;
+    public float invincibleTime;
 }
