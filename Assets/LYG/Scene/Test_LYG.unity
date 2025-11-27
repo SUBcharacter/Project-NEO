@@ -2660,14 +2660,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   phantomBlade: {fileID: 11400000, guid: db269eb95e53e9a46b69d98b0ee4a707, type: 2}
   chargeAttack: {fileID: 11400000, guid: 53cf16fc6fdd2584bbdb3727675097ab, type: 2}
+  autoTargeting: {fileID: 11400000, guid: 1589577da4da4a44a960bedd85030c16, type: 2}
   chargeHitBox: {fileID: 317116979}
   player: {fileID: 0}
   knifePool: {fileID: 0}
   phantomBladeTimer: 0
   chargeAttackTimer: 0
+  autoTargetingTimer: 0
   casting: 0
+  openFire: 0
   phantomBladeUsable: 0
   chargeAttackUsable: 0
+  autoTargetingUsable: 0
 --- !u!114 &1674002508
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -16,4 +16,10 @@ public class SkillStat : ScriptableObject
     public float chargeSpeed;
     public float chargeAccel;
     public float knockBackForce;
+
+    [Header("Auto Targeting Parameter")] 
+    public LayerMask scanable;
+    public float scanRadius;
+    public float scanTime;
+    public int damage;
 }

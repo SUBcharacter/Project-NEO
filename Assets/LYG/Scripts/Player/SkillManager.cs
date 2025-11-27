@@ -7,16 +7,20 @@ public class SkillManager : MonoBehaviour
 {
     [SerializeField] SkillStat phantomBlade;
     [SerializeField] SkillStat chargeAttack;
+    [SerializeField] SkillStat autoTargeting;
     [SerializeField] HitBox chargeHitBox;
     [SerializeField] Player player;
     public Magazine knifePool;
 
     public float phantomBladeTimer;
     public float chargeAttackTimer;
+    public float autoTargetingTimer;
 
     public bool casting;
+    public bool openFire;
     public bool phantomBladeUsable;
     public bool chargeAttackUsable;
+    public bool autoTargetingUsable;
 
     private void Awake()
     {
@@ -34,13 +38,15 @@ public class SkillManager : MonoBehaviour
         ChargeAttackCoolTime();
     }
 
+    #region Phantom Blade
+
     void PhantomBladeCoolTime()
     {
         if (phantomBladeUsable)
             return;
         phantomBladeTimer += Time.deltaTime;
 
-        if(phantomBladeTimer <= 0)
+        if (phantomBladeTimer <= 0)
         {
             phantomBladeUsable = true;
             phantomBladeTimer = phantomBlade.coolTime;
@@ -59,32 +65,7 @@ public class SkillManager : MonoBehaviour
         StartCoroutine(PhantomBlade(spawnPoint, dir));
     }
 
-    void ChargeAttackCoolTime()
-    {
-        if (chargeAttackUsable)
-            return;
-        chargeAttackTimer -= Time.deltaTime;
-
-        if (chargeAttackTimer <= 0)
-        {
-            chargeAttackUsable = true;
-            chargeAttackTimer = chargeAttack.coolTime;
-        }
-    }
-
-    public void InitiatingChargeAttack(Vector2 dir)
-    {
-        if (!chargeAttackUsable)
-        {
-            Debug.Log("쿨다운");
-            return;
-        }
-        chargeAttackUsable = false;
-        casting = true;
-        StartCoroutine(ChargeAttack(dir));
-    }
-
-    public IEnumerator PhantomBlade(Transform[] spawnPoint, Vector2 dir)
+    IEnumerator PhantomBlade(Transform[] spawnPoint, Vector2 dir)
     {
         if (player.stamina >= phantomBlade.staminaCost)
         {
@@ -94,7 +75,7 @@ public class SkillManager : MonoBehaviour
             GameObject[] knives = new GameObject[phantomBlade.attackCount];
             Vector2[] spawnPoints = new Vector2[spawnPoint.Length];
 
-            for(int i = 0; i<spawnPoint.Length; i++)
+            for (int i = 0; i < spawnPoint.Length; i++)
             {
                 spawnPoints[i] = spawnPoint[i].position;
             }
@@ -121,13 +102,42 @@ public class SkillManager : MonoBehaviour
             {
                 k.GetComponent<Knife>().Shoot(dir);
             }
-            casting = false; 
+            casting = false;
         }
         else
         {
             Debug.Log("스태미나 부족");
             casting = false;
         }
+    }
+
+    #endregion
+
+    #region Charge Attack
+
+    void ChargeAttackCoolTime()
+    {
+        if (chargeAttackUsable)
+            return;
+        chargeAttackTimer -= Time.deltaTime;
+
+        if (chargeAttackTimer <= 0)
+        {
+            chargeAttackUsable = true;
+            chargeAttackTimer = chargeAttack.coolTime;
+        }
+    }
+
+    public void InitiatingChargeAttack(Vector2 dir)
+    {
+        if (!chargeAttackUsable)
+        {
+            Debug.Log("쿨다운");
+            return;
+        }
+        chargeAttackUsable = false;
+        casting = true;
+        StartCoroutine(ChargeAttack(dir));
     }
 
     public IEnumerator ChargeAttack(Vector2 dir)
@@ -193,11 +203,54 @@ public class SkillManager : MonoBehaviour
 
             player.gameObject.layer = originMask;
             player.charging = false;
-            casting = false; 
+            casting = false;
         }
         else
         {
             casting = false;
         }
     }
+
+    #endregion
+
+    #region Auto Targeting
+
+    public void InitiatingAutoTargeting()
+    {
+        if(!casting)
+        {
+            casting = true;
+            StartCoroutine(ScanTargets());
+        }
+        else
+        {
+            
+        }
+    }
+
+    IEnumerator ScanTargets()
+    {
+        float timer = 0;
+        while(true)
+        {
+
+            if (openFire)
+            {
+                yield break;
+            }
+
+            timer += Time.deltaTime;
+            if(timer >= autoTargeting.scanTime)
+            {
+                casting = false;
+
+                yield break;
+            }
+
+            yield return null;
+        }
+    }
+
+    #endregion
 }
+
