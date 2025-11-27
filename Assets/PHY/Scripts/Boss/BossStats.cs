@@ -16,10 +16,11 @@ public class BossStats : MonoBehaviour
 
     // 보스 공격력이 필요한지는 모르겠지만 일단 만들었음
     [Header("보스 패턴 딜(?) 관련 변수")]
-    private float attackDamage = 20f;
+    private float baseAttackDamage = 20f;
 
-    [Header("보스 딜레이 관련 변수")]
-    private bool isHit = false;
+    [Header("보스 페이즈 전환 관련 변수")]
+    private bool isInvicible = false;       // 페이즈 바뀔 때 잠시 무적처리 하는 변수
+    private bool isNextPhase = false;     // 다음 페이즈로 넘어가는 중인지 확인하는 변수
 
     [Header("보스 죽음 관련 변수")]
     private bool isDead = false;
@@ -63,7 +64,7 @@ public class BossStats : MonoBehaviour
     public float AttackedDamage()
     {
         // 근데 이게 필요한가 싶은 생각이 듦.. 필요한가? 
-        // skill.GetSkillDamage() <- 이런 함수로 받아와야하나? ㅎr....
+        // skill.GetSkillDamage() <- 이런 함수로 받아와야하나?
         return 0.0f;
     }
 
@@ -73,16 +74,21 @@ public class BossStats : MonoBehaviour
 
         int phaseIndex = -1;    // 기본 설정 및 페이즈 변환 없음
 
-        if (hpRatio <= 0.1f)
-            phaseIndex = 2;         // 10% 이하 광폭
-        else if (hpRatio <= 0.6f)
-            phaseIndex = 1;         // 60% 이하 2페이즈
+        if (hpRatio <= 0.6f && bossAI.CurrentPhase == bossAI.allPhases[0])
+        {
+            phaseIndex = 1;         // 10% 이하 광폭
+        }
+        else if (hpRatio <= 0.1f && bossAI.CurrentPhase == bossAI.allPhases[1])
+        {
+            phaseIndex = 2;         // 60% 이하 2페이즈
+        }
 
         if (phaseIndex == -1) return;
 
         // Todo
         // 발생한 문제 : Trigger로 처리하면 연사가 되지만 딜이 동시에 많이 들어가 60% 이하로 떨어질 때 2페이즈로 넘어가는 인덱스 에러가
         // 나와야하는데 피가 절반 깎여야 2페이즈로 넘어가는 문제가 발생함. tlqkf 
+        // 2025-11-26 해결 완료
 
         // 페이즈 중복 전환 방지를 위한 방어 코드
         if (bossAI.CurrentPhase != bossAI.allPhases[phaseIndex])
@@ -95,7 +101,7 @@ public class BossStats : MonoBehaviour
     // 딜레이(경직)도 일단 보류
     public void Delay()
     {
-        if (isHit)
+        if (isDead)
         {
             // Todo
             // Delay 로직 넣기
