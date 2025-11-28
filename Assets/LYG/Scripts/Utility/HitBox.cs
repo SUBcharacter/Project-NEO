@@ -3,11 +3,13 @@ using UnityEngine;
 public class HitBox : MonoBehaviour
 {
     public HitBoxStat stats;
+    public Collider2D col;
 
     public bool triggered;
     private void Awake()
     {
         triggered = false;
+        col = GetComponent<Collider2D>();
     }
 
     public void Init()

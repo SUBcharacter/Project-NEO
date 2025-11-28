@@ -16,13 +16,13 @@ public class Player : MonoBehaviour
     [SerializeField] Transform muzzle;
     [SerializeField] Transform[] knifeSpawnPointUpper;
     [SerializeField] Transform[] knifeSpawnPoint;
-    [SerializeField] GameObject crosshair;
     [SerializeField] SpriteRenderer ren;
     [SerializeField] Magazine mag;
     [SerializeField] SkillManager skillManager;
     public Rigidbody2D rigid;
     public Transform arm;
     public CapsuleCollider2D col;
+    public PlayerUI UI;
 
     [SerializeField] Vector2 moveVec;
     [SerializeField] Vector2 mouseInputVec;
@@ -78,6 +78,7 @@ public class Player : MonoBehaviour
         ren = GetComponent<SpriteRenderer>();
         col = GetComponent<CapsuleCollider2D>();
         skillManager = GetComponentInChildren<SkillManager>();
+        UI = GetComponentInChildren<PlayerUI>();
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = false;
         StateInit();
@@ -90,7 +91,15 @@ public class Player : MonoBehaviour
             return;
         if(Input.GetKeyDown(KeyCode.K))
         {
-            Hit(1);
+            if(facingRight)
+            {
+                transform.position = new Vector3(transform.position.x + 7, transform.position.y, transform.position.z);
+            }
+            else
+            {
+                transform.position = new Vector3(transform.position.x - 7, transform.position.y, transform.position.z);
+            }
+            
         }
         currentState?.Update(this);
         Stamina();
@@ -165,10 +174,13 @@ public class Player : MonoBehaviour
             if(dir.x <0)
             {
                 ren.flipX = true;
+                arm.transform.localScale = new Vector3(1, -1, 0);
             }
             else if(dir.x >0)
             {
                 ren.flipX = false;
+                arm.transform.localScale = new Vector3(1, 1, 1);
+
             }
         }
         else
@@ -177,10 +189,13 @@ public class Player : MonoBehaviour
             if(rigid.linearVelocityX < -0.0001f)
             {
                 ren.flipX = true;
+                arm.transform.localScale = new Vector3(1, -1, 0);
             }
             else if(rigid.linearVelocityX > 0.0001f)
             {
                 ren.flipX = false;
+                arm.transform.localScale = new Vector3(1, 1, 1);
+
             }
 
             facingRight = !ren.flipX;
@@ -198,7 +213,7 @@ public class Player : MonoBehaviour
         // 기본 속도
         Vector2 moveVelocity = moveVec * stats.speed;
 
-        SlopeCheck();
+        //SlopeCheck();
 
         if (currentState is PlayerWallJumpState)
         {
@@ -239,7 +254,7 @@ public class Player : MonoBehaviour
     {
         // 마우스 위치 변환 및 크로스헤어 위치 트래킹
         mousePos = Camera.main.ScreenToWorldPoint(mouseInputVec);
-        crosshair.GetComponent<RectTransform>().position = mouseInputVec;
+        UI.playerCrossHair.rectTransform.position = mouseInputVec;
     }
 
     void GroundCheck()
@@ -452,6 +467,8 @@ public class Player : MonoBehaviour
         {
             wallLeft = false;
             wallRight = false;
+            if (aiming)
+                return;
             if(!(currentState is PlayerIdleState))
             {
                 ChangeState(states["Idle"]);
@@ -490,8 +507,6 @@ public class Player : MonoBehaviour
         mag.Fire(dir,muzzle.position);
         bulletCount--;
     }
-
-    
 
     void Death()
     {
@@ -534,6 +549,21 @@ public class Player : MonoBehaviour
 
         Vector2 dir = (mousePos - (Vector2)transform.position).normalized;
         skillManager.InitiatingChargeAttack(dir);
+    }
+
+    void AutoTargeting()
+    {
+        Debug.Log("오토 타겟팅");
+
+        skillManager.InitiatingAutoTargeting();
+    }
+
+    void FlashAttack()
+    {
+        if (skillManager.casting)
+            return;
+        Debug.Log("섬광참");
+        skillManager.InitiatingFlashAttack(facingRight);
     }
 
     #region public Function
@@ -746,8 +776,6 @@ public class Player : MonoBehaviour
         Debug.Log("스킬 1");
         if (currentState is PlayerHitState)
             return;
-        if (skillManager.casting)
-            return;
 
         if(context.performed)
         {
@@ -757,6 +785,7 @@ public class Player : MonoBehaviour
                     PhantomBlade();
                     break;
                 case WeaponState.Ranged:
+                    AutoTargeting();
                     break;
             }
         }
@@ -767,8 +796,7 @@ public class Player : MonoBehaviour
         Debug.Log("스킬 2");
         if (currentState is PlayerHitState)
             return;
-        if (skillManager.casting)
-            return;
+        
         if (context.performed)
         {
             switch (currentWeapon)

@@ -50,7 +50,7 @@ public class Bullet : MonoBehaviour
     {
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90f;
 
-        gameObject.transform.rotation = Quaternion.Euler(0, 0, angle);
+        gameObject.transform.localRotation = Quaternion.Euler(0, 0, angle);
     }
 
     protected virtual void Triggered(Collider2D collision)

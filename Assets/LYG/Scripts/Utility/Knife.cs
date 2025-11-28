@@ -33,16 +33,19 @@ public class Knife : Bullet
     public override void Init(Vector2 dir, Vector3 pos)
     {
         parent = GetComponentInParent<Transform>();
+        transform.SetParent(parent);
+        rigid.simulated = false;
         timer = 0;
         attacking = false;
-        transform.position = pos;
+        transform.localPosition = pos;
         gameObject.SetActive(true);
         
     }
 
     public override void Shoot(Vector2 _)
     {
-        attacking = true;   
+        attacking = true;
+        rigid.simulated = true;
         transform.SetParent(null);
         rigid.linearVelocity = attackDir * stats.speed;
     }

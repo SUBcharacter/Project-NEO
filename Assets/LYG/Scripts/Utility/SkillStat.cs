@@ -8,6 +8,7 @@ public class SkillStat : ScriptableObject
     public float staminaCost;
     public float coolTime;
     public int bulletCost;
+    public int damage;
 
     [Header("Phantom Blade Parameter")]
     public int attackCount;
@@ -21,5 +22,7 @@ public class SkillStat : ScriptableObject
     public LayerMask scanable;
     public float scanRadius;
     public float scanTime;
-    public int damage;
+
+    [Header("Flash Blade")]
+    public float attackDistance;
 }
