@@ -21,14 +21,16 @@ MonoBehaviour:
   airJumpForce: 8.5
   wallJumpX: 5
   wallJumpY: 10
-  staminaRecoveryDuration: 1
+  maxBullet: 300
   maxStamina: 40
+  staminaRecoveryDuration: 1
   staminaRecoveryAmount: 3.2
   maxSlopeAngle: 45
   slopeRayLength: 2
   slopeLostDuration: 0.1
+  MeleeAttackRelaxTime: 0.4
+  RangeAttackRelaxTime: 3
   wallJumpDuration: 0.15
-  relaxTime: 3
   returnVelocity: 3
   knockBackForce: {x: 5, y: 4}
   hitLimit: 0.3

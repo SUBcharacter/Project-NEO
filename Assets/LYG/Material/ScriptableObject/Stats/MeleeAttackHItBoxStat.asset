@@ -9,20 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4cc69c584d200c74bb11382c26bdb989, type: 3}
-  m_Name: FlashBlade
+  m_Script: {fileID: 11500000, guid: 526c27f852900624da9a145a441debbd, type: 3}
+  m_Name: MeleeAttackHItBoxStat
   m_EditorClassIdentifier: 
-  staminaCost: 0
-  coolTime: 6
-  bulletCost: 0
-  damage: 0
-  attackCount: 0
-  chargeSpeed: 0
-  chargeAccel: 0
-  knockBackForce: 0
-  scanable:
+  attackable:
     serializedVersion: 2
-    m_Bits: 72
-  scanRadius: 0
-  scanTime: 0
-  attackDistance: 0
+    m_Bits: 2176
+  damage: 10

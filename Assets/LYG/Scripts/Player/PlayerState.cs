@@ -42,8 +42,13 @@ public class PlayerMeleeAttackState : PlayerState
 
     public override void Update(Player player)
     {
+        if(player.attacking)
+        {
+            timer = 0;
+        }
+
         timer += Time.deltaTime;
-        if(timer >= player.stats.relaxTime)
+        if (timer >= player.stats.MeleeAttackRelaxTime)
         {
             player.ChangeState(player.states["Idle"]);
         }
@@ -51,7 +56,7 @@ public class PlayerMeleeAttackState : PlayerState
 
     public override void Exit(Player player)
     {
-
+        player.meleeAttackIndex = 0;
     }
 }
 
@@ -78,7 +83,7 @@ public class PlayerRangeAttackState : PlayerState
         // 입력 없으면 진정 타이머 갱신
         player.RotateArm();
         timer += Time.deltaTime;
-        if (timer >= player.stats.relaxTime)
+        if (timer >= player.stats.RangeAttackRelaxTime)
         {
             player.ChangeState(player.states["Idle"]);
         }
@@ -126,6 +131,7 @@ public class PlayerDodgeState : PlayerState
         player.dodging = true;
         player.rigid.gravityScale = 0f;
         player.rigid.linearVelocityY = 0f;
+        player.ghostTrail.gameObject.SetActive(true);
     }
 
     public override void Update(Player player)
@@ -153,6 +159,7 @@ public class PlayerDodgeState : PlayerState
         player.gameObject.layer = maskOrigin;
         player.dodging = false;
         player.rigid.gravityScale = gravityScale;
+        player.ghostTrail.gameObject.SetActive(false);
     }
 }
 

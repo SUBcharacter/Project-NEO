@@ -12,7 +12,7 @@ public class SkillManager : MonoBehaviour
     [SerializeField] SkillStat autoTargeting;
     [SerializeField] SkillStat flashAttack;
     [SerializeField] HitBox chargeHitBox;
-    [SerializeField] HitBox slashHitBox;
+    [SerializeField] GameObject slashHitBox;
     [SerializeField] Player player;
     public Magazine knifePool;
 
@@ -50,6 +50,7 @@ public class SkillManager : MonoBehaviour
         PhantomBladeCoolTime();
         ChargeAttackCoolTime();
         AutoTargetingCoolTime();
+        FlashAttackCoolTime();
     }
 
     #region Phantom Blade
@@ -158,6 +159,7 @@ public class SkillManager : MonoBehaviour
     {
         if (player.stamina >= chargeAttack.staminaCost)
         {
+            player.ghostTrail.gameObject.SetActive(true);
             player.charging = true;
             player.stamina -= chargeAttack.staminaCost;
             Debug.Log("Chaaarge");
@@ -212,7 +214,7 @@ public class SkillManager : MonoBehaviour
 
             player.rigid.gravityScale = gravityScale;
             player.col.enabled = true;
-
+            player.ghostTrail.gameObject.SetActive(false);
             yield return CoroutineCasher.Wait(0.2f);
 
             player.gameObject.layer = originMask;
@@ -410,27 +412,53 @@ public class SkillManager : MonoBehaviour
 
         casting = true;
         flashAttackUsable = false;
+        StartCoroutine(FlashAttack(facingRight));
     }
 
-    void PlayerMove(bool facingRight)
+    float CalculateDistance(bool facingRight, Vector2 dir)
     {
-        RaycastHit2D hit;
+        RaycastHit2D hit = Physics2D.Raycast(player.transform.position, dir, flashAttack.attackDistance, flashAttack.scanable);
 
-        if(facingRight)
+        float tuning = player.col.size.x / 2;
+        float distance;
+        if (hit.collider != null)
         {
-            hit = Physics2D.Raycast(player.transform.position, Vector2.right, flashAttack.attackDistance, flashAttack.scanable);
+            distance = hit.distance - tuning;
         }
         else
         {
-            hit = Physics2D.Raycast(player.transform.position, Vector2.left, flashAttack.attackDistance, flashAttack.scanable);
+            distance = flashAttack.attackDistance;
         }
+
+        Debug.Log(facingRight ? "오른쪽으로 텔포!" : "왼쪽으로 텔포!");
+        return distance;
+    }
+
+    GameObject CreateHitBox(float distance, Vector2 dir)
+    {
+        Vector3 origin = player.transform.position;
+        Vector3 position = new Vector3(origin.x + ((distance/2) * dir.x), origin.y,origin.z);
+        float tuning = 8 / flashAttack.attackDistance;
+
+        GameObject hitbox = Instantiate(slashHitBox, position, Quaternion.identity);
+
+        hitbox.transform.localScale = new Vector3(distance * tuning, 1, 1);
+
+        return hitbox;
     }
 
     IEnumerator FlashAttack(bool facingRight)
     {
+        Vector2 dir = facingRight ? Vector2.right : Vector2.left;
+        float distance = CalculateDistance(facingRight, dir);
 
+        GameObject hitBox = CreateHitBox(distance, dir);
 
-        yield return null;
+        player.transform.position += new Vector3(distance * dir.x, 0, 0);
+        casting = false;
+        yield return CoroutineCasher.Wait(0.1f);
+
+        Destroy(hitBox);
     }
 
     #endregion 

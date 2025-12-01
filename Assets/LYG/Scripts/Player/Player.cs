@@ -17,8 +17,12 @@ public class Player : MonoBehaviour
     [SerializeField] Transform[] knifeSpawnPointUpper;
     [SerializeField] Transform[] knifeSpawnPoint;
     [SerializeField] SpriteRenderer ren;
+    [SerializeField] GameObject meleeAttackHitBox;
+    [SerializeField] GameObject meleeAirAttackHitBox;
+    [SerializeField] GameObject[] meleeAttackHitBoxes;
     [SerializeField] Magazine mag;
     [SerializeField] SkillManager skillManager;
+    public GhostTrail ghostTrail;
     public Rigidbody2D rigid;
     public Transform arm;
     public CapsuleCollider2D col;
@@ -30,11 +34,14 @@ public class Player : MonoBehaviour
     [SerializeField] Vector2 currentVelocity;
     [SerializeField] LayerMask groundMask;
     [SerializeField] public Vector2 mousePos;
+    [SerializeField] WeaponState currentWeapon;
 
     public PlayerStats stats;
 
     [SerializeField] int health;
+    public int meleeAttackIndex;
     public int bulletCount;
+
 
     [SerializeField] bool facingRight;
     [SerializeField] bool canAirJump;
@@ -45,6 +52,7 @@ public class Player : MonoBehaviour
     [SerializeField] bool jumped;
     public bool isDead;
     public bool isGround;
+    public bool attacking;
     public bool aiming;
     public bool dodging;
     public bool charging;
@@ -53,16 +61,15 @@ public class Player : MonoBehaviour
     public bool hit;
 
     Coroutine fire;
-    Coroutine skill;
     PlayerState currentState;
-    WeaponState currentWeapon;
     public Dictionary<string,PlayerState> states = new();
 
     float slopeAngle;
     float slopeLostTimer;
-    public float stamina;
 
     float staminaTimer;
+    public float stamina;
+
 
     private void Awake()
     {
@@ -79,6 +86,7 @@ public class Player : MonoBehaviour
         col = GetComponent<CapsuleCollider2D>();
         skillManager = GetComponentInChildren<SkillManager>();
         UI = GetComponentInChildren<PlayerUI>();
+        ghostTrail = GetComponentInChildren<GhostTrail>();
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = false;
         StateInit();
@@ -89,21 +97,9 @@ public class Player : MonoBehaviour
     {
         if (isDead)
             return;
-        if(Input.GetKeyDown(KeyCode.K))
-        {
-            if(facingRight)
-            {
-                transform.position = new Vector3(transform.position.x + 7, transform.position.y, transform.position.z);
-            }
-            else
-            {
-                transform.position = new Vector3(transform.position.x - 7, transform.position.y, transform.position.z);
-            }
-            
-        }
+        
         currentState?.Update(this);
         Stamina();
-        currentVelocity = rigid.linearVelocity;
         if (hit)
             return;
         SpriteControl();
@@ -137,6 +133,7 @@ public class Player : MonoBehaviour
         arm.gameObject.SetActive(false);
         health = stats.maxHealth;
         bulletCount = 30;
+        meleeAttackIndex = 0;
         stamina = stats.maxStamina;
         isDead = false;
         currentWeapon = WeaponState.Melee;
@@ -166,7 +163,7 @@ public class Player : MonoBehaviour
         if (currentState is PlayerHitState)
             return;
         // 마우스 위치와 입력에 따른 스프라이트 변화 - 수정 예정
-        if(aiming)
+        if(aiming || attacking)
         {
             // 사격 상태일시
             Vector2 dir = (mousePos - (Vector2)arm.position).normalized;
@@ -174,13 +171,14 @@ public class Player : MonoBehaviour
             if(dir.x <0)
             {
                 ren.flipX = true;
-                arm.transform.localScale = new Vector3(1, -1, 0);
+                arm.transform.localScale = new Vector3(1, -1, 1);
+                meleeAttackHitBox.transform.localScale = new Vector3(-1, 1, 1);
             }
             else if(dir.x >0)
             {
                 ren.flipX = false;
                 arm.transform.localScale = new Vector3(1, 1, 1);
-
+                meleeAttackHitBox.transform.localScale = new Vector3(1, 1, 1);
             }
         }
         else
@@ -197,9 +195,8 @@ public class Player : MonoBehaviour
                 arm.transform.localScale = new Vector3(1, 1, 1);
 
             }
-
-            facingRight = !ren.flipX;
         }
+            facingRight = !ren.flipX;
     }
 
     void Move()
@@ -207,7 +204,7 @@ public class Player : MonoBehaviour
         if (currentState is PlayerHitState)
             return;
         // 회피 중 예외 처리
-        if (dodging || charging)
+        if (dodging || charging || attacking)
             return;
 
         // 기본 속도
@@ -467,7 +464,7 @@ public class Player : MonoBehaviour
         {
             wallLeft = false;
             wallRight = false;
-            if (aiming)
+            if (aiming || currentState is PlayerMeleeAttackState)
                 return;
             if(!(currentState is PlayerIdleState))
             {
@@ -489,6 +486,39 @@ public class Player : MonoBehaviour
         rigid.linearVelocityX = moveVec.x * stats.dodgeForce;
     }
 
+    void MeleeAttack()
+    {
+        if (currentState is PlayerHitState || charging || attacking)
+            return;
+
+        if (!(currentState is PlayerMeleeAttackState))
+        {
+            ChangeState(states["MeleeAttack"]);
+        }
+
+        Vector2 dir = (mousePos - (Vector2)muzzle.position).normalized;
+
+        if(isGround)
+        {
+            switch (meleeAttackIndex)
+            {
+                case 0:
+                    StartCoroutine(Slash(dir));
+                    break;
+                case 1:
+                    StartCoroutine(Sting(dir));
+                    break;
+                case 3:
+                    StartCoroutine(HandCannon(dir));
+                    break;
+            }
+        }
+        else
+        {
+            StartCoroutine(AirSlash());
+        }
+    }
+
     void Launch()
     {
         if (currentState is PlayerHitState || charging)
@@ -500,8 +530,8 @@ public class Player : MonoBehaviour
         Vector2 dir = (mousePos - (Vector2)muzzle.position).normalized;
 
         // 랜더마이징으로 탄착군 형성
-        float rand = Random.Range(-3f, 3f);
-        dir = Quaternion.Euler(0, 0, rand) * dir;
+        //float rand = Random.Range(-3f, 3f);
+        //dir = Quaternion.Euler(0, 0, rand) * dir;
         
         // 총알 풀에서 발사
         mag.Fire(dir,muzzle.position);
@@ -517,13 +547,7 @@ public class Player : MonoBehaviour
         rigid.gravityScale = 0;
     }
 
-    void MeleeAttack()
-    {
-        if (currentState is PlayerHitState || charging)
-            return;
-        // 제작 중
-        Vector2 dir = (mousePos - (Vector2)muzzle.position).normalized;
-    }
+    #region Skills
 
     void PhantomBlade()
     {
@@ -565,6 +589,8 @@ public class Player : MonoBehaviour
         Debug.Log("섬광참");
         skillManager.InitiatingFlashAttack(facingRight);
     }
+
+    #endregion
 
     #region public Function
 
@@ -611,6 +637,25 @@ public class Player : MonoBehaviour
         else
         {
             rigid.linearVelocity = stats.knockBackForce;
+        }
+    }
+
+    public void GetBullet(int amount)
+    {
+        bulletCount += amount;
+
+        if(bulletCount >= stats.maxBullet)
+        {
+            bulletCount = stats.maxBullet;
+        }
+    }
+
+    public void GetHealth(int amount)
+    {
+        health += amount;
+        if(health >= stats.maxHealth)
+        {
+            health = stats.maxHealth;
         }
     }
 
@@ -666,7 +711,6 @@ public class Player : MonoBehaviour
                 rigid.linearVelocityY = stats.airJumpForce;
                 canAirJump = false;
             }
-            
         }
     }
 
@@ -689,6 +733,7 @@ public class Player : MonoBehaviour
             switch (currentWeapon)
             {
                 case WeaponState.Melee:
+                    MeleeAttack();
                     break;
 
                 case WeaponState.Ranged:
@@ -782,10 +827,10 @@ public class Player : MonoBehaviour
             switch (currentWeapon)
             {
                 case WeaponState.Melee:
-                    PhantomBlade();
+                    ChargeAttack();
                     break;
                 case WeaponState.Ranged:
-                    AutoTargeting();
+                    PhantomBlade();
                     break;
             }
         }
@@ -802,9 +847,10 @@ public class Player : MonoBehaviour
             switch (currentWeapon)
             {
                 case WeaponState.Melee:
-                    ChargeAttack();
+                    FlashAttack();
                     break;
                 case WeaponState.Ranged:
+                    AutoTargeting();
                     break;
             }
         }
@@ -824,6 +870,166 @@ public class Player : MonoBehaviour
     
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(bottomCenter + Vector2.down * 0.05f, radius);
+    }
+
+    //IEnumerator Slash(Vector2 dir)
+    //{
+    //    if(!(currentState is PlayerMeleeAttackState))
+    //    {
+    //        ChangeState(states["MeleeAttack"]);
+    //    }
+    //    attacking = true;
+    //    if(isGround)
+    //    {
+    //        meleeAttackHitBoxes[meleeAttackIndex].SetActive(true);
+    //        rigid.linearVelocity = Vector2.zero;
+    //        if (dir.x > 0)
+    //        {
+    //            rigid.linearVelocityX = meleeAttackIndex != 2 ? 3 : 6;
+    //        }
+    //        else
+    //        {
+    //            rigid.linearVelocityX = meleeAttackIndex != 2 ? -3 : -6;
+    //        }
+    //    }
+    //    else
+    //    {
+    //        meleeAirAttackHitBox.SetActive(true);
+    //    }
+    //
+    //    yield return CoroutineCasher.Wait(0.1f);
+    //
+    //    if(isGround)
+    //    {
+    //        rigid.linearVelocity = Vector2.zero;
+    //        meleeAttackHitBoxes[meleeAttackIndex].SetActive(false);
+    //        meleeAttackIndex = (meleeAttackIndex + 1) % meleeAttackHitBoxes.Length;
+    //        meleeAirAttackHitBox.SetActive(false);
+    //    }
+    //    else
+    //    {
+    //        meleeAirAttackHitBox.SetActive(false);
+    //    }
+    //    
+    //
+    //    yield return CoroutineCasher.Wait(0.1f);
+    //    attacking = false;
+    //    
+    //}
+
+    IEnumerator Slash(Vector2 dir)
+    {
+        Debug.Log("베기");
+        attacking = true;
+
+        meleeAttackHitBoxes[meleeAttackIndex].SetActive(true);
+
+        rigid.linearVelocity = Vector2.zero;
+        if(dir.x > 0)
+        {
+            rigid.linearVelocityX = 4;
+        }
+        else
+        {
+            rigid.linearVelocityX = -4;
+        }
+
+        yield return CoroutineCasher.Wait(0.1f);
+
+        rigid.linearVelocity = Vector2.zero;
+        meleeAttackHitBoxes[meleeAttackIndex].SetActive(false);
+        meleeAttackIndex = (meleeAttackIndex + 1) % meleeAttackHitBoxes.Length;
+
+        yield return CoroutineCasher.Wait(0.1f);
+
+        attacking = false;
+    }
+
+    IEnumerator Sting(Vector2 dir)
+    {
+        Debug.Log("베기");
+        attacking = true;
+
+        meleeAttackHitBoxes[meleeAttackIndex].SetActive(true);
+
+        yield return CoroutineCasher.Wait(0.05f);
+
+        meleeAttackHitBoxes[meleeAttackIndex].SetActive(false);
+        meleeAttackIndex = (meleeAttackIndex + 1) % meleeAttackHitBoxes.Length;
+
+        meleeAttackHitBoxes[meleeAttackIndex].SetActive(true);
+
+        rigid.linearVelocity = Vector2.zero;
+        if (dir.x > 0)
+        {
+            rigid.linearVelocityX = 7;
+        }
+        else
+        {
+            rigid.linearVelocityX = -7;
+        }
+
+        yield return CoroutineCasher.Wait(0.05f);
+
+        rigid.linearVelocity = Vector2.zero;
+        meleeAttackHitBoxes[meleeAttackIndex].SetActive(false);
+        meleeAttackIndex = (meleeAttackIndex + 1) % meleeAttackHitBoxes.Length;
+
+        yield return CoroutineCasher.Wait(0.1f);
+
+        attacking = false;
+    }
+
+    IEnumerator HandCannon(Vector2 dir)
+    {
+        Debug.Log("근접 사격");
+        attacking = true;
+
+        meleeAttackHitBoxes[meleeAttackIndex].SetActive(true);
+        rigid.linearVelocity = Vector2.zero;
+
+        if (dir.x > 0)
+        {
+            rigid.linearVelocityX = -3;
+        }
+        else
+        {
+            rigid.linearVelocityX = 3;
+        }
+        yield return CoroutineCasher.Wait(0.1f);
+
+        
+        meleeAttackHitBoxes[meleeAttackIndex].SetActive(false);
+        meleeAttackIndex = (meleeAttackIndex + 1) % meleeAttackHitBoxes.Length;
+
+        yield return CoroutineCasher.Wait(0.1f);
+
+        rigid.linearVelocity = Vector2.zero;
+
+        attacking = false;
+
+    }
+
+    IEnumerator AirSlash()
+    {
+        attacking = true;
+
+        meleeAirAttackHitBox.SetActive(true);
+        Debug.Log("에어 슬래쉬!");
+        if(isGround)
+        {
+            attacking = false;
+            meleeAirAttackHitBox.SetActive(false);
+            yield break;
+        }
+        rigid.linearVelocityY = 0;
+        rigid.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
+        yield return CoroutineCasher.Wait(0.1f);
+
+        meleeAirAttackHitBox.SetActive(false);
+
+        yield return CoroutineCasher.Wait(0.1f);
+        attacking = false;
     }
 
     IEnumerator Fire()

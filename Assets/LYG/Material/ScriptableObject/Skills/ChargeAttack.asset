@@ -15,7 +15,14 @@ MonoBehaviour:
   staminaCost: 5
   coolTime: 2
   bulletCost: 0
+  damage: 0
   attackCount: 0
   chargeSpeed: 30
   chargeAccel: 75
   knockBackForce: 10
+  scanable:
+    serializedVersion: 2
+    m_Bits: 0
+  scanRadius: 0
+  scanTime: 0
+  attackDistance: 0
