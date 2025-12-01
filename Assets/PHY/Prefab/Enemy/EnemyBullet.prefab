@@ -286,5 +286,5 @@ MonoBehaviour:
   attackMask:
     serializedVersion: 2
     m_Bits: 840
-  speed: 50
+  speed: 20
   damage: 0

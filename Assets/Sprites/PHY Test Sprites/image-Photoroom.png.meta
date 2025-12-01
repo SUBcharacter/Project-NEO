@@ -242,10 +242,10 @@ TextureImporter:
       name: image-Photoroom_1
       rect:
         serializedVersion: 2
-        x: 77
-        y: 1050
-        width: 112
-        height: 133
+        x: 60
+        y: 1040
+        width: 145
+        height: 145
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -264,10 +264,10 @@ TextureImporter:
       name: image-Photoroom_2
       rect:
         serializedVersion: 2
-        x: 230
-        y: 1051
-        width: 107
-        height: 137
+        x: 205
+        y: 1041
+        width: 145
+        height: 145
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -286,10 +286,10 @@ TextureImporter:
       name: image-Photoroom_3
       rect:
         serializedVersion: 2
-        x: 364
-        y: 1049
-        width: 124
-        height: 133
+        x: 347
+        y: 1041
+        width: 145
+        height: 145
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -308,10 +308,10 @@ TextureImporter:
       name: image-Photoroom_4
       rect:
         serializedVersion: 2
-        x: 519
-        y: 1048
-        width: 111
-        height: 140
+        x: 492
+        y: 1040
+        width: 145
+        height: 145
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -396,10 +396,10 @@ TextureImporter:
       name: image-Photoroom_8
       rect:
         serializedVersion: 2
-        x: 76
-        y: 818
-        width: 138
-        height: 130
+        x: 67
+        y: 817
+        width: 145
+        height: 145
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -418,10 +418,10 @@ TextureImporter:
       name: image-Photoroom_9
       rect:
         serializedVersion: 2
-        x: 238
-        y: 818
-        width: 143
-        height: 129
+        x: 236
+        y: 817
+        width: 145
+        height: 145
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -520,28 +520,6 @@ TextureImporter:
       bones: []
       spriteID: 5ea1a486cfc0b0390800000000000000
       internalID: -7851167247169348891
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: image-Photoroom_14
-      rect:
-        serializedVersion: 2
-        x: 62
-        y: 763
-        width: 111
-        height: 42
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: b719c283dafe51320800000000000000
-      internalID: 2528190293089227131
       vertices: []
       indices: 
       edges: []

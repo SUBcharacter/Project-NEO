@@ -8,7 +8,7 @@ public class DetectionRange : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Default"))
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
             isPlayerInRange = true;
             target = collision.transform;
