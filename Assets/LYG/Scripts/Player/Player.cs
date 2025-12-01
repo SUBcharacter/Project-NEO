@@ -1023,7 +1023,7 @@ public class Player : MonoBehaviour
             yield break;
         }
         rigid.linearVelocityY = 0;
-        rigid.AddForce(Vector2.up * 5, ForceMode2D.Impulse);
+        rigid.AddForce(Vector2.up * 3, ForceMode2D.Impulse);
         yield return CoroutineCasher.Wait(0.1f);
 
         meleeAirAttackHitBox.SetActive(false);

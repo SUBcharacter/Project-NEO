@@ -3249,7 +3249,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_SizeDelta: {x: 25, y: 25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1351062475
 MonoBehaviour:
@@ -3546,7 +3546,7 @@ MonoBehaviour:
   ghostPrefab: {fileID: 2439063567540992291, guid: 5ae300bd8752cb74aa75a7ce58771ff9, type: 3}
   pool: []
   timer: 0
-  duration: 0.1
+  duration: 0.01
   index: 0
   size: 50
 --- !u!1 &1484647867
@@ -4609,6 +4609,7 @@ SceneRoots:
   - {fileID: 1091755419}
   - {fileID: 1467807790}
   - {fileID: 55520107}
+  - {fileID: 868008369}
   - {fileID: 17341507}
   - {fileID: 1038145547}
   - {fileID: 2048273124}
@@ -4618,4 +4619,3 @@ SceneRoots:
   - {fileID: 699302745}
   - {fileID: 1648248578}
   - {fileID: 541799159}
-  - {fileID: 868008369}
