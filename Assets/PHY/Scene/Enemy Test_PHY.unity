@@ -316,11 +316,11 @@ MonoBehaviour:
   startPos: {x: 0, y: 0, z: 0}
   enemyBulletPrefab: {fileID: 4426512859898953349, guid: 639db2cecac8c7e40a5a47cb3992ed48, type: 3}
   firePoint: {fileID: 1752880420}
+  bulletCount: 4
+  bulletInterval: 0.15
   detectionRange: {fileID: 993207990}
   attackRange: {fileID: 263233998}
-  fireCooldown: 1
-  isAiming: 0
-  isFiring: 0
+  fireCooldown: 2
 --- !u!1 &263233996
 GameObject:
   m_ObjectHideFlags: 0
@@ -935,30 +935,6 @@ CompositeCollider2D:
         Y: -9843750
       - X: 210000000
         Y: -10312500
-    - - X: 110000000
-        Y: -19843750
-      - X: 110000000
-        Y: -20000000
-      - X: 119843752
-        Y: -20000000
-      - X: 120000000
-        Y: -19843750
-      - X: 120000000
-        Y: -10312500
-      - X: 119687504
-        Y: -10000000
-      - X: 110000000
-        Y: -10000000
-      - X: 110000000
-        Y: -10312500
-      - X: 109687504
-        Y: -10000000
-      - X: 100000000
-        Y: -10000000
-      - X: 100000000
-        Y: -20000000
-      - X: 109843752
-        Y: -20000000
   m_CompositePaths:
     m_Paths:
     - - {x: 20.984364, y: -2}
@@ -1075,18 +1051,6 @@ CompositeCollider2D:
       - {x: 20.968838, y: -1}
       - {x: 20.984383, y: -0.99999243}
       - {x: 21, y: -0.98446244}
-    - - {x: 10.9843645, y: -2}
-      - {x: 11, y: -1.9844624}
-      - {x: 11.00003, y: -2}
-      - {x: 11.984383, y: -1.9999924}
-      - {x: 12, y: -1.9843643}
-      - {x: 11.999992, y: -1.0312424}
-      - {x: 11.9687395, y: -1}
-      - {x: 11, y: -1.0000293}
-      - {x: 10.999939, y: -1.0311882}
-      - {x: 10.9687395, y: -1}
-      - {x: 10, y: -1.0000293}
-      - {x: 10.00003, y: -2}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0.00005
   m_UseDelaunayMesh: 0
@@ -1180,26 +1144,6 @@ Tilemap:
   m_Enabled: 1
   m_Tiles:
   - first: {x: -7, y: -2, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 1
-      m_TileSpriteIndex: 1
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      dummyAlignment: 0
-      m_AllTileFlags: 1073741825
-  - first: {x: 10, y: -2, z: 0}
-    second:
-      serializedVersion: 2
-      m_TileIndex: 1
-      m_TileSpriteIndex: 1
-      m_TileMatrixIndex: 0
-      m_TileColorIndex: 0
-      m_TileObjectToInstantiateIndex: 65535
-      dummyAlignment: 0
-      m_AllTileFlags: 1073741825
-  - first: {x: 11, y: -2, z: 0}
     second:
       serializedVersion: 2
       m_TileIndex: 1
@@ -1473,15 +1417,15 @@ Tilemap:
   m_TileAssetArray:
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 29
+  - m_RefCount: 27
     m_Data: {fileID: 11400000, guid: 84fbdc7b32cbfff45a9748786a029932, type: 2}
   m_TileSpriteArray:
   - m_RefCount: 0
     m_Data: {fileID: 0}
-  - m_RefCount: 29
+  - m_RefCount: 27
     m_Data: {fileID: 194853924, guid: ee87fec0c5dfaaa429cd00029e541fcc, type: 3}
   m_TileMatrixArray:
-  - m_RefCount: 29
+  - m_RefCount: 27
     m_Data:
       e00: 1
       e01: 0
@@ -1500,7 +1444,7 @@ Tilemap:
       e32: 0
       e33: 1
   m_TileColorArray:
-  - m_RefCount: 29
+  - m_RefCount: 27
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
@@ -3572,7 +3516,7 @@ GameObject:
   - component: {fileID: 1957830255}
   - component: {fileID: 1957830254}
   - component: {fileID: 1957830253}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}

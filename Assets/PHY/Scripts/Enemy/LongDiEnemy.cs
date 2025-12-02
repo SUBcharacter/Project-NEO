@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class LongDiEnemy : MonoBehaviour
@@ -15,26 +16,29 @@ public class LongDiEnemy : MonoBehaviour
     [Header("Enemy 총알 발사 관련 변수")]
     [SerializeField] private GameObject enemyBulletPrefab;
     [SerializeField] private Transform firePoint;
+    [SerializeField] private int bulletCount = 4;
+    [SerializeField] private float bulletInterval = 0.15f;   // 일단 좀 느리게
     private Vector3 fixedFirePointPosition;
     private Vector3 fixedEnemyPos;
 
     [Header("Player 감지 관련 변수")]
     [SerializeField] private DetectionRange detectionRange;
     [SerializeField] private AttackRange attackRange;
+
     [SerializeField] private float fireCooldown = 1f;
     private float fireTimer = 0f;
 
     [Header("애니메이션 관련 변수")]
     private Animator animator;
-    [SerializeField] private bool isAiming = false;
-    [SerializeField] private bool isFiring = false;
-    private float readytoFireTime = 0.5f;  // 조준으로 넘어갈 때 준비 시간
+    private bool isAiming = false;
+    private bool isFiring = false;
+    private float readytoFireTime = 0.5f;
     private float readyTimer = 0f;
     private bool isReadyToFire = false;
 
     // 내부 컴포넌트
-    protected Rigidbody2D rigid;
-    protected SpriteRenderer spriteRenderer;
+    private Rigidbody2D rigid;
+    private SpriteRenderer spriteRenderer;
 
     private void Awake()
     {
@@ -45,9 +49,7 @@ public class LongDiEnemy : MonoBehaviour
         startPos = transform.position;
         fixedEnemyPos = transform.position;
 
-
-        fixedFirePointPosition = firePoint.localPosition;  
-        Debug.Log("firepoint 위치 : " + firePoint.localPosition);
+        fixedFirePointPosition = firePoint.localPosition;
     }
 
     private void Update()
@@ -65,27 +67,19 @@ public class LongDiEnemy : MonoBehaviour
     }
 
     private void LateUpdate()
-    { 
+    {
+        // firePoint 좌우 반전 유지
         Vector3 newFirePos = fixedFirePointPosition;
-
         if (spriteRenderer.flipX)
-        {
             newFirePos.x *= -1f;
-        }
 
         firePoint.localPosition = newFirePos;
 
-
-        // 애니메이터가 위치 흔드는 거 막기
+        // 공격 중엔 애니메이션이 위치 흔들지 못하게 고정
         if (isAiming || isFiring)
-        {
             transform.position = fixedEnemyPos;
-        }
         else
-        { 
-            fixedEnemyPos = transform.position; 
-        }
-
+            fixedEnemyPos = transform.position;
     }
 
     private void Move()
@@ -93,8 +87,8 @@ public class LongDiEnemy : MonoBehaviour
         float moveDir = isMovingRight ? 1f : -1f;
         rigid.linearVelocity = new Vector2(moveDir * moveSpeed, rigid.linearVelocity.y);
 
-        float distanceMoved = transform.position.x - startPos.x;
-        if (Mathf.Abs(distanceMoved) >= moveDistance)
+        float dist = transform.position.x - startPos.x;
+        if (Mathf.Abs(dist) >= moveDistance)
         {
             isMovingRight = !isMovingRight;
             startPos = transform.position;
@@ -104,10 +98,11 @@ public class LongDiEnemy : MonoBehaviour
 
     private void TryFire()
     {
+        if (isFiring) return;   // 중복 발사 완전 차단
+
         if (!detectionRange.isPlayerInRange || !attackRange.isPlayerInAttackRange)
         {
             isAiming = false;
-            isFiring = false;
             isReadyToFire = false;
             readyTimer = 0f;
             return;
@@ -128,67 +123,71 @@ public class LongDiEnemy : MonoBehaviour
 
         if (fireTimer >= fireCooldown && isReadyToFire)
         {
-            isFiring = true;
+            isFiring = true;   // 다음 공격 시작
             rigid.linearVelocity = Vector2.zero;
+
             animator.SetBool("isAttack", true);
             fireTimer = 0f;
+
+            Fire();
         }
     }
 
     private void Fire()
+    { 
+        StartCoroutine(FireRoutine());
+    }
+
+    private IEnumerator FireRoutine()
+    {
+
+        for (int i = 0; i < bulletCount; i++)
+        {
+            Shoot();
+
+            yield return CoroutineCasher.Wait(bulletInterval);
+        }
+
+        animator.SetBool("isAttack", false);
+        isAiming = false;
+        isReadyToFire = false;
+        isFiring = false;     // 버스트 끝났으니 다음 공격 가능
+    }
+
+    private void Shoot()
     {
         if (firePoint == null)
-        {
-            Debug.LogError("firePoint가 null임.");
             return;
-        }
 
-        Vector3 lastTargetPos = attackRange.target.position;
+        Vector3 targetPos = attackRange.target.position;
+        Vector2 dir = (targetPos - firePoint.position).normalized;
 
-        Debug.Log("공격 대상 : " + attackRange.target.name);
-        Vector2 direction = (lastTargetPos - firePoint.position).normalized;
+        spriteRenderer.flipX = dir.x < 0;
 
-        spriteRenderer.flipX = direction.x < 0;
-
-        // firePoint 위치를 바라보는 방향에 따라 좌우 반전
-        Vector3 newFirePos = fixedFirePointPosition;
-
+        Vector3 newPos = fixedFirePointPosition;
         if (spriteRenderer.flipX)
-        {
-            newFirePos.x *= -1f;
-        }
-
-        firePoint.localPosition = newFirePos;
-
-        Debug.Log("에너미 불렛 현재 발사 위치 : " + firePoint.localPosition);
+            newPos.x *= -1f;
+        firePoint.localPosition = newPos;
 
         GameObject bullet = Instantiate(enemyBulletPrefab, firePoint.position, Quaternion.identity);
-        bullet.GetComponent<EnemyBullet>().Fire(firePoint.position, lastTargetPos);
-
-     
-
-        isAiming = false;
-        isFiring = false;
-        isReadyToFire = false;
+        bullet.GetComponent<EnemyBullet>().Fire(firePoint.position, targetPos);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if(collision.GetComponent<EnemyBullet>() != null)
-            return;
+        if (collision.GetComponent<EnemyBullet>() != null) return;
 
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Default"))
         {
-            Debug.Log($"충돌 감지: {collision.gameObject.name}, 레이어: {collision.gameObject.layer}");
-
             TakeDamage();
-            Debug.Log("요원이 플레이어에게 맞음");
+
         }
     }
 
     public void TakeDamage()
     {
         currentHits++;
+        Debug.Log($"맞은 횟수 : {currentHits}");
         if (currentHits >= maxHits)
             Die();
     }
@@ -207,6 +206,4 @@ public class LongDiEnemy : MonoBehaviour
             Gizmos.DrawSphere(firePoint.position, 0.05f);
         }
     }
-
 }
-
