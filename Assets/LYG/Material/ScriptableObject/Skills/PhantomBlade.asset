@@ -12,7 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cc69c584d200c74bb11382c26bdb989, type: 3}
   m_Name: PhantomBlade
   m_EditorClassIdentifier: 
-  staminaCost: 8
+  staminaCost: 0
   coolTime: 4
+  bulletCost: 3
+  damage: 0
   attackCount: 3
-  bulletCost: 0
+  chargeSpeed: 0
+  chargeAccel: 0
+  knockBackForce: 0
+  scanable:
+    serializedVersion: 2
+    m_Bits: 0
+  scanRadius: 0
+  scanTime: 0
+  attackDistance: 0

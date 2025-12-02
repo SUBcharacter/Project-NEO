@@ -14,19 +14,33 @@ public class SkillManager : MonoBehaviour
     [SerializeField] HitBox chargeHitBox;
     [SerializeField] GameObject slashHitBox;
     [SerializeField] Player player;
-    public Magazine knifePool;
+    [SerializeField] Magazine knifePool;
 
-    public float phantomBladeTimer;
-    public float chargeAttackTimer;
-    public float autoTargetingTimer;
-    public float flashAttackTimer;
+    [SerializeField] float phantomBladeTimer;
+    [SerializeField] float chargeAttackTimer;
+    [SerializeField] float autoTargetingTimer;
+    [SerializeField] float flashAttackTimer;
 
-    public bool casting;
-    public bool openFire;
-    public bool phantomBladeUsable;
-    public bool chargeAttackUsable;
-    public bool autoTargetingUsable;
-    public bool flashAttackUsable;
+    public float PhantomBladeTimer => phantomBladeTimer;
+    public float ChargeAttackTimer => chargeAttackTimer;
+    public float AutoTargetingTimer => autoTargetingTimer;
+    public float FlashAttackTimer => flashAttackTimer;
+
+    [SerializeField] bool casting;
+    [SerializeField] bool charging;
+    [SerializeField] bool openFire;
+    [SerializeField] bool phantomBladeUsable;
+    [SerializeField] bool chargeAttackUsable;
+    [SerializeField] bool autoTargetingUsable;
+    [SerializeField] bool flashAttackUsable;
+
+    public bool Casting => casting;
+    public bool Charging => charging;
+    public bool _OpenFire => openFire;
+    public bool PhantomBladeUsable => phantomBladeUsable;
+    public bool ChargeAttackUsable => chargeAttackUsable;
+    public bool AutoTargetingUsable => autoTargetingUsable;
+    public bool FlashAttackUsable => flashAttackUsable;
 
     private void Awake()
     {
@@ -82,9 +96,9 @@ public class SkillManager : MonoBehaviour
 
     IEnumerator PhantomBlade(Transform[] spawnPoint, Vector2 dir)
     {
-        if (player.stamina >= phantomBlade.staminaCost)
+        if (player.BulletCount >= phantomBlade.bulletCost)
         {
-            player.stamina -= phantomBlade.staminaCost;
+            player.BulletCount -= phantomBlade.bulletCost;
             int index;
             List<int> usedIndex = new();
             GameObject[] knives = new GameObject[phantomBlade.attackCount];
@@ -157,31 +171,31 @@ public class SkillManager : MonoBehaviour
 
     public IEnumerator ChargeAttack(Vector2 dir)
     {
-        if (player.stamina >= chargeAttack.staminaCost)
+        if (player.Stamina >= chargeAttack.staminaCost)
         {
-            player.ghostTrail.gameObject.SetActive(true);
-            player.charging = true;
-            player.stamina -= chargeAttack.staminaCost;
+            player.GhTr.gameObject.SetActive(true);
+            charging = true;
+            player.Stamina -= chargeAttack.staminaCost;
             Debug.Log("Chaaarge");
             LayerMask originMask = player.gameObject.layer;
-            float gravityScale = player.rigid.gravityScale;
+            float gravityScale = player.Rigid.gravityScale;
             float velocity = 0;
 
-            player.rigid.gravityScale = 0;
+            player.Rigid.gravityScale = 0;
             player.gameObject.layer = LayerMask.NameToLayer("Invincible");
-            player.rigid.linearVelocity = Vector2.zero;
-            player.col.enabled = false;
+            player.Rigid.linearVelocity = Vector2.zero;
+            player.Col.enabled = false;
             yield return CoroutineCasher.Wait(0.01f);
             chargeHitBox.Init();
             while (true)
             {
 
                 velocity = Mathf.MoveTowards(velocity, chargeAttack.chargeSpeed, chargeAttack.chargeAccel * Time.deltaTime);
-                player.rigid.linearVelocity = dir * velocity;
+                player.Rigid.linearVelocity = dir * velocity;
 
                 if (chargeHitBox.triggered)
                 {
-                    player.rigid.linearVelocity = Vector2.zero;
+                    player.Rigid.linearVelocity = Vector2.zero;
                     chargeHitBox.gameObject.SetActive(false);
 
                     RaycastHit2D hit = Physics2D.Raycast(player.transform.position, dir, 5f, chargeHitBox.stats.attackable);
@@ -197,14 +211,14 @@ public class SkillManager : MonoBehaviour
                         knockDir = -dir;
                     }
 
-                    player.rigid.linearVelocity = knockDir * chargeAttack.knockBackForce;
+                    player.Rigid.linearVelocity = knockDir * chargeAttack.knockBackForce;
                     Debug.Log("ºÎµúÇôÀÕ");
                     break;
                 }
 
                 if (Mathf.Abs(velocity) >= chargeAttack.chargeSpeed - 1f)
                 {
-                    player.rigid.linearVelocity = Vector2.zero;
+                    player.Rigid.linearVelocity = Vector2.zero;
                     chargeHitBox.gameObject.SetActive(false);
                     break;
                 }
@@ -212,13 +226,13 @@ public class SkillManager : MonoBehaviour
                 yield return null;
             }
 
-            player.rigid.gravityScale = gravityScale;
-            player.col.enabled = true;
-            player.ghostTrail.gameObject.SetActive(false);
+            player.Rigid.gravityScale = gravityScale;
+            player.Col.enabled = true;
+            player.GhTr.gameObject.SetActive(false);
             yield return CoroutineCasher.Wait(0.2f);
 
             player.gameObject.layer = originMask;
-            player.charging = false;
+            charging = false;
             casting = false;
         }
         else
@@ -312,6 +326,8 @@ public class SkillManager : MonoBehaviour
     {
         if(targets.Length == 0)
         {
+            openFire = false;
+            casting = false;
             return;
         }
         autoTargetingUsable = false;
@@ -323,12 +339,12 @@ public class SkillManager : MonoBehaviour
             {
                 case (int)Layers.enemy:
                     Debug.Log("HeadShot");
-                    player.bulletCount--;
+                    player.BulletCount--;
                     t.gameObject.SetActive(false);
                     break;
                 case (int)Layers.boss:
                     Debug.Log("HeadShot");
-                    player.bulletCount--;
+                    player.BulletCount--;
                     t.gameObject.SetActive(false);
                     break;
             }
@@ -337,7 +353,7 @@ public class SkillManager : MonoBehaviour
         {
             c.gameObject.SetActive(false);
         }
-
+        openFire = false;
         casting = false;
     }
 
@@ -367,6 +383,8 @@ public class SkillManager : MonoBehaviour
                 {
                     c.gameObject.SetActive(false);
                 }
+                autoTargetingUsable = false;
+                autoTargetingTimer = 0.5f;
                 yield break;
             }
 
@@ -419,7 +437,7 @@ public class SkillManager : MonoBehaviour
     {
         RaycastHit2D hit = Physics2D.Raycast(player.transform.position, dir, flashAttack.attackDistance, flashAttack.scanable);
 
-        float tuning = player.col.size.x / 2;
+        float tuning = player.Col.size.x / 2;
         float distance;
         if (hit.collider != null)
         {
@@ -449,16 +467,25 @@ public class SkillManager : MonoBehaviour
 
     IEnumerator FlashAttack(bool facingRight)
     {
-        Vector2 dir = facingRight ? Vector2.right : Vector2.left;
-        float distance = CalculateDistance(facingRight, dir);
+        if (player.Stamina >= flashAttack.staminaCost)
+        {
+            player.Stamina -= flashAttack.staminaCost;
+            Vector2 dir = facingRight ? Vector2.right : Vector2.left;
+            float distance = CalculateDistance(facingRight, dir);
 
-        GameObject hitBox = CreateHitBox(distance, dir);
+            GameObject hitBox = CreateHitBox(distance, dir);
 
-        player.transform.position += new Vector3(distance * dir.x, 0, 0);
-        casting = false;
-        yield return CoroutineCasher.Wait(0.1f);
+            player.transform.position += new Vector3(distance * dir.x, 0, 0);
+            casting = false;
+            yield return CoroutineCasher.Wait(0.1f);
 
-        Destroy(hitBox);
+            Destroy(hitBox); 
+        }
+        else
+        {
+            Debug.Log("½ºÅÂ¹Ì³ª ºÎÁ·");
+            casting = false;
+        }
     }
 
     #endregion 

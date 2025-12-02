@@ -6,19 +6,19 @@ public class HitBox : MonoBehaviour
     public Collider2D col;
 
     public bool triggered;
-    private void Awake()
+    protected virtual void Awake()
     {
         triggered = false;
         col = GetComponent<Collider2D>();
     }
 
-    public void Init()
+    public virtual void Init()
     {
         triggered = false;
         gameObject.SetActive(true);
     }
 
-    void Triggered(Collision2D collision)
+    protected virtual void Triggered(Collision2D collision)
     {
         // 각 레이어에 맞게 작용하게끔 작성할 것
         if (((1 << collision.gameObject.layer) & stats.attackable) == 0)
@@ -50,7 +50,7 @@ public class HitBox : MonoBehaviour
         }
     }
 
-    void Triggered(Collider2D collision)
+    protected virtual void Triggered(Collider2D collision)
     {
         // 각 레이어에 맞게 작용하게끔 작성할 것
         if (((1 << collision.gameObject.layer) & stats.attackable) == 0)
@@ -82,12 +82,12 @@ public class HitBox : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    protected void OnCollisionEnter2D(Collision2D collision)
     {
         Triggered(collision);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected void OnTriggerEnter2D(Collider2D collision)
     {
         Triggered(collision);
     }

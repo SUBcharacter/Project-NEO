@@ -32,7 +32,6 @@ public class PlayerIdleState : PlayerState
 
 public class PlayerMeleeAttackState : PlayerState
 {
-    // 근접 공격 상태 - 제작 중
     float timer;
 
     public override void Start(Player player)
@@ -42,21 +41,21 @@ public class PlayerMeleeAttackState : PlayerState
 
     public override void Update(Player player)
     {
-        if(player.attacking)
+        if(player.Attacking)
         {
             timer = 0;
         }
 
         timer += Time.deltaTime;
-        if (timer >= player.stats.MeleeAttackRelaxTime)
+        if (timer >= player.Stats.MeleeAttackRelaxTime)
         {
-            player.ChangeState(player.states["Idle"]);
+            player.ChangeState(player.States["Idle"]);
         }
     }
 
     public override void Exit(Player player)
     {
-        player.meleeAttackIndex = 0;
+        player.MeleeAttackIndex = 0;
     }
 }
 
@@ -65,7 +64,6 @@ public class PlayerRangeAttackState : PlayerState
     // 사격 상태
 
     float timer;
-    float relaxTime = 3f;
 
     public override void Start(Player player)
     {
@@ -73,8 +71,8 @@ public class PlayerRangeAttackState : PlayerState
         // 사격 상태 활성화
         // 사격 팔 활성화
         timer = 0;
-        player.aiming = true;
-        player.arm.gameObject.SetActive(true);
+        player.Aiming = true;
+        player.Arm.EnableSprite(true);
     }
 
     public override void Update(Player player)
@@ -83,16 +81,16 @@ public class PlayerRangeAttackState : PlayerState
         // 입력 없으면 진정 타이머 갱신
         player.RotateArm();
         timer += Time.deltaTime;
-        if (timer >= player.stats.RangeAttackRelaxTime)
+        if (timer >= player.Stats.RangeAttackRelaxTime)
         {
-            player.ChangeState(player.states["Idle"]);
+            player.ChangeState(player.States["Idle"]);
         }
     }
 
     public override void Exit(Player player)
     {
-        player.aiming = false;
-        player.arm.gameObject.SetActive(false);
+        player.Aiming = false;
+        player.Arm.EnableSprite(false);
     }
 }
 
@@ -127,28 +125,28 @@ public class PlayerDodgeState : PlayerState
         // Y축 속도 제거
         maskOrigin = player.gameObject.layer;
         player.gameObject.layer = LayerMask.NameToLayer("Invincible");
-        gravityScale = player.rigid.gravityScale;
-        player.dodging = true;
-        player.rigid.gravityScale = 0f;
-        player.rigid.linearVelocityY = 0f;
-        player.ghostTrail.gameObject.SetActive(true);
+        gravityScale = player.Rigid.gravityScale;
+        player.Dodging = true;
+        player.Rigid.gravityScale = 0f;
+        player.Rigid.linearVelocityY = 0f;
+        player.GhTr.gameObject.SetActive(true);
     }
 
     public override void Update(Player player)
     {
         // Y축 속도 제거
-        player.rigid.linearVelocityY = 0f;
+        player.Rigid.linearVelocityY = 0f;
         
         // 속도 변화
-        currentVel = player.rigid.linearVelocityX;
+        currentVel = player.Rigid.linearVelocityX;
         currentVel = Mathf.Lerp(currentVel, 0, 5*Time.deltaTime);
-        player.rigid.linearVelocityX = currentVel;
+        player.Rigid.linearVelocityX = currentVel;
 
         // 자연스러운 상태 복귀(극한점 튜닝)
-        if(Mathf.Abs(currentVel) <= player.stats.returnVelocity)
+        if(Mathf.Abs(currentVel) <= player.Stats.returnVelocity)
         {
-            player.rigid.gravityScale = gravityScale;
-            player.ChangeState(player.states["Idle"]);
+            player.Rigid.gravityScale = gravityScale;
+            player.ChangeState(player.States["Idle"]);
         }
     }
 
@@ -157,9 +155,9 @@ public class PlayerDodgeState : PlayerState
         // 회피 상태 해제
         // 중력 계수 복귀
         player.gameObject.layer = maskOrigin;
-        player.dodging = false;
-        player.rigid.gravityScale = gravityScale;
-        player.ghostTrail.gameObject.SetActive(false);
+        player.Dodging = false;
+        player.Rigid.gravityScale = gravityScale;
+        player.GhTr.gameObject.SetActive(false);
     }
 }
 
@@ -168,28 +166,28 @@ public class PlayerClimbState : PlayerState
     float gravityScale;
     public override void Start(Player player)
     {
-        player.onWall = true;
-        player.canWallJump = true;
-        gravityScale = player.rigid.gravityScale;
-        player.rigid.linearVelocityY = 0f;
-        player.rigid.gravityScale = 0f;
+        player.Check.OnWall = true;
+        player.Check.CanWallJump = true;
+        gravityScale = player.Rigid.gravityScale;
+        player.Rigid.linearVelocityY = 0f;
+        player.Rigid.gravityScale = 0f;
     }
 
     public override void Update(Player player)
     {
-        if(player.isGround)
+        if(player.Check.IsGround)
         {
-            player.ChangeState(player.states["Idle"]);
+            player.ChangeState(player.States["Idle"]);
         }
 
-        player.rigid.linearVelocityY = -1;
+        player.Rigid.linearVelocityY = -1;
     }
 
     public override void Exit(Player player)
     {
-        player.onWall = false;
-        player.canWallJump = false;
-        player.rigid.gravityScale = gravityScale;
+        player.Check.OnWall = false;
+        player.Check.CanWallJump = false;
+        player.Rigid.gravityScale = gravityScale;
     }
 }
 
@@ -206,9 +204,9 @@ public class PlayerWallJumpState : PlayerState
     public override void Update(Player player)
     {
         timer += Time.deltaTime;
-        if(timer > player.stats.wallJumpDuration)
+        if(timer > player.Stats.wallJumpDuration)
         {
-            player.ChangeState(player.states["Idle"]);
+            player.ChangeState(player.States["Idle"]);
         }
     }
 
@@ -226,8 +224,8 @@ public class PlayerHitState : PlayerState
     public override void Start(Player player)
     {
         timer = 0;
-        player.hit = true;
-        player.rigid.linearVelocity = Vector2.zero;
+        player._Hit = true;
+        player.Rigid.linearVelocity = Vector2.zero;
         player.KnockBack();
         player.StartCoroutine(InvincibleTime(player));
     }
@@ -235,16 +233,16 @@ public class PlayerHitState : PlayerState
     public override void Update(Player player)
     {
         timer += Time.deltaTime;
-        if(timer > player.stats.hitLimit)
+        if(timer > player.Stats.hitLimit)
         {
-            player.ChangeState(player.states["Idle"]);
+            player.ChangeState(player.States["Idle"]);
         }
     }
 
     public override void Exit(Player player)
     {
-        player.hit = false;
-        player.rigid.linearVelocity = Vector2.zero;
+        player._Hit = false;
+        player.Rigid.linearVelocity = Vector2.zero;
     }
 
     IEnumerator InvincibleTime(Player player)
@@ -253,7 +251,7 @@ public class PlayerHitState : PlayerState
 
         player.gameObject.layer = LayerMask.NameToLayer("Invincible");
 
-        yield return CoroutineCasher.Wait(player.stats.invincibleTime);
+        yield return CoroutineCasher.Wait(player.Stats.invincibleTime);
 
         player.gameObject.layer = originMask;
     }

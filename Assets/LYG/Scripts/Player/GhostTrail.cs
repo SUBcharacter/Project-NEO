@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class GhostTrail : MonoBehaviour
 {
+    [SerializeField] Player player;
     [SerializeField] SpriteRenderer ren;
     [SerializeField] GameObject ghostPrefab;
     [SerializeField] List<GameObject> pool;
@@ -16,7 +17,8 @@ public class GhostTrail : MonoBehaviour
     private void Awake()
     {
         index = 0;
-        ren = GetComponentInParent<SpriteRenderer>();
+        player = GetComponentInParent<Player>();
+        ren = player.Ren;
         for(int i = 0; i< size; i++)
         {
             GameObject instance = Instantiate(ghostPrefab, transform);

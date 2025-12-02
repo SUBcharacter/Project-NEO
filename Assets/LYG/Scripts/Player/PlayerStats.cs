@@ -22,7 +22,8 @@ public class PlayerStats : ScriptableObject
     public float staminaRecoveryDuration;
     public float staminaRecoveryAmount;
 
-    [Header("Slope Check Parameter")]
+    [Header("Terrain Check Parameter")]
+    public LayerMask groundMask;
     public float maxSlopeAngle;
     public float slopeRayLength;
     public float slopeLostDuration;
