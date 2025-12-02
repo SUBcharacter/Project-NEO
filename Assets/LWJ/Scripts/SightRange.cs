@@ -26,11 +26,14 @@ public class SightRange : MonoBehaviour
 
     private void FindTargetsInFOV()
     {
+
+        float dirMultiplier = Mathf.Sign(transform.localScale.x); // +1 또는 -1
+        Vector2 fovDirection = Vector2.right * dirMultiplier;
         IsPlayerInSight = false; // 매 프레임 초기화
         PlayerInSight = null;
 
         // 시야의 기준 방향을 왼쪽
-        Vector2 fovDirection = Vector2.left;
+   
 
         //플레이어가 시야 반경 내에 있다면 그 플레이어를 향해 레이캐스트
         Collider2D[] targetsInRadius = Physics2D.OverlapCircleAll(transform.position, viewRadius, targetLayer);
@@ -80,10 +83,10 @@ public class SightRange : MonoBehaviour
 
         Gizmos.color = Color.red; // 시야각 선
 
-   
-        float baseAngle = 180f;
 
-    
+        float dirMultiplier = Mathf.Sign(transform.localScale.x);
+        float baseAngle = (dirMultiplier > 0) ? 0f : 180f;
+
         Vector3 viewAngleA = DirFromAngle(baseAngle - viewAngle / 2);
         Vector3 viewAngleB = DirFromAngle(baseAngle + viewAngle / 2);
 

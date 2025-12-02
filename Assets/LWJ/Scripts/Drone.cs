@@ -11,7 +11,8 @@ public class Drone : MonoBehaviour
     bool isWait = false;
     public Vector2 offset = new Vector2(0f, 1.5f);
     [SerializeField] LayerMask playerLayer;
-
+    [SerializeField] float explosionRadius = 1.5f;
+    [SerializeField] LayerMask damagelayer; 
     void Awake()
     {
         droneStates[0] = new D_Idlestate();
@@ -52,6 +53,17 @@ public class Drone : MonoBehaviour
             Debug.Log("드론이 플레이어와 충돌했습니다.");
             Destroy(this.gameObject);
         }
+
+    }
+    void PerformExplosion()
+    {
+        Collider2D[] objectsInRange = Physics2D.OverlapCircleAll(transform.position, explosionRadius, damagelayer);
+
+        foreach (Collider2D col in objectsInRange)
+        {
+            Debug.Log($"{col.gameObject.name} 폭발 데미지 받음.");
+        }
+
     }
     public void WaitDroneandattackstate()
     {
@@ -67,8 +79,20 @@ public class Drone : MonoBehaviour
         isWait = false;
     }
 
+    IEnumerator Explosion_timer()
+    {
+        yield return CoroutineCasher.Wait(3f);
+        PerformExplosion();
+        Destroy(this.gameObject);
+    }
+
     public void SetDroneActive(bool isActive)
     {
         gameObject.SetActive(isActive);
+    }
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, explosionRadius);
     }
 }

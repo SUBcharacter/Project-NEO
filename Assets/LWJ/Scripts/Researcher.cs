@@ -11,6 +11,8 @@ public class Researcher : MonoBehaviour
     SpriteRenderer spriteRenderer;
     public SightRange sightRange;
     public bool isDroneSummoned = false;
+    public LayerMask groundLayer;
+    public LayerMask wallLayer;
     void Awake()
     {
         sightRange = GetComponent<SightRange>();    

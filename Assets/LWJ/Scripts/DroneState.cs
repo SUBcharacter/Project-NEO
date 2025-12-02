@@ -33,6 +33,7 @@ public class D_Attackstate : DroneState
     public override void Start(Drone drone) 
     {
         drone.SetDroneActive(true);
+        drone.StartCoroutine("Explosion_timer");
         Debug.Log("Attack State Ω√¿€");
     }
     public override void Update(Drone drone) 
