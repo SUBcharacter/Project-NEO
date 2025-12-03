@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cd3645f468a289f4cb9a70b8bd3125ee, type: 3}
-  m_Name: PlayerBullet
+  m_Name: Handgun
   m_EditorClassIdentifier: 
   attackable:
     serializedVersion: 2

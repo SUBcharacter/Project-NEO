@@ -21,11 +21,6 @@ public class SkillManager : MonoBehaviour
     [SerializeField] float autoTargetingTimer;
     [SerializeField] float flashAttackTimer;
 
-    public float PhantomBladeTimer => phantomBladeTimer;
-    public float ChargeAttackTimer => chargeAttackTimer;
-    public float AutoTargetingTimer => autoTargetingTimer;
-    public float FlashAttackTimer => flashAttackTimer;
-
     [SerializeField] bool casting;
     [SerializeField] bool charging;
     [SerializeField] bool openFire;
@@ -33,6 +28,17 @@ public class SkillManager : MonoBehaviour
     [SerializeField] bool chargeAttackUsable;
     [SerializeField] bool autoTargetingUsable;
     [SerializeField] bool flashAttackUsable;
+
+    public SkillStat PhantomBladeStat => phantomBlade;
+    public SkillStat ChargeAttackStat => chargeAttack;
+    public SkillStat AutoTargetingStat => autoTargeting;
+    public SkillStat FlashAttackStat => flashAttack;
+
+    public float PhantomBladeTimer => phantomBladeTimer;
+    public float ChargeAttackTimer => chargeAttackTimer;
+    public float AutoTargetingTimer => autoTargetingTimer;
+    public float FlashAttackTimer => flashAttackTimer;
+
 
     public bool Casting => casting;
     public bool Charging => charging;
@@ -184,7 +190,7 @@ public class SkillManager : MonoBehaviour
             player.Rigid.gravityScale = 0;
             player.gameObject.layer = LayerMask.NameToLayer("Invincible");
             player.Rigid.linearVelocity = Vector2.zero;
-            player.Col.enabled = false;
+            player.Col.isTrigger = true;
             yield return CoroutineCasher.Wait(0.01f);
             chargeHitBox.Init();
             while (true)
@@ -210,7 +216,7 @@ public class SkillManager : MonoBehaviour
                     {
                         knockDir = -dir;
                     }
-
+                    CameraShake.instance.Shake(4, 0.2f);
                     player.Rigid.linearVelocity = knockDir * chargeAttack.knockBackForce;
                     Debug.Log("부딪혀잇");
                     break;
@@ -227,9 +233,9 @@ public class SkillManager : MonoBehaviour
             }
 
             player.Rigid.gravityScale = gravityScale;
-            player.Col.enabled = true;
+            player.Col.isTrigger = false;
             player.GhTr.gameObject.SetActive(false);
-            yield return CoroutineCasher.Wait(0.2f);
+            yield return CoroutineCasher.Wait(0.3f);
 
             player.gameObject.layer = originMask;
             charging = false;
@@ -359,37 +365,46 @@ public class SkillManager : MonoBehaviour
 
     IEnumerator ScanTargets()
     {
-        float timer = 0;
-        Collider2D[] targets;
-        while(true)
+        if(player.BulletCount >= autoTargeting.bulletCost)
         {
-            targets = Scanning();
-
-
-            if (openFire)
+            float timer = 0;
+            Collider2D[] targets;
+            while (true)
             {
-                Debug.Log("It's Highnoon");
-                openFire = false;
                 targets = Scanning();
-                OpenFire(targets);
-                yield break;
-            }
 
-            timer += Time.deltaTime;
-            if(timer >= autoTargeting.scanTime)
-            {
-                casting = false;
-                foreach (var c in player.UI.targetCrossHair)
+
+                if (openFire)
                 {
-                    c.gameObject.SetActive(false);
+                    Debug.Log("It's Highnoon");
+                    openFire = false;
+                    targets = Scanning();
+                    OpenFire(targets);
+                    yield break;
                 }
-                autoTargetingUsable = false;
-                autoTargetingTimer = 0.5f;
-                yield break;
-            }
 
-            yield return null;
+                timer += Time.deltaTime;
+                if (timer >= autoTargeting.scanTime)
+                {
+                    casting = false;
+                    foreach (var c in player.UI.targetCrossHair)
+                    {
+                        c.gameObject.SetActive(false);
+                    }
+                    autoTargetingUsable = false;
+                    autoTargetingTimer = 0.5f;
+                    yield break;
+                }
+
+                yield return null;
+            }
         }
+        else
+        {
+            Debug.Log("최소 코스트 부족");
+            casting = false;
+        }
+        
     }
 
     private void OnDrawGizmosSelected()
@@ -470,6 +485,8 @@ public class SkillManager : MonoBehaviour
         if (player.Stamina >= flashAttack.staminaCost)
         {
             player.Stamina -= flashAttack.staminaCost;
+            CameraShake.instance.Shake(4, 0.2f);
+            player.Stamina -= flashAttack.staminaCost;
             Vector2 dir = facingRight ? Vector2.right : Vector2.left;
             float distance = CalculateDistance(facingRight, dir);
 
@@ -479,7 +496,7 @@ public class SkillManager : MonoBehaviour
             casting = false;
             yield return CoroutineCasher.Wait(0.1f);
 
-            Destroy(hitBox); 
+            Destroy(hitBox);
         }
         else
         {

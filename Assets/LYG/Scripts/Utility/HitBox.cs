@@ -2,10 +2,13 @@ using UnityEngine;
 
 public class HitBox : MonoBehaviour
 {
+    // 히트박스 특성에 맞게 상속 클래스 작성 후 제작
+
     public HitBoxStat stats;
     public Collider2D col;
 
     public bool triggered;
+
     protected virtual void Awake()
     {
         triggered = false;
@@ -18,6 +21,7 @@ public class HitBox : MonoBehaviour
         gameObject.SetActive(true);
     }
 
+    // OnCollision 이벤트 용
     protected virtual void Triggered(Collision2D collision)
     {
         // 각 레이어에 맞게 작용하게끔 작성할 것
@@ -50,6 +54,7 @@ public class HitBox : MonoBehaviour
         }
     }
 
+    // OnTriggered 이벤트 용
     protected virtual void Triggered(Collider2D collision)
     {
         // 각 레이어에 맞게 작용하게끔 작성할 것

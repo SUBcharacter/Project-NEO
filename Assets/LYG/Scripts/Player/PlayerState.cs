@@ -12,10 +12,10 @@ public abstract class PlayerState
 
 public class PlayerIdleState : PlayerState
 {
+    // 통상 상태 - 제어, 통제 없음
+
     public override void Start(Player player)
     {
-        // 모든 공격 상태 해제
-        // 팔 비활성화
         
     }
 
@@ -32,20 +32,24 @@ public class PlayerIdleState : PlayerState
 
 public class PlayerMeleeAttackState : PlayerState
 {
+    // 근접 공격 상태
     float timer;
 
     public override void Start(Player player)
     {
+        // 진정 타이머
         timer = 0;
     }
 
     public override void Update(Player player)
     {
+        // Attacking 스위치 활성화 시 타이머 초기화
         if(player.Attacking)
         {
             timer = 0;
         }
 
+        // 진정 타이머 업데이트
         timer += Time.deltaTime;
         if (timer >= player.Stats.MeleeAttackRelaxTime)
         {
@@ -55,6 +59,7 @@ public class PlayerMeleeAttackState : PlayerState
 
     public override void Exit(Player player)
     {
+        // 상태 탈출 시 근접 공격 콤보 초기화
         player.MeleeAttackIndex = 0;
     }
 }
@@ -163,11 +168,18 @@ public class PlayerDodgeState : PlayerState
 
 public class PlayerClimbState : PlayerState
 {
+    // 벽에 매달린 상태
+
     float gravityScale;
     public override void Start(Player player)
     {
+        // OnWall 스위치
         player.Check.OnWall = true;
+
+        // 벽점프 회복
         player.Check.CanWallJump = true;
+
+        // 중력 저장 및 제거, Y축 속도 일시 제거
         gravityScale = player.Rigid.gravityScale;
         player.Rigid.linearVelocityY = 0f;
         player.Rigid.gravityScale = 0f;
@@ -175,24 +187,32 @@ public class PlayerClimbState : PlayerState
 
     public override void Update(Player player)
     {
+        // 벽 -> 지상
         if(player.Check.IsGround)
         {
             player.ChangeState(player.States["Idle"]);
         }
 
+        // 벽에 매달릴시 아래로 미끄러짐
         player.Rigid.linearVelocityY = -1;
     }
 
     public override void Exit(Player player)
     {
+        // OnWall 스위치
         player.Check.OnWall = false;
+
+        // 벽 점프 몰수
         player.Check.CanWallJump = false;
+
+        // 중력 회복
         player.Rigid.gravityScale = gravityScale;
     }
 }
 
 public class PlayerWallJumpState : PlayerState
 {
+    // 벽 점프 시 진입
     float timer;
 
     public override void Start(Player player)
@@ -203,6 +223,7 @@ public class PlayerWallJumpState : PlayerState
 
     public override void Update(Player player)
     {
+        // 일시적으로 상태 변환 제어
         timer += Time.deltaTime;
         if(timer > player.Stats.wallJumpDuration)
         {
@@ -219,19 +240,29 @@ public class PlayerWallJumpState : PlayerState
 
 public class PlayerHitState : PlayerState
 {
+    // 피격 상태
     float timer;
 
     public override void Start(Player player)
     {
+        // 제어 불능 타이머 초기화
         timer = 0;
+        // Hit 스위치
         player._Hit = true;
+
+        // 플레이어 속도 일시 제거
         player.Rigid.linearVelocity = Vector2.zero;
+
+        // 넉백 적용
         player.KnockBack();
+
+        // 무적 시간 작동
         player.StartCoroutine(InvincibleTime(player));
     }
 
     public override void Update(Player player)
     {
+        // 제어 불능 타이머
         timer += Time.deltaTime;
         if(timer > player.Stats.hitLimit)
         {
@@ -241,12 +272,16 @@ public class PlayerHitState : PlayerState
 
     public override void Exit(Player player)
     {
+        // Hit 스위치
         player._Hit = false;
+
+        // 플레이어 속도 일시 제거
         player.Rigid.linearVelocity = Vector2.zero;
     }
 
     IEnumerator InvincibleTime(Player player)
     {
+        // 레이어 마스크 일시 교체
         LayerMask originMask = player.gameObject.layer;
 
         player.gameObject.layer = LayerMask.NameToLayer("Invincible");

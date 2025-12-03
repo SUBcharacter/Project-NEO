@@ -11,6 +11,14 @@ public enum WeaponState
     Melee,Ranged
 };
 
+public enum ShotMode
+{
+    Handgun,
+    Shotgun,
+    DoubleTap,
+    Minigun
+}
+
 public class Player : MonoBehaviour
 {
     [SerializeField] Rigidbody2D rigid;
@@ -23,7 +31,8 @@ public class Player : MonoBehaviour
     [SerializeField] GameObject[] meleeAttackHitBoxes;
     [SerializeField] SpriteRenderer ren;
     [SerializeField] PlayerInput input;
-    [SerializeField] Magazine mag;
+    [SerializeField] Magazine handgunMag;
+    [SerializeField] Magazine shotgunMag;
     [SerializeField] SkillManager skillManager;
     [SerializeField] TerrainCheck check;
     [SerializeField] PlayerState currentState;
@@ -36,8 +45,10 @@ public class Player : MonoBehaviour
 
     [SerializeField] Vector2 groundNormal;
     [SerializeField] Vector2 currentVelocity;
-    [SerializeField] WeaponState currentWeapon;
     [SerializeField] Vector2 mousePos;
+    [SerializeField] WeaponState currentWeapon;
+    [SerializeField] ShotMode currentMode;
+    [SerializeField] ShotMode[] shotModes = new ShotMode[3];
 
     [SerializeField] float staminaTimer;
     [SerializeField] float stamina;
@@ -45,6 +56,7 @@ public class Player : MonoBehaviour
     [SerializeField] int health;
     [SerializeField] int meleeAttackIndex;
     [SerializeField] int bulletCount;
+    [SerializeField] int index;
 
     [SerializeField] bool facingRight;
     [SerializeField] bool aiming;
@@ -65,6 +77,9 @@ public class Player : MonoBehaviour
     public CapsuleCollider2D Col { get => col; set => col = value; }
     public TerrainCheck Check { get => check; set => check = value; }
 
+    public WeaponState CrWp => currentWeapon;
+    public ShotMode StMd => currentMode;
+
     public float Stamina { get => stamina; set => stamina = value; }
 
     public int MeleeAttackIndex { get => meleeAttackIndex; set => meleeAttackIndex = value; }
@@ -80,14 +95,6 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
-        /* 초기화 목록
-         * 마우스 커서 상태
-         * 무기 팔 상태
-         * 체력
-         * isDead = false
-         * 무기 상태 - 근접
-         * 행동 상태 - 대기
-        */ 
         rigid = GetComponent<Rigidbody2D>();
         col = GetComponent<CapsuleCollider2D>();
         input = GetComponent<PlayerInput>();
@@ -108,8 +115,16 @@ public class Player : MonoBehaviour
         if (isDead)
             return;
         
+        if(Input.GetKeyDown(KeyCode.Tab))
+        {
+            index = (index + 1) % shotModes.Length;
+            currentMode = shotModes[index];
+        }
+
         currentState?.Update(this);
         StaminaTimer();
+
+
         if (hit)
             return;
         SpriteControl();
@@ -127,6 +142,7 @@ public class Player : MonoBehaviour
 
     void StateInit()
     {
+        // 현재까지 작업한 상태 등록
         states["Idle"] = new PlayerIdleState();
         states["RangeAttack"] = new PlayerRangeAttackState();
         states["MeleeAttack"] = new PlayerMeleeAttackState();
@@ -135,21 +151,31 @@ public class Player : MonoBehaviour
         states["Climb"] = new PlayerClimbState();
         states["WallJump"] = new PlayerWallJumpState();
         states["Hit"] = new PlayerHitState();
+
+        shotModes = new ShotMode[4];
+        shotModes[0] = ShotMode.Handgun;
+        shotModes[1] = ShotMode.Shotgun;
+        shotModes[2] = ShotMode.DoubleTap;
+        shotModes[3] = ShotMode.Minigun;
     }
 
     void PlayerStatInit()
     {
+        // 기본적인 스탯 초기화
         health = stats.maxHealth;
-        bulletCount = 30;
+        bulletCount = stats.maxBullet;
         meleeAttackIndex = 0;
         stamina = stats.maxStamina;
         isDead = false;
         currentWeapon = WeaponState.Melee;
+        currentMode = ShotMode.Handgun;
         ChangeState(states["Idle"]);
     }
 
     void StaminaTimer()
     {
+        // 스태미너 리얼 타임 회복
+        // 현재 초당 10% 설정
         if (isDead)
             return;
         staminaTimer += Time.deltaTime;
@@ -172,7 +198,7 @@ public class Player : MonoBehaviour
         // 마우스 위치와 입력에 따른 스프라이트 변화 - 수정 예정
         if(aiming || attacking)
         {
-            // 사격 상태일시
+            // 사격 상태 혹은 근접 공격 상태
             Vector2 dir = (mousePos - (Vector2)arm.transform.position).normalized;
 
             if(dir.x <0)
@@ -190,7 +216,7 @@ public class Player : MonoBehaviour
         }
         else
         {
-            // 기본 상태 및 근접 공격 상태
+            // 기본 상태
             if(rigid.linearVelocityX < -0.0001f)
             {
                 ren.flipX = true;
@@ -208,14 +234,22 @@ public class Player : MonoBehaviour
 
     void Move()
     {
-        if (currentState is PlayerHitState)
-            return;
-        // 회피 중 예외 처리
-        if (dodging || skillManager.Charging || attacking)
+        // 회피, 차지어택, 근접 공격, 피격 시 리턴
+        if (currentState is PlayerHitState || dodging || skillManager.Charging || attacking)
             return;
 
-        // 기본 속도
-        Vector2 moveVelocity = input.MoveVec * stats.speed;
+        // 기본 속도 최대 속도
+        float speed;
+        if(currentMode == ShotMode.Minigun && aiming)
+        {
+            speed = stats.speed / 2f;
+        }
+        else
+        {
+            speed = stats.speed;
+        }
+
+        Vector2 moveVelocity = input.MoveVec * speed;
 
         //check.SlopeCheck();
 
@@ -227,6 +261,7 @@ public class Player : MonoBehaviour
 
         if(!check.IsGround)
         {
+            // 체공 상태 시 가속 이동 (가속 빠름)
             float newX = Mathf.Lerp(rigid.linearVelocityX, moveVelocity.x, 1f);
             rigid.linearVelocityX = newX;
             return;
@@ -263,59 +298,109 @@ public class Player : MonoBehaviour
 
     void MeleeAttack()
     {
+        // 차지어택, 근접공격 중, 피격 시 리턴
         if (currentState is PlayerHitState || skillManager.Charging || attacking)
             return;
 
+        // 근접 공격 상태가 아닐 경우 진입
         if (!(currentState is PlayerMeleeAttackState))
         {
             ChangeState(states["MeleeAttack"]);
         }
 
+        // 공격 방향 결정
         Vector2 dir = (mousePos - (Vector2)muzzle.position).normalized;
 
         if(check.IsGround)
         {
+            // 지상 공격
             switch (meleeAttackIndex)
             {
                 case 0:
+                    // 1타
                     StartCoroutine(Slash(dir));
                     break;
                 case 1:
+                    // 2타
                     StartCoroutine(Sting(dir));
                     break;
                 case 3:
+                    // 3타
                     StartCoroutine(HandCannon(dir));
                     break;
             }
         }
         else
         {
+            // 공중 공격
             StartCoroutine(AirSlash());
         }
     }
 
     void Launch()
     {
-        if (currentState is PlayerHitState || skillManager.Charging)
+        ChangeState(states["RangeAttack"]);
+
+        // 총알 없을 시, 차지 어택 시, 피격 시 리턴
+        if (currentState is PlayerHitState || skillManager.Charging || bulletCount <= 0)
             return;
-        if (bulletCount <= 0)
-            return;
+
         // 사격 함수
         // 마우스 위치를 받아 방향 계산
         Vector2 dir = (mousePos - (Vector2)muzzle.position).normalized;
 
+        switch(currentMode)
+        {
+            case ShotMode.Handgun:
+                handgunMag.Fire(dir, muzzle.position);
+                bulletCount--;
+                break;
+            case ShotMode.Shotgun:
+                CameraShake.instance.Shake(5, 0.2f);
+                for(int i = 0; i < 12; i++)
+                {
+                    dir = (mousePos - (Vector2)muzzle.position).normalized;
+                    float rand = Random.Range(-10f, 10f);
+                    dir = Quaternion.Euler(0, 0, rand) * dir;
+                    shotgunMag.Fire(dir, muzzle.position);
+                }
+                bulletCount--;
+                break;
+            case ShotMode.DoubleTap:
+                for(int i = 0; i < 2; i++)
+                {
+                    dir = (mousePos - (Vector2)muzzle.position).normalized;
+                    float rand = Random.Range(-2f, 2f);
+                    dir = Quaternion.Euler(0, 0, rand) * dir;
+                    handgunMag.Fire(dir, muzzle.position);
+                    bulletCount--;
+                }
+                break;
+            case ShotMode.Minigun:
+                {
+                    CameraShake.instance.Shake(4, 0.1f);
+                    float rand = Random.Range(-3f, 3f);
+                    dir = Quaternion.Euler(0, 0, rand) * dir;
+                    handgunMag.Fire(dir, muzzle.position);
+                    bulletCount--;
+                }
+                break;
+
+        }
+
         // 랜더마이징으로 탄착군 형성
+        // 무기 종류에 따라 사용 가능성 있음
         //float rand = Random.Range(-3f, 3f);
         //dir = Quaternion.Euler(0, 0, rand) * dir;
         
-        // 총알 풀에서 발사
-        mag.Fire(dir,muzzle.position);
-        bulletCount--;
+        // 총알 풀에서 발사 및 총알 -1
+        //mag.Fire(dir,muzzle.position);
+        //bulletCount--;
     }
 
     void Death()
     {
-        // 제작 중
+        // TODO - 사망시 연출 및 이벤트 관리
         isDead = true;
         health = 0;
         rigid.linearVelocity = Vector2.zero;
@@ -324,41 +409,53 @@ public class Player : MonoBehaviour
 
     #region Skills
 
+    // 이기어검 스킬
     void PhantomBlade()
     {
+        // 스킬 사용중 시 리턴
         if (skillManager.Casting)
             return;
 
+        // 초기 방향 결정
         Vector2 dir = (mousePos - (Vector2)transform.position).normalized;
+
         if (check.IsGround)
         {
+            // 지상에 있을 경우 지형 위쪽에서만 생성
             skillManager.InitiatingPhantomBlade(knifeSpawnPointUpper, dir);
         }
         else
         {
+            // 체공시 플레이어 주변 생성
             skillManager.InitiatingPhantomBlade(knifeSpawnPoint, dir);
         }
     }
 
+    // 몸통박치기 스킬
     void ChargeAttack()
     {
+        // 스킬 사용중 시 리턴
         if (skillManager.Casting)
             return;
         Debug.Log("차지어택");
 
+        // 방향 결정 및 실행
         Vector2 dir = (mousePos - (Vector2)transform.position).normalized;
         skillManager.InitiatingChargeAttack(dir);
     }
 
+    // 오토 타겟팅 스킬
     void AutoTargeting()
     {
         Debug.Log("오토 타겟팅");
-
+        // 입력 제한은 스킬 매니저에서
         skillManager.InitiatingAutoTargeting();
     }
 
+    // 섬광참 스킬
     void FlashAttack()
     {
+        // 스킬 사용중 시 리턴
         if (skillManager.Casting)
             return;
         Debug.Log("섬광참");
@@ -395,16 +492,20 @@ public class Player : MonoBehaviour
         // 피격 함수
 
         health -= damage;
+
+        // 체력 검사 후 사망 판정
         if(health <= 0)
         {
             Death();
             return;
         }
+        // 피격 상태 진입
         ChangeState(states["Hit"]);
     }
 
     public void KnockBack()
     {
+        // 플레이어의 방향에 따른 넉백
         if (facingRight)
         {
             rigid.linearVelocity = new Vector2(-stats.knockBackForce.x, stats.knockBackForce.y);
@@ -417,6 +518,7 @@ public class Player : MonoBehaviour
 
     public void GetBullet(int amount)
     {
+        // 불릿 오브 획득시 실행
         bulletCount += amount;
 
         if(bulletCount >= stats.maxBullet)
@@ -427,6 +529,7 @@ public class Player : MonoBehaviour
 
     public void GetHealth(int amount)
     {
+        // 힐팩 또는 체력 회복 시 실행
         health += amount;
         if(health >= stats.maxHealth)
         {
@@ -434,6 +537,8 @@ public class Player : MonoBehaviour
         }
     }
 
+    #region Input Function
+    // 입력 함수들
     public void Jump(InputAction.CallbackContext context)
     {
         if (currentState is PlayerHitState || skillManager.Charging || dodging)
@@ -526,7 +631,7 @@ public class Player : MonoBehaviour
                 case WeaponState.Melee:
                     break;
                 case WeaponState.Ranged:
-                    if (fire != null)
+                    if(currentMode == ShotMode.Minigun && fire != null)
                     {
                         StopCoroutine(fire);
                         fire = null;
@@ -607,14 +712,18 @@ public class Player : MonoBehaviour
 
     #endregion
 
-    
+    #endregion
+
+
 
     //------------------------------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
     // 코루틴
 
+    // 근접 1타
     IEnumerator Slash(Vector2 dir)
     {
+        // 애니메이션 완성시 변경 예정
         Debug.Log("베기");
         attacking = true;
 
@@ -641,8 +750,10 @@ public class Player : MonoBehaviour
         attacking = false;
     }
 
+    // 근접 2타
     IEnumerator Sting(Vector2 dir)
     {
+        // 애니메이션 완성시 변경 예정
         Debug.Log("베기");
         attacking = true;
 
@@ -676,8 +787,10 @@ public class Player : MonoBehaviour
         attacking = false;
     }
 
+    // 근접 3타
     IEnumerator HandCannon(Vector2 dir)
     {
+        // 애니메이션 완성시 변경 예정
         Debug.Log("근접 사격");
         attacking = true;
 
@@ -706,8 +819,10 @@ public class Player : MonoBehaviour
 
     }
 
+    // 공중 근접 공격
     IEnumerator AirSlash()
     {
+        // 애니메이션 완성시 변경 예정
         attacking = true;
 
         meleeAirAttackHitBox.SetActive(true);
@@ -732,8 +847,27 @@ public class Player : MonoBehaviour
     {
         // 사격 코루틴
         // 입력 있을 시 계속해서 사격 상태 갱신
-        ChangeState(states["RangeAttack"]);
-        Launch();
-        yield return null;
+
+        if (bulletCount <= 0)
+            yield break;
+
+        if(currentMode == ShotMode.Minigun)
+        {
+            while(true)
+            {
+                Launch();
+                if (bulletCount <= 0)
+                    yield break;
+                yield return CoroutineCasher.Wait(0.01f);
+            }
+        }
+        else
+        {
+            Launch();
+            if (currentMode == ShotMode.Shotgun)
+                yield return CoroutineCasher.Wait(0.5f);
+        }
+
+        fire = null;
     }
 }

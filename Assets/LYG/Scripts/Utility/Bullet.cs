@@ -23,6 +23,8 @@ public class Bullet : MonoBehaviour
 
     protected void LifeTime()
     {
+        // 터널링 현상으로 인한 풀 복귀 불능 제어
+        // 일정시간 후 풀로 복귀
         timer += Time.deltaTime;
         if (timer >= stats.lifeTime)
         {
@@ -33,6 +35,7 @@ public class Bullet : MonoBehaviour
 
     public virtual void Init(Vector2 dir, Vector3 pos)
     {
+        // Bullet 속성의 투사체 초기화
         parent = GetComponentInParent<Transform>();
         timer = 0;
         transform.position = pos;
@@ -42,12 +45,14 @@ public class Bullet : MonoBehaviour
 
     public virtual void Shoot(Vector2 dir)
     {
+        // 발사
         transform.SetParent(null);
         rigid.linearVelocity = dir * stats.speed;
     }
 
     public virtual void Rotating(Vector2 dir)
     {
+        // 방향에 맞게 회전
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg - 90f;
 
         gameObject.transform.localRotation = Quaternion.Euler(0, 0, angle);

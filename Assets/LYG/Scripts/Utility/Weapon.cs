@@ -12,6 +12,7 @@ public class Weapon : MonoBehaviour
 
     public void EnableSprite(bool value)
     {
+        // 스프라이트 상태 변환
         ren.enabled = value;
     }
 }

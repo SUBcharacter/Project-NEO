@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class GhostTrail : MonoBehaviour
 {
+    // 활성화 시 지속적으로 잔상 생성
+
     [SerializeField] Player player;
     [SerializeField] SpriteRenderer ren;
     [SerializeField] GameObject ghostPrefab;
