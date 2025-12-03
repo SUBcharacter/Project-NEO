@@ -7,12 +7,14 @@ public class Drone : MonoBehaviour
     DroneState currentstates;
     public Transform Resear_trans;
     public Transform Player_trans;
-    [SerializeField] public float D_speed = 3f;
+  
     bool isWait = false;
     public Vector2 offset = new Vector2(0f, 1.5f);
+
     [SerializeField] LayerMask playerLayer;
     [SerializeField] float explosionRadius = 1.5f;
-    [SerializeField] LayerMask damagelayer; 
+    [SerializeField] LayerMask damagelayer;
+    [SerializeField] public float D_speed = 3f;
     void Awake()
     {
         droneStates[0] = new D_Idlestate();
@@ -82,6 +84,7 @@ public class Drone : MonoBehaviour
     IEnumerator Explosion_timer()
     {
         yield return CoroutineCasher.Wait(3f);
+        Debug.Log("µå·Ð Æø¹ß");
         PerformExplosion();
         Destroy(this.gameObject);
     }

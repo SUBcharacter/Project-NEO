@@ -156,6 +156,7 @@ MonoBehaviour:
   - {fileID: 836138032}
   - {fileID: 829693222}
   Player_Trans: {fileID: 579583862}
+  Bullet_prefab: {fileID: 337160583029289659, guid: 78080b7173b949c40b674e48964acdb1, type: 3}
   D_prefab: {fileID: 978974537}
   sightRange: {fileID: 0}
   isDroneSummoned: 0
@@ -1550,7 +1551,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Resear_trans: {fileID: 34134124}
   Player_trans: {fileID: 579583862}
-  D_speed: 3
   offset: {x: 0, y: 1.5}
   playerLayer:
     serializedVersion: 2
@@ -1559,6 +1559,7 @@ MonoBehaviour:
   damagelayer:
     serializedVersion: 2
     m_Bits: 256
+  D_speed: 3
 --- !u!61 &978974538
 BoxCollider2D:
   m_ObjectHideFlags: 0

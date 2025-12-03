@@ -3,7 +3,6 @@ using UnityEngine.EventSystems;
 
 public abstract class ResearcherState 
 {
-   
     public abstract void Start(Researcher researcher);
     public abstract void Update(Researcher researcher);
     public abstract void Exit(Researcher researcher);
@@ -35,17 +34,20 @@ public class R_IdleState : ResearcherState
 
                 return;
             }
+          
         }
         else
         {
-            if (researcher.sightRange != null && researcher.sightRange.IsPlayerInSight && researcher.isDroneSummoned)
+            if (researcher.sightRange != null && researcher.sightRange.IsPlayerInSight)
             {
-                Debug.Log("연구원 공격!");
+              
                 researcher.ChangeState(researcher.R_States[2]);
 
                 return;
             }
+
         }
+
         if (CheckForObstacle(researcher) || CheckForLedge(researcher))
         {
             Movedistance *= -1; // 방향 반전
@@ -71,7 +73,7 @@ public class R_IdleState : ResearcherState
             researcher.groundLayer // 벽/땅 레이어 마스크 사용
         );
 
-        // Debug.DrawRay(researcher.transform.position, checkDirection * wallCheckDistance, (hit.collider != null) ? Color.red : Color.green); 
+        Debug.DrawRay(researcher.transform.position, checkDirection * wallCheckDistance, (hit.collider != null) ? Color.red : Color.green); 
 
         return hit.collider != null;
     }
@@ -131,14 +133,14 @@ public class R_SummonDroneState : ResearcherState
         researcher.isDroneSummoned = true;
         newDrone.Init(researcher.transform, researcher.Player_Trans);
         Debug.Log("드론 소환");
+        researcher.WaitDronetimer();
 
-        researcher.ChangeState(researcher.R_States[0]);
 
 
     }
     public override void Update(Researcher researcher)
     {
-        
+       
     }
     public override void Exit(Researcher researcher)
     {
@@ -148,16 +150,36 @@ public class R_SummonDroneState : ResearcherState
 
 public class R_Attackstate : ResearcherState
 {
+    private float fireRate = 2f; // 0.5초마다 발사
+    private float nextFireTime;
     public override void Start(Researcher researcher)
     {
-
+        Debug.Log("연구원 공격!");
+        nextFireTime = Time.time;
     }
     public override void Update(Researcher researcher)
     {
+        if(researcher.sightRange != null && !researcher.sightRange.IsPlayerInSight)
+        {
+            Debug.Log("플레이어 시야에서 벗어남");
+            researcher.ChangeState(researcher.R_States[0]);
+            return;
+        }
+        else
+        {
+            if (Time.time >= nextFireTime)
+            {
+                Vector2 shootDirection = researcher.GetcurrentVect2();
+                researcher.ShootBullet(shootDirection);
 
+                nextFireTime = Time.time + fireRate; 
+            }
+        }
     }
     public override void Exit(Researcher researcher)
     {
     }
+
+ 
 }
 
