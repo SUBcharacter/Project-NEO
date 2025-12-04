@@ -28,11 +28,9 @@ public class R_Bullet : MonoBehaviour
         moveDirection = direction.normalized;
         bulletSpeed = speed;
 
-        // 총알의 초기 회전 설정: 발사 방향을 향하도록 회전
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0, 0, angle);
 
-        // 총알 수명 타이머 시작
         Destroy(gameObject, lifeTime);
 
     }

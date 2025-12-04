@@ -17,7 +17,7 @@ public class R_IdleState : ResearcherState
     private float groundCheckDistance = 0.8f;
     public override void Start(Researcher researcher)
     {
-        Debug.Log("Idle State 시작");
+        Debug.Log("Researcher Idle State 시작");
     
     }
     public override void Update(Researcher researcher)
@@ -100,7 +100,7 @@ public class R_IdleState : ResearcherState
     }
     public override void Exit(Researcher researcher)
     {
-        Debug.Log("Idle State 종료");
+        Debug.Log("Researcher Idle State 종료");
     }
 
     private void FlipResearcher(Researcher researcher, float direction)
@@ -129,9 +129,11 @@ public class R_SummonDroneState : ResearcherState
         int rand = Random.Range(0, researcher.dronespawnpoints.Length);
         Transform spawnPos = researcher.dronespawnpoints[rand];
 
-        Drone newDrone = GameObject.Instantiate(researcher.D_prefab, spawnPos.position, Quaternion.identity);
+        GameObject newDrone = GameObject.Instantiate(researcher.D_prefab, spawnPos.position, Quaternion.identity);
         researcher.isDroneSummoned = true;
-        newDrone.Init(researcher.transform, researcher.Player_Trans);
+        Drone drone = newDrone.GetComponent<Drone>();
+        drone.SummonInit(researcher.transform, researcher.Player_Trans);
+        
         Debug.Log("드론 소환");
         researcher.WaitDronetimer();
 
@@ -150,15 +152,16 @@ public class R_SummonDroneState : ResearcherState
 
 public class R_Attackstate : ResearcherState
 {
-    private float fireRate = 2f; // 0.5초마다 발사
+    private float fireRate = 1f; 
     private float nextFireTime;
     public override void Start(Researcher researcher)
     {
         Debug.Log("연구원 공격!");
-        nextFireTime = Time.time;
+        nextFireTime = fireRate;
     }
     public override void Update(Researcher researcher)
     {
+
         if(researcher.sightRange != null && !researcher.sightRange.IsPlayerInSight)
         {
             Debug.Log("플레이어 시야에서 벗어남");
@@ -167,12 +170,13 @@ public class R_Attackstate : ResearcherState
         }
         else
         {
-            if (Time.time >= nextFireTime)
+            nextFireTime -= Time.deltaTime;
+            if (0 >= nextFireTime)
             {
                 Vector2 shootDirection = researcher.GetcurrentVect2();
                 researcher.ShootBullet(shootDirection);
 
-                nextFireTime = Time.time + fireRate; 
+                nextFireTime = fireRate; 
             }
         }
     }

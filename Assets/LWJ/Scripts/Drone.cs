@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Drone : MonoBehaviour
 {
-    public DroneState[] droneStates = new DroneState[5];
+    public DroneState[] droneStates = new DroneState[3];
     DroneState currentstates;
     public Transform Resear_trans;
     public Transform Player_trans;
@@ -15,11 +15,19 @@ public class Drone : MonoBehaviour
     [SerializeField] float explosionRadius = 1.5f;
     [SerializeField] LayerMask damagelayer;
     [SerializeField] public float D_speed = 3f;
+    SpriteRenderer spriteRenderer;
+    public LayerMask groundLayer;
+    public LayerMask wallLayer;
+    public float Movedistance = 1f;
+    public SightRange sightRange;
     void Awake()
     {
         droneStates[0] = new D_Idlestate();
         droneStates[1] = new D_Attackstate();
-      
+        droneStates[2] = new D_Summonstate();
+        ChangeState(droneStates[0]);
+        sightRange = GetComponent<SightRange>();    
+        spriteRenderer = GetComponent<SpriteRenderer>();    
     }
 
     void Start()
@@ -41,13 +49,14 @@ public class Drone : MonoBehaviour
         currentstates?.Start(this);  
     }
 
-    public void Init(Transform researcher, Transform player)
+    public void SummonInit(Transform researcher, Transform player)
     {
         Resear_trans = researcher;
         Player_trans = player;
-        ChangeState(droneStates[0]);  
+        ChangeState(droneStates[2]);  
     }
 
+   
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (((1 << collision.gameObject.layer) & playerLayer) != 0)
@@ -97,5 +106,35 @@ public class Drone : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, explosionRadius);
+    }
+
+    public void FlipSprite(Vector2 direction)
+    {
+        if (direction.x > 0)
+        {
+            spriteRenderer.flipY = false;
+        }
+        else
+        {
+            spriteRenderer.flipY = true;
+
+        }
+    }
+
+    public void FlipDrone(Drone drone, float direction)
+    {
+
+        Vector3 currentScale = drone.transform.localScale;
+
+
+        if (direction > 0 && currentScale.x < 0)
+        {
+            drone.transform.localScale = new Vector3(Mathf.Abs(currentScale.x), currentScale.y, currentScale.z);
+        }
+
+        else if (direction < 0 && currentScale.x > 0)
+        {
+            drone.transform.localScale = new Vector3(-Mathf.Abs(currentScale.x), currentScale.y, currentScale.z);
+        }
     }
 }

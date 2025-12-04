@@ -6,7 +6,7 @@ public class Researcher : MonoBehaviour
     [SerializeField] public Transform[] dronespawnpoints;
     [SerializeField] public Transform Player_Trans;
     [SerializeField] public GameObject Bullet_prefab;
-    public Drone D_prefab;
+    public GameObject D_prefab;
     public ResearcherState[] R_States = new ResearcherState[3];
     public ResearcherState currentStates;
     SpriteRenderer spriteRenderer;
@@ -82,7 +82,7 @@ public class Researcher : MonoBehaviour
     IEnumerator Waittimerdrone()
     {
         yield return CoroutineCasher.Wait(2f);
-        ChangeState(R_States[0]);
+        ChangeState(R_States[2]);
     }
 
     public Vector2 GetcurrentVect2()
