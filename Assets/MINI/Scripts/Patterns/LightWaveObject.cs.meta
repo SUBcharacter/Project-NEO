@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 7824bdafaa527d64f958df604f11cec5
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - lightWaveRing: {fileID: 856658455107507820, guid: e19831fc036e68948bc3592b64de74c0, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

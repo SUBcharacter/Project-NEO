@@ -1,11 +1,17 @@
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "SmashPattern", menuName = "Boss/Patterns/Smash")]
 public class SmashPattern : BossPattern
 {
-    float beforeYOffSet;
-    float patternDuration = 1.2f;
+    [SerializeField] float beforeYOffSet;
+    [SerializeField] float patternDuration = 1.2f;
+    [SerializeField] int repeatCount = 1;
+    [SerializeField] float delayBetweenSmash = 0.4f;
+    [SerializeField] LayerMask groundLayer;
+    //[SerializeField] AnimationCurve jumpCurve; // 높이 조절용 커브 혹시몰라서 생성
 
-    public SmashPattern(BossAI boss) : base(boss) { }
+    [SerializeField] GameObject smashFXPrefab;
+    private Vector3 smashPrefaboffset;
 
     Vector3 Parabola(Vector3 start, Vector3 end, float height, float t)
     {
@@ -13,7 +19,28 @@ public class SmashPattern : BossPattern
         pos.y += Mathf.Sin(t * Mathf.PI) * height;
         return pos;
     }
-    public override async void Start()
+    public override async void StartPattern()
+    {
+        if (boss == null)
+        {
+            Debug.LogError("SmashPattern의 boss참조가 Null임");
+            return;
+        }
+        if (groundLayer == 0)       
+            groundLayer = LayerMask.GetMask("Default", "Terrain", "Ground");
+
+        for (int i = 0; i < repeatCount; i++)
+        {
+            await Smash();
+            if (i < repeatCount - 1)
+            {
+                await Awaitable.WaitForSecondsAsync(delayBetweenSmash, boss.DestroyCancellationToken);
+            }
+        }
+        boss.OnAnimationTrigger("AttackEnd");
+    }
+
+    private async Awaitable Smash()
     {
         animator.SetTrigger("ReadySmash");
         beforeYOffSet = boss.transform.position.y;
@@ -23,7 +50,7 @@ public class SmashPattern : BossPattern
         }
         catch (System.OperationCanceledException)
         {
-            Exit();
+            ExitPattern();
             return;
         }
 
@@ -31,10 +58,17 @@ public class SmashPattern : BossPattern
         animator.SetBool("IsSmashing", true);
 
         Vector3 start = boss.transform.position;
-        Vector3 target = GetAdjustedLandingPosition(boss.player.position);
+        Vector3 groundPos = GetGroundPosition(boss.player.position);
 
-        var rb = boss.GetComponent<Rigidbody2D>();
-        rb.linearVelocity = Vector2.zero;
+        float bossHalfHeight = 0f;
+        Collider2D bossCol = boss.GetComponent<Collider2D>();
+
+        if (bossCol != null)
+        {
+            bossHalfHeight = bossCol.bounds.extents.y;
+        }
+        Vector3 bossTargetPos = groundPos;
+        bossTargetPos.y += bossHalfHeight;
 
         float duration = patternDuration / 2f;
         float height = 2f;
@@ -46,66 +80,59 @@ public class SmashPattern : BossPattern
 
             if (t > 1f) t = 1f;
 
-            boss.transform.position = Parabola(start, target, height, t);
-
+            boss.transform.position = Parabola(start, bossTargetPos, height, t);
 
             await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
         }
-        boss.transform.position = target;
+        boss.transform.position = bossTargetPos;
         rb.linearVelocity = Vector2.zero;
 
         boss.animator.SetBool("IsSmashing", false);
-        boss.OnAnimationTrigger("AttackEnd");
+        if (smashFXPrefab != null)
+            Instantiate(smashFXPrefab, groundPos + new Vector3(0f, 0.5f, 0f), Quaternion.identity);
+            
+        
     }
-
-    Vector3 GetAdjustedLandingPosition(Vector3 playerPosition)
+    Vector3 GetGroundPosition(Vector3 targetPos)
     {
-        int groundLayer = LayerMask.GetMask("Ground");
-        if (groundLayer == 0) Debug.LogError("Ground 없음.");
+        // 디버깅용 시각화
+        Vector3 rayStart = targetPos + Vector3.up * 5f;
+        Debug.DrawRay(rayStart, Vector3.down * 15f, Color.green, 2.0f);
 
-        RaycastHit2D hit = Physics2D.Raycast(playerPosition + Vector3.up * 2f, Vector2.down, 10f, groundLayer);
+        RaycastHit2D hit = Physics2D.Raycast(rayStart, Vector2.down, 15f, groundLayer);
 
-        Debug.DrawRay(playerPosition + Vector3.up * 2f, Vector2.down * 10f, Color.red, 2.0f);
+        Vector3 result = targetPos;
 
-        Vector3 landPos = playerPosition;
         if (hit.collider != null)
         {
-            landPos.y = hit.point.y;
+            result.y = hit.point.y;
+            Debug.Log($"Smash 바닥 감지 성공: {hit.collider.name} / Y: {result.y}");
         }
         else
         {
-            // 바닥을 못 찾음 -> 현재 플레이어 Y좌표 사용 (임시 방편)            
-            Debug.LogWarning("오류임");
+            Debug.LogWarning("Smash 바닥 감지 실패! (레이어 확인 필요). 보스 현재 Y축으로 대체합니다.");
+            
+            // 일단은 '플레이어의 발 밑'이라 가정하고 조금 내림
+            result.y = targetPos.y - 1.0f;
         }
 
-        Collider2D bossCollider = boss.GetComponent<Collider2D>();
-        if (bossCollider != null)
-        {
-            landPos.y += bossCollider.bounds.extents.y; // 스프라이트 생기면 조정 필요함
-        }
-        landPos.x = playerPosition.x;
-
-        return landPos;
+        result.x = targetPos.x;
+        return result;
     }
-
-
     public override void OnAnimationEvent(string eventName)
     {
         if (eventName == "SmashImpact")
         {
-            
+
         }
-    }
-
-
-    // update 에다가 이제 쫒아가는 로직 짜야함 애니메이션 trigger 쏴줬고 transform.position 이런거로 플레이어 위치로 이동하게
-    public override void Update()
+    }  
+    public override void UpdatePattern()
     {
         //animator.SetBool("IsSmashing", false); <- 이거 나중에 애니메이션 클립에서 처리하거나 해야할 듯?
         /* 여따가 뭐 유도 로직이나 기타 작성*/
     }
 
-    public override void Exit()
+    public override void ExitPattern()
     {
         // boss.OnAnimationTrigger("AttackEnd");
         // boss.ChangeState(new IdleState(boss));

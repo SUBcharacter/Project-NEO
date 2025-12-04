@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 14001aec9512e66408801af56a0aa7dc, type: 3}
+  m_Name: LightWavePattern
+  m_EditorClassIdentifier: 
+  lightWaveObject: {fileID: 1933580668229941274, guid: 372cb5b754d3a794c95cde5b74793b3b, type: 3}
+  objectSpawnOffset: {x: 3, y: 3}
+  maxObejects: 2

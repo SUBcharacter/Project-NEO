@@ -37,16 +37,18 @@ public class BossIdleState : BossState
         while (isPatrolling)
         {
             float timer = 0;
+            boss.FaceTarget(boss.transform.position + Vector3.left);
             while (timer < 1f && isPatrolling)         // 좌로 패트롤
             {
                 timer += Time.deltaTime;
                 boss.transform.position += bossSpeed * Time.deltaTime * Vector3.left;
                 await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
             }
-
             if (!isPatrolling) break;
             await Awaitable.WaitForSecondsAsync(2f, boss.DestroyCancellationToken);
 
+
+            boss.FaceTarget(boss.transform.position + Vector3.right);
             timer = 0;
             while (timer < 1f && isPatrolling)         // 우로 패트롤
             {
@@ -54,7 +56,6 @@ public class BossIdleState : BossState
                 boss.transform.position += bossSpeed * Time.deltaTime * Vector3.right;
                 await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
             }
-
             if (!isPatrolling) break;
             await Awaitable.WaitForSecondsAsync(2f, boss.DestroyCancellationToken);
         }
@@ -64,7 +65,7 @@ public class BossIdleState : BossState
     {
         distanceToPlayer = Vector2.Distance(boss.transform.position, boss.player.position);
         //Debug.Log(distanceToPlayer);
-        if (boss.player.transform != null && distanceToPlayer < 8f)
+        if (boss.player.transform != null && distanceToPlayer < 13f)
         {
             isPatrolling = false;
             boss.ChangeState(new AttackingState(boss));
@@ -86,7 +87,20 @@ public class BossCoolDownState : BossState
 
     public override void Start()
     {
-        cooldownTime = 2.0f;
+        switch(boss.CurrentPhase.phaseName)
+        {
+            case "Phase 1":
+                cooldownTime = 2.0f;
+                break;
+            case "Phase 2":
+                cooldownTime = 1.5f;
+                break;
+            case "Berserk":
+                cooldownTime = 1.0f;
+                break;
+            default:          
+                break;
+        }        
     }
     public override void Update()
     {
@@ -102,7 +116,20 @@ public class BossCoolDownState : BossState
     public override void Exit()
     {
         // 흠..
-        cooldownTime = 2f;
+        switch (boss.CurrentPhase.phaseName)
+        {
+            case "Phase 1":
+                cooldownTime = 2.0f;
+                break;
+            case "Phase 2":
+                cooldownTime = 1.5f;
+                break;
+            case "Berserk":
+                cooldownTime = 1.0f;
+                break;
+            default:
+                break;
+        }
     }
 }
 
@@ -132,7 +159,20 @@ public class AttackingState : BossState
 
     public override void Start()
     {
-        attackCounter = 2;
+        switch (boss.CurrentPhase.phaseName)
+        {
+            case "Phase 1":
+                attackCounter = 1;
+                break;
+            case "Phase 2":
+                attackCounter = 2;
+                break;
+            case "Berserk":
+                attackCounter = 4;
+                break;
+            default:                
+                break;
+        }     
         ExecutePattern();
     }
 
@@ -148,19 +188,23 @@ public class AttackingState : BossState
         else candidatePatterns = boss.CurrentPhase.longPattern;
 
         if (candidatePatterns == null || candidatePatterns.Count == 0) // 혹시 모를 예외처리
-            candidatePatterns = boss.CurrentPhase.shortPattern;
+        {
+            //candidatePatterns = boss.CurrentPhase.shortPattern;
+            candidatePatterns = boss.CurrentPhase.middlePattern;
+            //candidatePatterns = boss.CurrentPhase.longPattern;
+        }
 
         int index = Random.Range(0, candidatePatterns.Count);
         currentPattern = candidatePatterns[index];
 
-
-        currentPattern.Start();
+        currentPattern.Initialize(boss);
+        currentPattern.StartPattern();
     }
     public override void OnAnimationEvent(string eventName)
     {
         if (eventName == "AttackEnd")
         {
-            currentPattern.Exit();
+            currentPattern.ExitPattern();
 
             attackCounter--;
             if (attackCounter > 0)
@@ -174,9 +218,9 @@ public class AttackingState : BossState
         }
         else
         {
-            currentPattern.OnAnimationEvent(eventName);
+            currentPattern?.OnAnimationEvent(eventName);
         }
     }
-    public override void Update() => currentPattern?.Update();
-    public override void Exit() => currentPattern?.Exit();
+    public override void Update() => currentPattern?.UpdatePattern();
+    public override void Exit() => currentPattern?.ExitPattern();
 }
