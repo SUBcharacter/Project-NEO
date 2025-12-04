@@ -1,18 +1,16 @@
 using UnityEngine;
 
-public class Weapon : MonoBehaviour
+public abstract class Weapon : MonoBehaviour
 {
-    [SerializeField] SpriteRenderer ren;
+    [SerializeField] protected SpriteRenderer[] ren;
+    [SerializeField] protected Magazine mag;
+    [SerializeField] protected ShotMode mode;
 
-    private void Awake()
-    {
-        ren = GetComponentInChildren<SpriteRenderer>();
-        ren.enabled = false;
-    }
+    public ShotMode Mode => mode;
 
-    public void EnableSprite(bool value)
-    {
-        // 스프라이트 상태 변환
-        ren.enabled = value;
-    }
+    protected abstract void Awake();
+
+    public abstract void EnableSprite(bool value);
+
+    public abstract void Launch(Vector2 dir);
 }

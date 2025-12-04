@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackable:
     serializedVersion: 2
-    m_Bits: 2248
+    m_Bits: 2760
   speed: 65
   damage: 3
   lifeTime: 1.5

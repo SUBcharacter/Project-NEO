@@ -23,16 +23,15 @@ public class Player : MonoBehaviour
 {
     [SerializeField] Rigidbody2D rigid;
     [SerializeField] CapsuleCollider2D col;
-    [SerializeField] Transform muzzle;
-    [SerializeField] Transform[] knifeSpawnPointUpper;
-    [SerializeField] Transform[] knifeSpawnPoint;
+    [SerializeField] SpriteRenderer ren;
+    [SerializeField] Dictionary<string, PlayerState> states = new();
     [SerializeField] GameObject meleeAttackHitBox;
     [SerializeField] GameObject meleeAirAttackHitBox;
     [SerializeField] GameObject[] meleeAttackHitBoxes;
-    [SerializeField] SpriteRenderer ren;
+    [SerializeField] Transform armPositon;
+    [SerializeField] Transform[] knifeSpawnPointUpper;
+    [SerializeField] Transform[] knifeSpawnPoint;
     [SerializeField] PlayerInput input;
-    [SerializeField] Magazine handgunMag;
-    [SerializeField] Magazine shotgunMag;
     [SerializeField] SkillManager skillManager;
     [SerializeField] TerrainCheck check;
     [SerializeField] PlayerState currentState;
@@ -41,14 +40,11 @@ public class Player : MonoBehaviour
     [SerializeField] Weapon arm;
     [SerializeField] GhostTrail ghostTrail;
     [SerializeField] Coroutine fire;
-    [SerializeField] Dictionary<string, PlayerState> states = new();
 
     [SerializeField] Vector2 groundNormal;
     [SerializeField] Vector2 currentVelocity;
     [SerializeField] Vector2 mousePos;
     [SerializeField] WeaponState currentWeapon;
-    [SerializeField] ShotMode currentMode;
-    [SerializeField] ShotMode[] shotModes = new ShotMode[3];
 
     [SerializeField] float staminaTimer;
     [SerializeField] float stamina;
@@ -67,6 +63,7 @@ public class Player : MonoBehaviour
 
     public SpriteRenderer Ren => ren;
     public SkillManager SkMn => skillManager;
+    public Transform ArmPositon => armPositon;
     public PlayerState CrSt => currentState;
     public PlayerStats Stats => stats;
     public PlayerUI UI => ui;
@@ -77,8 +74,8 @@ public class Player : MonoBehaviour
     public CapsuleCollider2D Col { get => col; set => col = value; }
     public TerrainCheck Check { get => check; set => check = value; }
 
+
     public WeaponState CrWp => currentWeapon;
-    public ShotMode StMd => currentMode;
 
     public float Stamina { get => stamina; set => stamina = value; }
 
@@ -114,12 +111,6 @@ public class Player : MonoBehaviour
     {
         if (isDead)
             return;
-        
-        if(Input.GetKeyDown(KeyCode.Tab))
-        {
-            index = (index + 1) % shotModes.Length;
-            currentMode = shotModes[index];
-        }
 
         currentState?.Update(this);
         StaminaTimer();
@@ -151,12 +142,6 @@ public class Player : MonoBehaviour
         states["Climb"] = new PlayerClimbState();
         states["WallJump"] = new PlayerWallJumpState();
         states["Hit"] = new PlayerHitState();
-
-        shotModes = new ShotMode[4];
-        shotModes[0] = ShotMode.Handgun;
-        shotModes[1] = ShotMode.Shotgun;
-        shotModes[2] = ShotMode.DoubleTap;
-        shotModes[3] = ShotMode.Minigun;
     }
 
     void PlayerStatInit()
@@ -168,7 +153,6 @@ public class Player : MonoBehaviour
         stamina = stats.maxStamina;
         isDead = false;
         currentWeapon = WeaponState.Melee;
-        currentMode = ShotMode.Handgun;
         ChangeState(states["Idle"]);
     }
 
@@ -199,7 +183,7 @@ public class Player : MonoBehaviour
         if(aiming || attacking)
         {
             // 사격 상태 혹은 근접 공격 상태
-            Vector2 dir = (mousePos - (Vector2)arm.transform.position).normalized;
+            Vector2 dir = (mousePos - (Vector2)transform.position).normalized;
 
             if(dir.x <0)
             {
@@ -240,7 +224,7 @@ public class Player : MonoBehaviour
 
         // 기본 속도 최대 속도
         float speed;
-        if(currentMode == ShotMode.Minigun && aiming)
+        if(arm.Mode == ShotMode.Minigun && aiming)
         {
             speed = stats.speed / 2f;
         }
@@ -309,7 +293,7 @@ public class Player : MonoBehaviour
         }
 
         // 공격 방향 결정
-        Vector2 dir = (mousePos - (Vector2)muzzle.position).normalized;
+        Vector2 dir = (mousePos - (Vector2)transform.position).normalized;
 
         if(check.IsGround)
         {
@@ -347,46 +331,11 @@ public class Player : MonoBehaviour
 
         // 사격 함수
         // 마우스 위치를 받아 방향 계산
-        Vector2 dir = (mousePos - (Vector2)muzzle.position).normalized;
+        RotateArm();
+        Vector2 dir = (mousePos - (Vector2)transform.position).normalized;
 
-        switch(currentMode)
-        {
-            case ShotMode.Handgun:
-                handgunMag.Fire(dir, muzzle.position);
-                bulletCount--;
-                break;
-            case ShotMode.Shotgun:
-                CameraShake.instance.Shake(5, 0.2f);
-                for(int i = 0; i < 12; i++)
-                {
-                    dir = (mousePos - (Vector2)muzzle.position).normalized;
-                    float rand = Random.Range(-10f, 10f);
-                    dir = Quaternion.Euler(0, 0, rand) * dir;
-                    shotgunMag.Fire(dir, muzzle.position);
-                }
-                bulletCount--;
-                break;
-            case ShotMode.DoubleTap:
-                for(int i = 0; i < 2; i++)
-                {
-                    dir = (mousePos - (Vector2)muzzle.position).normalized;
-                    float rand = Random.Range(-2f, 2f);
-                    dir = Quaternion.Euler(0, 0, rand) * dir;
-                    handgunMag.Fire(dir, muzzle.position);
-                    bulletCount--;
-                }
-                break;
-            case ShotMode.Minigun:
-                {
-                    CameraShake.instance.Shake(4, 0.1f);
-                    float rand = Random.Range(-3f, 3f);
-                    dir = Quaternion.Euler(0, 0, rand) * dir;
-                    handgunMag.Fire(dir, muzzle.position);
-                    bulletCount--;
-                }
-                break;
-
-        }
+        arm.Launch(dir);
+        bulletCount--;
 
         // 랜더마이징으로 탄착군 형성
         // 무기 종류에 따라 사용 가능성 있음
@@ -631,7 +580,7 @@ public class Player : MonoBehaviour
                 case WeaponState.Melee:
                     break;
                 case WeaponState.Ranged:
-                    if(currentMode == ShotMode.Minigun && fire != null)
+                    if(arm.Mode == ShotMode.Minigun && fire != null)
                     {
                         StopCoroutine(fire);
                         fire = null;
@@ -851,21 +800,27 @@ public class Player : MonoBehaviour
         if (bulletCount <= 0)
             yield break;
 
-        if(currentMode == ShotMode.Minigun)
+        switch(arm.Mode)
         {
-            while(true)
-            {
+            case ShotMode.Handgun:
                 Launch();
-                if (bulletCount <= 0)
-                    yield break;
-                yield return CoroutineCasher.Wait(0.01f);
-            }
-        }
-        else
-        {
-            Launch();
-            if (currentMode == ShotMode.Shotgun)
-                yield return CoroutineCasher.Wait(0.5f);
+                break;
+            case ShotMode.DoubleTap:
+                Launch();
+                break;
+            case ShotMode.Shotgun:
+                Launch();
+                if (arm.Mode == ShotMode.Shotgun)
+                    yield return CoroutineCasher.Wait(0.5f);
+                break;
+            case ShotMode.Minigun:
+                while (true)
+                {
+                    Launch();
+                    if (bulletCount <= 0)
+                        yield break;
+                    yield return CoroutineCasher.Wait(0.01f);
+                }
         }
 
         fire = null;

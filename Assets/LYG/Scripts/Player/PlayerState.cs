@@ -39,6 +39,8 @@ public class PlayerMeleeAttackState : PlayerState
     {
         // 진정 타이머
         timer = 0;
+        player.MeleeAttackIndex = 0;
+        player.StopAllCoroutines();
     }
 
     public override void Update(Player player)

@@ -20,7 +20,7 @@ public class GhostTrail : MonoBehaviour
     {
         index = 0;
         player = GetComponentInParent<Player>();
-        ren = player.Ren;
+        
         for(int i = 0; i< size; i++)
         {
             GameObject instance = Instantiate(ghostPrefab, transform);
@@ -32,6 +32,7 @@ public class GhostTrail : MonoBehaviour
 
     private void Start()
     {
+        ren = player.Ren;
         gameObject.SetActive(false);
     }
 

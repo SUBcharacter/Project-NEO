@@ -1,4 +1,6 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class LaserTurret : MonoBehaviour
 {
@@ -7,11 +9,15 @@ public class LaserTurret : MonoBehaviour
     [SerializeField] Transform muzzle;
     [SerializeField] LineRenderer aimLine;
     [SerializeField] Detector detector;
+    [SerializeField] Coroutine fire;
     [SerializeField] Quaternion origin;
+    [SerializeField] LayerMask hitMask;
 
     [SerializeField] float laserLength;
     [SerializeField] float aimTrackingSpeed;
     [SerializeField] float relaxSpeed;
+    [SerializeField] float timer;
+    [SerializeField] float aimTime;
 
     [SerializeField] int health;
     [SerializeField] int maxHealth;
@@ -25,13 +31,11 @@ public class LaserTurret : MonoBehaviour
 
     private void Update()
     {
-        Aiming();
+        Activate();
     }
 
     void Aiming()
     {
-        target = detector.Detect();
-
         if(target != null)
         {
             Vector2 dir = ((Vector2)transform.position - (Vector2)target.position).normalized;
@@ -54,8 +58,58 @@ public class LaserTurret : MonoBehaviour
         }
     }
 
-    void Fire()
+    void Activate()
     {
+        target = detector.Detect();
 
+        if(target != null)
+        {
+            if(timer < aimTime)
+            {
+                Aiming();
+                timer += Time.deltaTime;
+            }
+            else
+            {
+                if (fire == null)
+                    fire = StartCoroutine(Fire());
+            }
+        }
+        else
+        {
+            Aiming();
+            timer = 0;
+        }
+    }
+
+    IEnumerator Fire()
+    {
+        aimLine.enabled = false;
+        yield return CoroutineCasher.Wait(0.5f);
+
+        RaycastHit2D hit = Physics2D.Raycast(muzzle.position, transform.up, laserLength, hitMask);
+
+        GameObject hitBox;
+        if(hit.collider != null)
+        {
+            float distance = hit.distance;
+            Vector2 plusPosition = transform.up * (distance/2);
+            Vector2 position = new Vector2((muzzle.position.x + plusPosition.x), (muzzle.position.y + plusPosition.y));
+            hitBox = Instantiate(laser,position,transform.rotation);
+            hitBox.transform.localScale = new Vector3(1, distance + 1, 1);
+        }
+        else
+        {
+            Vector2 plusPosition = transform.up * (laserLength / 2);
+            Vector2 position = new Vector2((muzzle.position.x + plusPosition.x),(muzzle.position.y + plusPosition.y));
+            hitBox = Instantiate(laser, position, transform.rotation);
+            hitBox.transform.localScale = new Vector3(1, laserLength + 1, 1);
+        }
+
+        yield return CoroutineCasher.Wait(2f);
+
+        timer = 0;
+        Destroy(hitBox);
+        fire = null;
     }
 }

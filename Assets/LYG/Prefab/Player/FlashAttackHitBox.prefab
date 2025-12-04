@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6036873209063368981}
   - component: {fileID: 2584039462888186619}
   - component: {fileID: 3955840460048643064}
-  - component: {fileID: 6170430447547754828}
+  - component: {fileID: 7529947420818269383}
   m_Layer: 0
   m_Name: FlashAttackHitBox
   m_TagString: Untagged
@@ -135,7 +135,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &6170430447547754828
+--- !u!114 &7529947420818269383
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -144,9 +144,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 2173618323061304949}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c62a2ef4a08ff4d4faf9feae7df43ae8, type: 3}
+  m_Script: {fileID: 11500000, guid: 43b6790a9d5374a43ae89d10afbb6bd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stats: {fileID: 11400000, guid: 92d4fd27c91a7584f9fdff9410ab8aba, type: 2}
   col: {fileID: 0}
+  stats: {fileID: 11400000, guid: 92d4fd27c91a7584f9fdff9410ab8aba, type: 2}
   triggered: 0

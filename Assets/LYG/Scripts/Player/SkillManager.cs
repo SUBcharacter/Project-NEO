@@ -199,12 +199,12 @@ public class SkillManager : MonoBehaviour
                 velocity = Mathf.MoveTowards(velocity, chargeAttack.chargeSpeed, chargeAttack.chargeAccel * Time.deltaTime);
                 player.Rigid.linearVelocity = dir * velocity;
 
-                if (chargeHitBox.triggered)
+                if (chargeHitBox.Trigger)
                 {
                     player.Rigid.linearVelocity = Vector2.zero;
                     chargeHitBox.gameObject.SetActive(false);
 
-                    RaycastHit2D hit = Physics2D.Raycast(player.transform.position, dir, 5f, chargeHitBox.stats.attackable);
+                    RaycastHit2D hit = Physics2D.Raycast(player.transform.position, dir, 5f, chargeHitBox.Stats.attackable);
                     Debug.DrawRay(player.transform.position, dir * 5f, Color.red);
                     Vector2 knockDir;
                     if (hit.collider != null)

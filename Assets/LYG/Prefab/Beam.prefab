@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2576233608645603698}
   - component: {fileID: 4838687129703166491}
   - component: {fileID: 9090245343302173357}
-  - component: {fileID: 3510598785530493976}
+  - component: {fileID: 7791527735918531865}
   m_Layer: 0
   m_Name: Beam
   m_TagString: Untagged
@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.25, y: 1, z: 1}
+  m_LocalScale: {x: 0.07, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -119,7 +119,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -135,7 +135,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &3510598785530493976
+--- !u!114 &7791527735918531865
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -144,9 +144,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1865333147332841577}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c62a2ef4a08ff4d4faf9feae7df43ae8, type: 3}
+  m_Script: {fileID: 11500000, guid: 43b6790a9d5374a43ae89d10afbb6bd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stats: {fileID: 11400000, guid: 9804140036adbba499dd3a23c381d6b4, type: 2}
   col: {fileID: 0}
+  stats: {fileID: 11400000, guid: 9804140036adbba499dd3a23c381d6b4, type: 2}
   triggered: 0
