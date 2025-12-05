@@ -49,7 +49,7 @@ public class GhostTrail : MonoBehaviour
 
     public void SpawnGhost()
     {
-        pool[index].GetComponent<Ghost>().SpawnGhost(transform, ren.sprite, ren.flipX);
+        pool[index].GetComponent<Ghost>().SpawnGhost(player.transform, ren.sprite, ren.flipX);
         index = (index + 1) % pool.Count;
     }
 }

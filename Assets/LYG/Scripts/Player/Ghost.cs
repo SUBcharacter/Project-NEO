@@ -12,7 +12,7 @@ public class Ghost : MonoBehaviour
 
     private void Awake()
     {
-        ren = GetComponent<SpriteRenderer>();
+        ren = GetComponentInChildren<SpriteRenderer>();
         baseColor = ren.color;
     }
 
@@ -22,7 +22,7 @@ public class Ghost : MonoBehaviour
 
         float t = Mathf.Clamp01(timer / lifeTime);
         float hue = 1f - t;
-        Color c = Color.HSVToRGB(hue, 1f, 1f);
+        Color c = Color.HSVToRGB(hue, 1f, 0.5f);
         c.a = t;
         ren.color = c;
 

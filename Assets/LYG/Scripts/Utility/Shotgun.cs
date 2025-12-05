@@ -30,7 +30,7 @@ public class Shotgun : Weapon
         for (int i = 0; i < pellet; i++)
         {
             Vector2 originDir = dir;
-            float rand = Random.Range(-20f, 20f);
+            float rand = Random.Range(-60f, 60f);
             originDir = Quaternion.Euler(0, 0, rand) * originDir;
             mag.Fire(originDir, muzzle.position);
         }

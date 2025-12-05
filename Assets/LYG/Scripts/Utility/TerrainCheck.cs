@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class TerrainCheck : MonoBehaviour
 {
-    Player player;
+    [SerializeField] Player player;
+
+    [SerializeField] Vector2 groundNormal;
 
     [SerializeField] bool canAirJump;
     [SerializeField] bool canDodge;
@@ -17,6 +19,7 @@ public class TerrainCheck : MonoBehaviour
     [SerializeField] bool onSlope;
 
 
+    public Vector2 GroundNormal => groundNormal;
     public bool WallLeft => wallLeft;
     public bool WallRight => wallRight;
     public bool OnSlope => onSlope;

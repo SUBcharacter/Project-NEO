@@ -41,7 +41,6 @@ public class Player : MonoBehaviour
     [SerializeField] GhostTrail ghostTrail;
     [SerializeField] Coroutine fire;
 
-    [SerializeField] Vector2 groundNormal;
     [SerializeField] Vector2 currentVelocity;
     [SerializeField] Vector2 mousePos;
     [SerializeField] WeaponState currentWeapon;
@@ -101,6 +100,7 @@ public class Player : MonoBehaviour
         arm = GetComponentInChildren<Weapon>();
         skillManager = GetComponentInChildren<SkillManager>();
         ghostTrail = GetComponentInChildren<GhostTrail>();
+        rigid.sharedMaterial = stats.noFriction;
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = false;
         StateInit();
@@ -255,7 +255,7 @@ public class Player : MonoBehaviour
         if (check.OnSlope && !check.Jumped)
         {
             // 법선 벡터의 수직 벡터 계산
-            Vector2 perp = Vector2.Perpendicular(groundNormal).normalized;
+            Vector2 perp = Vector2.Perpendicular(check.GroundNormal).normalized;
 
             // 이동 방향 조정 - 안할 시 반대로 움직이거나 방향 고정
             if (Vector2.Dot(perp, Vector2.right) < 0f)

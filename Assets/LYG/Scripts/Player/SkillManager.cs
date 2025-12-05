@@ -336,6 +336,8 @@ public class SkillManager : MonoBehaviour
             casting = false;
             return;
         }
+
+        CameraShake.instance.Shake(4, 0.2f);
         autoTargetingUsable = false;
         foreach(var t in targets)
         {
