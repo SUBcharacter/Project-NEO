@@ -1,8 +1,17 @@
 using System.Collections;
 using UnityEngine;
 
+/// <summary>
+/// 원거리 적 AI
+/// 이동 : 좌우 왕복
+/// 시야범위에 플레이어가 들어오면 조준 후 발사
+/// </summary>
+/// 
+
+/// 리셋이 가능하게 IResetable 만들어서 초기화 할 수 잇게 수정하기 
 public class LongDiEnemy : LongDiEnemyBase
 {
+    // 변수들은 스크립터블로 만들어서 관리. 
     [Header("Enemy 총알 발사 관련 변수")]
     [SerializeField] private GameObject enemyBulletPrefab;
     [SerializeField] private Transform firePoint;
@@ -45,7 +54,7 @@ public class LongDiEnemy : LongDiEnemyBase
 
     private void FixedUpdate()
     {
-        HandleMovement();
+        HandleMove();
     }
 
     private void LateUpdate()
@@ -64,8 +73,11 @@ public class LongDiEnemy : LongDiEnemyBase
 
         HandleAim();                    // 조준 처리
 
-        if (CanFire())                  // 발사 조건 충족 시 공격 시작
+        if (CanFire())
+        {
+            // 발사 조건 충족 시 공격 시작
             StartFire();
+        }
     }
 
     /// <summary>
@@ -127,7 +139,7 @@ public class LongDiEnemy : LongDiEnemyBase
     /// <summary>
     /// 이동 처리 (공격 중일 땐 정지)
     /// </summary>
-    private void HandleMovement()
+    private void HandleMove()
     {
         if (!isAiming && !isFiring)
             Move();

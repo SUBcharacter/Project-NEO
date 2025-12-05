@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// 에너미 추상 클래스 만들어서 처리하도록 수정하기
+/// 히트 박스가 활성화 되는건 총이랑 
+/// </summary>
 public class LongDiEnemyBase : MonoBehaviour
 {
     [Header("Enemy 이동관련 변수")]
