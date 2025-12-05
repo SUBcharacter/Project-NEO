@@ -6,6 +6,7 @@ public class DoubleTap : Weapon
 
     protected override void Awake()
     {
+        firing = false;
         ren = GetComponentsInChildren<SpriteRenderer>();
         mag = GetComponentInChildren<Magazine>();
         foreach (var r in ren)

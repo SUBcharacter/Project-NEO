@@ -6,7 +6,10 @@ public abstract class Weapon : MonoBehaviour
     [SerializeField] protected Magazine mag;
     [SerializeField] protected ShotMode mode;
 
+    [SerializeField] protected bool firing;
+
     public ShotMode Mode => mode;
+    public bool Firing => firing;
 
     protected abstract void Awake();
 

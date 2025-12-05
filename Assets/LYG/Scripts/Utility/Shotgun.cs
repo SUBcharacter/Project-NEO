@@ -1,13 +1,16 @@
+using System.Collections;
 using UnityEngine;
 
 public class Shotgun : Weapon
 {
     [SerializeField] Transform muzzle;
+    [SerializeField] Player player;
 
     [SerializeField] int pellet;
 
     protected override void Awake()
     {
+        player = FindAnyObjectByType<Player>();
         ren = GetComponentsInChildren<SpriteRenderer>();
         mag = GetComponentInChildren<Magazine>();
         foreach (var r in ren)
@@ -34,5 +37,15 @@ public class Shotgun : Weapon
             originDir = Quaternion.Euler(0, 0, rand) * originDir;
             mag.Fire(originDir, muzzle.position);
         }
+        StartCoroutine(Recoil());
+        player.Rigid.linearVelocity = Vector2.zero;
+        player.Rigid.linearVelocity += (-dir * 6);
+    }
+
+    IEnumerator Recoil()
+    {
+        firing = true;
+        yield return CoroutineCasher.Wait(0.5f);
+        firing = false;
     }
 }

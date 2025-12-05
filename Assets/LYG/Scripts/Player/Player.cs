@@ -58,6 +58,7 @@ public class Player : MonoBehaviour
     [SerializeField] bool hit;
     [SerializeField] bool attacking;
     [SerializeField] bool isDead;
+    [SerializeField] bool enhanced;
 
     public SpriteRenderer Ren => ren;
     public SkillManager SkMn => skillManager;
@@ -218,7 +219,7 @@ public class Player : MonoBehaviour
     void Move()
     {
         // 회피, 차지어택, 근접 공격, 피격 시 리턴
-        if (currentState is PlayerHitState || dodging || skillManager.Charging || attacking)
+        if (currentState is PlayerHitState || dodging || skillManager.Charging || attacking || arm.Firing)
             return;
 
         // 기본 속도 최대 속도
