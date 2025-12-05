@@ -20,6 +20,8 @@ public class BossAI : MonoBehaviour, IDamageable
 
     [SerializeField] private List<BossPhase> allPhases = new();
 
+    public List<BossPhase> AllPhase => allPhases;
+
     [HideInInspector] public List<GameObject> activeLightWaves = new();
 
     // 비동기 작업 취소용 토큰
@@ -80,7 +82,7 @@ public class BossAI : MonoBehaviour, IDamageable
         if (hpRatio <= 0.1f && currentPhase != allPhases[2]) SetPhase(2);           //10퍼 이하 광폭
         else if (hpRatio <= 0.6f && currentPhase != allPhases[1]) SetPhase(1);      //60퍼 이하 2페이즈
     }
-    void SetPhase(int index)
+    public void SetPhase(int index)
     {
         if (index >= allPhases.Count) return;
         currentPhase = allPhases[index];

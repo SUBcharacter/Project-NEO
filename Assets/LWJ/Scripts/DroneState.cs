@@ -14,7 +14,7 @@ public class D_Idlestate : DroneState
 
 
     private float wallCheckDistance = 0.5f; // 전방 벽 감지 거리
-    private float groundCheckDistance = 0.8f;
+   
     public override void Start(Drone drone) 
     {
 

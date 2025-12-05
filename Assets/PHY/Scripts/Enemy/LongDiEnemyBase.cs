@@ -20,7 +20,7 @@ public class LongDiEnemyBase : MonoBehaviour
     protected Rigidbody2D rigid;
     protected SpriteRenderer spriteRenderer;
 
-    protected void Awake()
+    protected virtual void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
