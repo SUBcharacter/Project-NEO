@@ -74,11 +74,11 @@ public class BossStats : MonoBehaviour
 
         int phaseIndex = -1;    // 기본 설정 및 페이즈 변환 없음
 
-        if (hpRatio <= 0.6f && bossAI.CurrentPhase == bossAI.allPhases[0])
+        if (hpRatio <= 0.6f && bossAI.CurrentPhase == bossAI.AllPhase[0])
         {
             phaseIndex = 1;         // 10% 이하 광폭
         }
-        else if (hpRatio <= 0.1f && bossAI.CurrentPhase == bossAI.allPhases[1])
+        else if (hpRatio <= 0.1f && bossAI.CurrentPhase == bossAI.AllPhase[1])
         {
             phaseIndex = 2;         // 60% 이하 2페이즈
         }
@@ -91,7 +91,7 @@ public class BossStats : MonoBehaviour
         // 2025-11-26 해결 완료
 
         // 페이즈 중복 전환 방지를 위한 방어 코드
-        if (bossAI.CurrentPhase != bossAI.allPhases[phaseIndex])
+        if (bossAI.CurrentPhase != bossAI.AllPhase[phaseIndex])
         {
             bossAI.SetPhase(phaseIndex);
             Debug.Log("보스 페이즈 전환 : " + phaseIndex);

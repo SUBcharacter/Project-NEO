@@ -35,7 +35,7 @@ public class LongDiEnemy : LongDiEnemyBase
     private float readyTimer = 0f;                               // 조준 시간 누적용 타이머
     private bool isReadyToFire = false;                          // 조준 완료 플래그
 
-    private void Awake()
+    protected override void Awake()
     {
         base.Awake();
         animator = GetComponent<Animator>();

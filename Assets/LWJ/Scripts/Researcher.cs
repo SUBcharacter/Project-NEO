@@ -57,7 +57,7 @@ public class Researcher : MonoBehaviour
 
         if(bulletComponent != null)
         {
-            bulletComponent.Init(dirToTarget,10f);
+            bulletComponent.Init(dirToTarget,transform.position);
         }
 
     }

@@ -1,45 +1,55 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class R_Bullet : MonoBehaviour
+public class R_Bullet : Bullet
 {
-    [SerializeField] Rigidbody2D rigid;
     [SerializeField] LayerMask attackMask;
-    private Vector2 moveDirection;
-    [SerializeField] private float bulletSpeed = 200f;
-    private float lifeTime = 5f;
 
-    [SerializeField] int damage;
-
-    private void Awake()
+    protected override void Awake()
     {
-        rigid = GetComponent<Rigidbody2D>();
+        base.Awake();
+       
+        stats.attackable = attackMask;
+        stats.damage = 5f;
+        stats.speed = 15f;
+        stats.lifeTime = 3f;
     }
 
-    private void Update()
+    protected override void Update()
     {
-
-        transform.Translate(moveDirection * bulletSpeed * Time.deltaTime, Space.World);
-
+        base.Update();
     }
 
-    public void Init(Vector2 direction,float speed)
+    public override void Init(Vector2 dir, Vector3 pos)
     {
-        moveDirection = direction.normalized;
-        bulletSpeed = speed;
-
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle);
-
-        Destroy(gameObject, lifeTime);
-
+        base.Init(dir, pos);    
+        Rotating(dir);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected override void Triggered(Collider2D collision)
     {
-        if (((1 << collision.gameObject.layer) & attackMask) == 0)
+        if (((1 << collision.gameObject.layer) & stats.attackable) == 0)
             return;
+        switch(collision.gameObject.layer)
+        {
+            case (int)Layers.terrain:
+                transform.SetParent(parent);
+                gameObject.SetActive(false);
+                break;
+            case (int)Layers.enviroment:
+                break;
+            case (int)Layers.enemy:
+                break;
+            case (int)Layers.player:
+                transform.SetParent(parent);
+                gameObject.SetActive(false);
+                break;
+            case (int)Layers.border:
+                break;
+            case (int)Layers.invincible:
+                break;
+        }
 
-        gameObject.SetActive(false);
     }
+
 }
