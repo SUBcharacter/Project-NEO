@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "GrabPattern", menuName = "Boss/Patterns/Grab")]
@@ -109,6 +110,9 @@ public class GrabPattern : BossPattern
             await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
         }
     }
+
+    // targetRb 건드리지 않고 스테이트 접근으로다가
+    // Grab 패턴 에서 ChangingState함수에 stats["Stun"] 뭐 이런식으로 접근
 
     private async Awaitable ProcessGrabSequence()
     {
