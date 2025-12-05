@@ -2,23 +2,20 @@ using UnityEngine;
 
 public class SightRange : MonoBehaviour
 {
-    // Inspector에서 설정할 시야 관련 변수들
+ 
     [Header("FOV Settings")]
-    [SerializeField] private float viewRadius = 5f; // 시야 반경
-    [Range(0, 360)] // 슬라이더 형태로 0~360 범위 설정
-    [SerializeField] private float viewAngle = 90f; // 시야각 (0~360도)
+    [SerializeField] private float viewRadius = 5f; 
+    [Range(0, 360)] 
+    [SerializeField] private float viewAngle = 90f; 
 
-    // 플레이어와 장애물 레이어를 Inspector에서 설정
-    [SerializeField] private LayerMask targetLayer; // 플레이어 레이어
-    [SerializeField] private LayerMask obstacleLayer; // 장애물 레이어 
+    [SerializeField] private LayerMask targetLayer; 
+    [SerializeField] private LayerMask obstacleLayer;  
 
-    // 플레이어 감지 여부
+    
     public bool IsPlayerInSight { get; private set; } = false;
 
-    // 플레이어가 감지되면 그 플레이어의 트랜스폼을 저장
     public Transform PlayerInSight { get; private set; }
 
-    // 매 프레임 시야 내 플레이어 찾기
     void Update()
     {
         FindTargetsInFOV();
@@ -27,15 +24,12 @@ public class SightRange : MonoBehaviour
     private void FindTargetsInFOV()
     {
 
-        float dirMultiplier = Mathf.Sign(transform.localScale.x); // +1 또는 -1
+        float dirMultiplier = Mathf.Sign(transform.localScale.x); 
         Vector2 fovDirection = Vector2.right * dirMultiplier;
-        IsPlayerInSight = false; // 매 프레임 초기화
+        IsPlayerInSight = false; 
         PlayerInSight = null;
 
-        // 시야의 기준 방향을 왼쪽
-   
-
-        //플레이어가 시야 반경 내에 있다면 그 플레이어를 향해 레이캐스트
+        //플레이어가 시야 반경 내에 있다면 플레이어를 향해 레이캐스트
         Collider2D[] targetsInRadius = Physics2D.OverlapCircleAll(transform.position, viewRadius, targetLayer);
 
         foreach (Collider2D targetCollider in targetsInRadius)
@@ -43,7 +37,6 @@ public class SightRange : MonoBehaviour
             Transform target = targetCollider.transform;
             Vector2 dirToTarget = (target.position - transform.position).normalized;
 
-            // 시야각 내에 있는지 확인
             if (Vector2.Angle(fovDirection, dirToTarget) < viewAngle / 2)
             {
                 // 장애물이 플레이어를 가리고 있는지 확인
@@ -78,10 +71,10 @@ public class SightRange : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        Gizmos.color = Color.yellow; // 시야 반경 원
+        Gizmos.color = Color.yellow; 
         Gizmos.DrawWireSphere(transform.position, viewRadius);
 
-        Gizmos.color = Color.red; // 시야각 선
+        Gizmos.color = Color.red; 
 
 
         float dirMultiplier = Mathf.Sign(transform.localScale.x);
@@ -93,7 +86,6 @@ public class SightRange : MonoBehaviour
         Gizmos.DrawLine(transform.position, transform.position + viewAngleA * viewRadius);
         Gizmos.DrawLine(transform.position, transform.position + viewAngleB * viewRadius);
 
-        // 플레이어를 감지시 선
         if (IsPlayerInSight && PlayerInSight != null)
         {
             Gizmos.color = Color.green;

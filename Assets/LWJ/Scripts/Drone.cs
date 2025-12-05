@@ -66,16 +66,9 @@ public class Drone : MonoBehaviour
         }
 
     }
-    void PerformExplosion()
-    {
-        Collider2D[] objectsInRange = Physics2D.OverlapCircleAll(transform.position, explosionRadius, damagelayer);
 
-        foreach (Collider2D col in objectsInRange)
-        {
-            Debug.Log($"{col.gameObject.name} 폭발 데미지 받음.");
-        }
 
-    }
+    #region 드론 공격 대기 코루틴
     public void WaitDroneandattackstate()
     {
         if (isWait) return;
@@ -90,6 +83,14 @@ public class Drone : MonoBehaviour
         isWait = false;
     }
 
+
+    #endregion
+
+    #region 드론 자폭
+    public void StartExplosionTimer()
+    {
+        StartCoroutine(Explosion_timer());
+    }
     IEnumerator Explosion_timer()
     {
         yield return CoroutineCasher.Wait(3f);
@@ -97,7 +98,18 @@ public class Drone : MonoBehaviour
         PerformExplosion();
         Destroy(this.gameObject);
     }
+    void PerformExplosion()
+    {
+        Collider2D[] objectsInRange = Physics2D.OverlapCircleAll(transform.position, explosionRadius, damagelayer);
 
+        foreach (Collider2D col in objectsInRange)
+        {
+            Debug.Log($"{col.gameObject.name} 폭발 데미지 받음.");
+        }
+
+    }
+
+    #endregion
     public void SetDroneActive(bool isActive)
     {
         gameObject.SetActive(isActive);
@@ -106,19 +118,6 @@ public class Drone : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, explosionRadius);
-    }
-
-    public void FlipSprite(Vector2 direction)
-    {
-        if (direction.x > 0)
-        {
-            spriteRenderer.flipY = false;
-        }
-        else
-        {
-            spriteRenderer.flipY = true;
-
-        }
     }
 
     public void FlipDrone(Drone drone, float direction)

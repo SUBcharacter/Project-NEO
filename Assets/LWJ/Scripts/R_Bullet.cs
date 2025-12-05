@@ -35,11 +35,6 @@ public class R_Bullet : MonoBehaviour
 
     }
 
-    void Triggered(Collider2D collision)
-    {
-
-    }
-
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (((1 << collision.gameObject.layer) & attackMask) == 0)
