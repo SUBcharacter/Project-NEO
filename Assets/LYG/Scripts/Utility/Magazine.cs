@@ -5,7 +5,6 @@ public class Magazine : MonoBehaviour
 {
     [SerializeField] GameObject bullet;
     [SerializeField] List<GameObject> pools;
-    [SerializeField] Dictionary<string, GameObject> dict;
 
     [SerializeField] int size;
     [SerializeField] int index;

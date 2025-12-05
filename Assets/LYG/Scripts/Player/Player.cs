@@ -51,7 +51,6 @@ public class Player : MonoBehaviour
     [SerializeField] int health;
     [SerializeField] int meleeAttackIndex;
     [SerializeField] int bulletCount;
-    [SerializeField] int index;
 
     [SerializeField] bool facingRight;
     [SerializeField] bool aiming;

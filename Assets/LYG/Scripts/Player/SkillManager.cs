@@ -319,8 +319,6 @@ public class SkillManager : MonoBehaviour
             {
                 player.UI.targetCrossHair[i].gameObject.SetActive(false);
             }
-            
-            
         }
 
         Debug.Log(targets.Length);
@@ -488,7 +486,6 @@ public class SkillManager : MonoBehaviour
         {
             player.Stamina -= flashAttack.staminaCost;
             CameraShake.instance.Shake(4, 0.2f);
-            player.Stamina -= flashAttack.staminaCost;
             Vector2 dir = facingRight ? Vector2.right : Vector2.left;
             float distance = CalculateDistance(facingRight, dir);
 
