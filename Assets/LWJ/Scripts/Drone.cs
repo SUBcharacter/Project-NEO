@@ -19,7 +19,11 @@ public class Drone : MonoBehaviour
     public LayerMask groundLayer;
     public LayerMask wallLayer;
     public float Movedistance = 1f;
+    public float D_Speed = 2f;
+    public float horizontalDirection = 1f;
+    public float wallCheckDistance = 0.5f; // 전방 벽 감지 거리
     public SightRange sightRange;
+
     void Awake()
     {
         droneStates[0] = new D_Idlestate();

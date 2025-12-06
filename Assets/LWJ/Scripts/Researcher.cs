@@ -1,10 +1,12 @@
+using System.Collections;
+using UnityEditor.Searcher;
 using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
-using System.Collections;
 public class Researcher : MonoBehaviour
 {
     [SerializeField] public Transform[] dronespawnpoints;
     [SerializeField] public Transform Player_Trans;
+
     [SerializeField] public GameObject Bullet_prefab;
     [SerializeField] public GameObject D_prefab;
 
@@ -12,6 +14,7 @@ public class Researcher : MonoBehaviour
     public ResearcherState currentStates;
 
     public SightRange sightRange;
+
     public bool isDroneSummoned = false;
 
     public LayerMask groundLayer;
@@ -19,6 +22,12 @@ public class Researcher : MonoBehaviour
 
     private SpriteRenderer spriteRenderer;
 
+    public float R_Speed = 2f;
+    public float Movedistance = 1f;
+    private float wallCheckDistance = 0.5f;
+    private float groundCheckDistance = 0.8f;
+    private float WaitTimer = 5f;
+    private float statetime;
     void Awake()
     {
         sightRange = GetComponent<SightRange>();    
@@ -32,7 +41,7 @@ public class Researcher : MonoBehaviour
 
     void Start()
     {
-       
+        statetime = Time.time + WaitTimer;
     }
 
     void Update()
@@ -61,19 +70,41 @@ public class Researcher : MonoBehaviour
         }
 
     }
-
-    #region 드론 소환 애니메이션 딜레이용 코루틴
-    public void WaitDronetimer()
+    #region 장애물 및 낭떠러지 체크
+    public bool CheckForObstacle(Researcher researcher)
     {
-        StartCoroutine(Waittimerdrone());
+        Vector2 checkDirection = (Movedistance > 0) ? Vector2.right : Vector2.left;
+
+        RaycastHit2D hit = Physics2D.Raycast(researcher.transform.position, checkDirection, wallCheckDistance, researcher.wallLayer);
+
+        return hit.collider != null;
     }
 
-    IEnumerator Waittimerdrone()
+    public bool CheckForLedge(Researcher researcher)
     {
-        yield return CoroutineCasher.Wait(2f);
-        ChangeState(R_States[2]);
+
+        Vector3 footPosition = researcher.transform.position;
+        footPosition.x += Movedistance * 0.3f;
+
+        RaycastHit2D hit = Physics2D.Raycast(footPosition, Vector2.down, groundCheckDistance, researcher.groundLayer);
+
+        return hit.collider == null;
     }
     #endregion
+
+    #region 드론 소환 애니메이션 딜레이용
+    public void StopResearcherTimer()
+    {
+       
+
+        if (Time.time >= statetime)
+        {
+            ChangeState(R_States[2]);
+        }
+    }
+    #endregion
+
+    // 현재 바라보는 방향 벡터 반환
     public Vector2 GetcurrentVect2()
     {
         float directonx = Mathf.Sign(transform.localScale.x);
@@ -96,5 +127,21 @@ public class Researcher : MonoBehaviour
         }
     }
 
-
+    public void SummonDrone()
+    {
+        int rand = Random.Range(0, dronespawnpoints.Length);
+        Transform spawnPos = dronespawnpoints[rand];
+        isDroneSummoned = true;
+        GameObject droneObject = Instantiate(D_prefab, spawnPos.position, Quaternion.identity);
+        Drone droneComponent = droneObject.GetComponent<Drone>();
+        if (droneComponent != null)
+        {
+            droneComponent.SummonInit(this.transform, Player_Trans);
+        }
+    }
+       
+    public void R_Hit()
+    {
+        
+    }
 }

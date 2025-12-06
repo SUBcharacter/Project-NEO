@@ -28,8 +28,7 @@ public class R_Bullet : Bullet
 
     protected override void Triggered(Collider2D collision)
     {
-        if (((1 << collision.gameObject.layer) & stats.attackable) == 0)
-            return;
+        if (((1 << collision.gameObject.layer) & stats.attackable) == 0) return;
         switch(collision.gameObject.layer)
         {
             case (int)Layers.terrain:

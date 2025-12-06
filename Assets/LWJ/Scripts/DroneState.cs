@@ -10,11 +10,6 @@ public abstract class DroneState
 
 public class D_Idlestate : DroneState
 {
-    float D_Speed = 2f;
-
-
-    private float wallCheckDistance = 0.5f; // 전방 벽 감지 거리
-
     public override void Start(Drone drone) 
     {
 
@@ -34,7 +29,7 @@ public class D_Idlestate : DroneState
         }
 
 
-        Vector3 movement = Vector3.right * drone.Movedistance * D_Speed * Time.deltaTime;
+        Vector3 movement = Vector3.right * drone.Movedistance * drone.D_Speed * Time.deltaTime;
         drone.transform.position += movement;
     }
 
@@ -44,7 +39,7 @@ public class D_Idlestate : DroneState
 
         Vector2 checkDirection = (drone.Movedistance > 0) ? Vector2.right : Vector2.left;
   
-        RaycastHit2D hit = Physics2D.Raycast(drone.transform.position,checkDirection,wallCheckDistance,drone.wallLayer);
+        RaycastHit2D hit = Physics2D.Raycast(drone.transform.position,checkDirection,drone.wallCheckDistance,drone.wallLayer);
 
         return hit.collider != null;
     }
@@ -73,8 +68,6 @@ public class D_Summonstate : DroneState
 }
     public class D_Attackstate : DroneState
     {
-
-    float horizontalDirection = 1f;
     public override void Start(Drone drone) 
     {
         drone.SetDroneActive(true);
@@ -89,15 +82,15 @@ public class D_Summonstate : DroneState
        
         if (directionX > 0)
         {
-            horizontalDirection = 1f;
+            drone.horizontalDirection = 1f;
         }
         else if (directionX < 0)
         {
-            horizontalDirection = -1f;
+            drone.horizontalDirection = -1f;
         }
      
             
-        drone.FlipDrone(drone, horizontalDirection);
+        drone.FlipDrone(drone, drone.horizontalDirection);
         
     }
     public override void Exit(Drone drone) { }
