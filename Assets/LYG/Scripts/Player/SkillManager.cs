@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Schema;
 using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 public class SkillManager : MonoBehaviour
@@ -24,10 +25,12 @@ public class SkillManager : MonoBehaviour
     [SerializeField] bool casting;
     [SerializeField] bool charging;
     [SerializeField] bool openFire;
+    [SerializeField] bool enhanced;
     [SerializeField] bool phantomBladeUsable;
     [SerializeField] bool chargeAttackUsable;
     [SerializeField] bool autoTargetingUsable;
     [SerializeField] bool flashAttackUsable;
+    [SerializeField] bool sandevistanUsable;
 
     public SkillStat PhantomBladeStat => phantomBlade;
     public SkillStat ChargeAttackStat => chargeAttack;
@@ -39,10 +42,10 @@ public class SkillManager : MonoBehaviour
     public float AutoTargetingTimer => autoTargetingTimer;
     public float FlashAttackTimer => flashAttackTimer;
 
-
     public bool Casting => casting;
     public bool Charging => charging;
     public bool _OpenFire => openFire;
+    public bool Enhanced => enhanced;
     public bool PhantomBladeUsable => phantomBladeUsable;
     public bool ChargeAttackUsable => chargeAttackUsable;
     public bool AutoTargetingUsable => autoTargetingUsable;
@@ -67,11 +70,65 @@ public class SkillManager : MonoBehaviour
 
     private void Update()
     {
+        OverFlowEnergyTimer();
         PhantomBladeCoolTime();
         ChargeAttackCoolTime();
         AutoTargetingCoolTime();
         FlashAttackCoolTime();
     }
+
+    #region Sandevistan
+
+    void OverFlowEnergyTimer()
+    {
+        if (player.IsDead || player.CrSt is PlayerMeleeAttackState || enhanced)
+            return;
+
+        if (player.OverFlowEnergy >= player.Stats.maxOverFlowEnergy)
+        {
+            sandevistanUsable = true;
+            player.OverFlowEnergy = player.Stats.maxOverFlowEnergy;
+            return;
+        }
+
+        sandevistanUsable = false;
+        player.OverFlowEnergy -= 2f * Time.deltaTime;
+
+        if (player.OverFlowEnergy <= 0)
+        {
+            player.OverFlowEnergy = 0;
+        }
+    }
+
+    public void SandevistanON()
+    {
+        if (!sandevistanUsable)
+            return;
+        StartCoroutine(Sandevistan());
+    }
+
+    IEnumerator Sandevistan()
+    {
+        enhanced = true;
+        sandevistanUsable = false;
+        while (true)
+        {
+            player.GhTr.gameObject.SetActive(true);
+            enhanced = true;
+            player.OverFlowEnergy -= 10 * Time.deltaTime;
+
+            if (player.OverFlowEnergy <= 0)
+            {
+                enhanced = false;
+                break;
+            }
+
+            yield return null;
+        }
+        player.GhTr.gameObject.SetActive(false);
+    }
+
+    #endregion
 
     #region Phantom Blade
 
@@ -106,8 +163,9 @@ public class SkillManager : MonoBehaviour
         {
             player.BulletCount -= phantomBlade.bulletCost;
             int index;
+            int enhancing = enhanced ? 2 : 1;
             List<int> usedIndex = new();
-            GameObject[] knives = new GameObject[phantomBlade.attackCount];
+            GameObject[] knives = new GameObject[phantomBlade.attackCount * enhancing];
             Vector2[] spawnPoints = new Vector2[spawnPoint.Length];
 
             for (int i = 0; i < spawnPoint.Length; i++)
@@ -115,7 +173,7 @@ public class SkillManager : MonoBehaviour
                 spawnPoints[i] = spawnPoint[i].localPosition;
             }
 
-            for (int i = 0; i < phantomBlade.attackCount; i++)
+            for (int i = 0; i < phantomBlade.attackCount * enhancing ; i++)
             {
                 while (true)
                 {
@@ -128,7 +186,7 @@ public class SkillManager : MonoBehaviour
                 usedIndex.Add(index);
                 knives[i] = knifePool.Fire(dir, spawnPoints[index]);
 
-                yield return CoroutineCasher.Wait(0.2f);
+                yield return CoroutineCasher.Wait(0.2f / (float)enhancing);
             }
 
             yield return CoroutineCasher.Wait(0.1f);
@@ -186,7 +244,7 @@ public class SkillManager : MonoBehaviour
             LayerMask originMask = player.gameObject.layer;
             float gravityScale = player.Rigid.gravityScale;
             float velocity = 0;
-
+            float enhancing = enhanced ? 1.5f : 1f;
             player.Rigid.gravityScale = 0;
             player.gameObject.layer = LayerMask.NameToLayer("Invincible");
             player.Rigid.linearVelocity = Vector2.zero;
@@ -196,7 +254,7 @@ public class SkillManager : MonoBehaviour
             while (true)
             {
 
-                velocity = Mathf.MoveTowards(velocity, chargeAttack.chargeSpeed, chargeAttack.chargeAccel * Time.deltaTime);
+                velocity = Mathf.MoveTowards(velocity, chargeAttack.chargeSpeed * enhancing, chargeAttack.chargeAccel * Time.deltaTime);
                 player.Rigid.linearVelocity = dir * velocity;
 
                 if (chargeHitBox.Trigger)
@@ -302,8 +360,8 @@ public class SkillManager : MonoBehaviour
         Vector2.Distance(player.transform.position,a.transform.position).
         CompareTo(Vector2.Distance(player.transform.position,b.transform.position))
         );
-
-        int count = Mathf.Min(autoTargeting.bulletCost, targets.Length);
+        int enhancing = enhanced ? 2 : 1;
+        int count = Mathf.Min(autoTargeting.bulletCost * enhancing, targets.Length);
         Collider2D[] result = new Collider2D[count];
 
         Array.Copy(targets, result, count);
@@ -337,6 +395,7 @@ public class SkillManager : MonoBehaviour
 
         CameraShake.instance.Shake(4, 0.2f);
         autoTargetingUsable = false;
+        int enhancing = enhanced ? 2 : 1;
         foreach(var t in targets)
         {
             if (t == null)
@@ -346,11 +405,13 @@ public class SkillManager : MonoBehaviour
                 case (int)Layers.enemy:
                     Debug.Log("HeadShot");
                     player.BulletCount--;
+                    // t.GetComponent<Enemy>().TakeDamage(autoTargeting.damage * enhancing);
                     t.gameObject.SetActive(false);
                     break;
                 case (int)Layers.boss:
                     Debug.Log("HeadShot");
                     player.BulletCount--;
+                    // t.GetComponent<Boss>().TakeDamage(autoTargeting.damage * enhancing);
                     t.gameObject.SetActive(false);
                     break;
             }

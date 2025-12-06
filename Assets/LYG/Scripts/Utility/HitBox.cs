@@ -15,7 +15,7 @@ public abstract class HitBox : MonoBehaviour
 
     protected abstract void Awake();
 
-    public abstract void Init();
+    public abstract void Init(bool enhanced = false);
 
     // OnCollision 이벤트 용
     protected abstract void Triggered(Collision2D collision);

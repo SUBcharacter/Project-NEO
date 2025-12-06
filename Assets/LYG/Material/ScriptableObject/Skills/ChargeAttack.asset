@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cc69c584d200c74bb11382c26bdb989, type: 3}
   m_Name: ChargeAttack
   m_EditorClassIdentifier: 
-  staminaCost: 5
+  staminaCost: 15
   coolTime: 2
   bulletCost: 0
   damage: 0

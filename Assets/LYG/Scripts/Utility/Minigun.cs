@@ -6,6 +6,8 @@ public class Minigun : Weapon
 
     protected override void Awake()
     {
+        firing = false;
+        player = FindAnyObjectByType<Player>();
         ren = GetComponentsInChildren<SpriteRenderer>();
         mag = GetComponentInChildren<Magazine>();
         foreach (var r in ren)
@@ -27,6 +29,6 @@ public class Minigun : Weapon
         CameraShake.instance.Shake(4, 0.1f);
         float rand = Random.Range(-3f, 3f);
         dir = Quaternion.Euler(0, 0, rand) * dir;
-        mag.Fire(dir, muzzle.position);
+        mag.Fire(dir, muzzle.position, player.SkMn.Enhanced);
     }
 }

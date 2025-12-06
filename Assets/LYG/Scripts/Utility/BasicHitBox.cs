@@ -2,14 +2,17 @@ using UnityEngine;
 
 public class BasicHitBox : HitBox
 {
+    bool enhance;
+
     protected override void Awake()
     {
         triggered = false;
         col = GetComponent<Collider2D>();
     }
 
-    public override void Init()
+    public override void Init(bool enhanced = false)
     {
+        enhance = enhanced;
         triggered = false;
         gameObject.SetActive(true);
     }
@@ -18,7 +21,7 @@ public class BasicHitBox : HitBox
     {
         if (((1 << collision.gameObject.layer) & stats.attackable) == 0)
             return;
-
+        // enhance 여부로 데미지 결정 할 것
         switch (collision.gameObject.layer)
         {
             case (int)Layers.terrain:

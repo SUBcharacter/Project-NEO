@@ -7,6 +7,7 @@ public class Handgun : Weapon
     protected override void Awake()
     {
         firing = false;
+        player = FindAnyObjectByType<Player>();
         ren = GetComponentsInChildren<SpriteRenderer>();
         mag = GetComponentInChildren<Magazine>();
         foreach(var r in ren)
@@ -25,7 +26,7 @@ public class Handgun : Weapon
 
     public override void Launch(Vector2 dir)
     {
-        mag.Fire(dir, muzzle.position);
+        mag.Fire(dir, muzzle.position, player.SkMn.Enhanced);
     }
 
     

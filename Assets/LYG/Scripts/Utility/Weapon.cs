@@ -2,6 +2,7 @@ using UnityEngine;
 
 public abstract class Weapon : MonoBehaviour
 {
+    [SerializeField] protected Player player;
     [SerializeField] protected SpriteRenderer[] ren;
     [SerializeField] protected Magazine mag;
     [SerializeField] protected ShotMode mode;

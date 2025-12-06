@@ -7,6 +7,7 @@ public class DoubleTap : Weapon
     protected override void Awake()
     {
         firing = false;
+        player = FindAnyObjectByType<Player>();
         ren = GetComponentsInChildren<SpriteRenderer>();
         mag = GetComponentInChildren<Magazine>();
         foreach (var r in ren)
@@ -27,7 +28,7 @@ public class DoubleTap : Weapon
     {
         foreach(var m in muzzle)
         {
-            mag.Fire(dir, m.position);
+            mag.Fire(dir, m.position, player.SkMn.Enhanced);
         }
     }
 }

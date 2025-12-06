@@ -30,7 +30,7 @@ public class Knife : Bullet
         }
     }
 
-    public override void Init(Vector2 dir, Vector3 pos)
+    public override void Init(Vector2 dir, Vector3 pos, bool enhanced = false)
     {
         parent = GetComponentInParent<Transform>();
         transform.SetParent(parent);

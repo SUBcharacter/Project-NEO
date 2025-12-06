@@ -26,8 +26,8 @@ public class Player : MonoBehaviour
     [SerializeField] SpriteRenderer ren;
     [SerializeField] Dictionary<string, PlayerState> states = new();
     [SerializeField] GameObject meleeAttackHitBox;
-    [SerializeField] GameObject meleeAirAttackHitBox;
-    [SerializeField] GameObject[] meleeAttackHitBoxes;
+    [SerializeField] HitBox meleeAirAttackHitBox;
+    [SerializeField] HitBox[] meleeAttackHitBoxes;
     [SerializeField] Transform armPositon;
     [SerializeField] Transform[] knifeSpawnPointUpper;
     [SerializeField] Transform[] knifeSpawnPoint;
@@ -45,8 +45,8 @@ public class Player : MonoBehaviour
     [SerializeField] Vector2 mousePos;
     [SerializeField] WeaponState currentWeapon;
 
-    [SerializeField] float staminaTimer;
     [SerializeField] float stamina;
+    [SerializeField] float overFlowEnergy;
 
     [SerializeField] int health;
     [SerializeField] int meleeAttackIndex;
@@ -58,7 +58,7 @@ public class Player : MonoBehaviour
     [SerializeField] bool hit;
     [SerializeField] bool attacking;
     [SerializeField] bool isDead;
-    [SerializeField] bool enhanced;
+    
 
     public SpriteRenderer Ren => ren;
     public SkillManager SkMn => skillManager;
@@ -77,6 +77,7 @@ public class Player : MonoBehaviour
     public WeaponState CrWp => currentWeapon;
 
     public float Stamina { get => stamina; set => stamina = value; }
+    public float OverFlowEnergy { get => overFlowEnergy; set => overFlowEnergy = value; }
 
     public int MeleeAttackIndex { get => meleeAttackIndex; set => meleeAttackIndex = value; }
     public int BulletCount { get => bulletCount; set => bulletCount = value; }
@@ -111,10 +112,12 @@ public class Player : MonoBehaviour
     {
         if (isDead)
             return;
-
+        if(Input.GetKeyDown(KeyCode.P))
+        {
+            GetOverFlowEnergy(10f);
+        }
         currentState?.Update(this);
         StaminaTimer();
-
 
         if (hit)
             return;
@@ -151,6 +154,7 @@ public class Player : MonoBehaviour
         bulletCount = stats.maxBullet;
         meleeAttackIndex = 0;
         stamina = stats.maxStamina;
+        overFlowEnergy = 0;
         isDead = false;
         currentWeapon = WeaponState.Melee;
         ChangeState(states["Idle"]);
@@ -162,16 +166,11 @@ public class Player : MonoBehaviour
         // 현재 초당 10% 설정
         if (isDead)
             return;
-        staminaTimer += Time.deltaTime;
+        stamina += stats.staminaRecoveryAmount * Time.deltaTime;
 
-        if(staminaTimer > stats.staminaRecoveryDuration)
+        if(stamina >= stats.maxStamina)
         {
-            staminaTimer = 0;
-            stamina += stats.staminaRecoveryAmount;
-            if(stamina >= stats.maxStamina)
-            {
-                stamina = stats.maxStamina;
-            }
+            stamina = stats.maxStamina;
         }
     }
 
@@ -230,7 +229,8 @@ public class Player : MonoBehaviour
         }
         else
         {
-            speed = stats.speed;
+
+            speed = skillManager.Enhanced ? stats.speed*2 : stats.speed;
         }
 
         Vector2 moveVelocity = input.MoveVec * speed;
@@ -411,6 +411,13 @@ public class Player : MonoBehaviour
         skillManager.InitiatingFlashAttack(facingRight);
     }
 
+    void Sandevistan()
+    {
+        if (skillManager.Enhanced)
+            return;
+        skillManager.SandevistanON();
+    }
+
     #endregion
 
     #region public Function
@@ -483,6 +490,18 @@ public class Player : MonoBehaviour
         if(health >= stats.maxHealth)
         {
             health = stats.maxHealth;
+        }
+    }
+
+    public void GetOverFlowEnergy(float amount)
+    {
+        if (skillManager.Enhanced)
+            return;
+        overFlowEnergy += amount;
+
+        if(overFlowEnergy >= stats.maxOverFlowEnergy)
+        {
+            overFlowEnergy = stats.maxOverFlowEnergy;
         }
     }
 
@@ -659,6 +678,17 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void OverFlowSkill(InputAction.CallbackContext context)
+    {
+        if (currentState is PlayerHitState)
+            return;
+
+        if(context.performed)
+        {
+            Sandevistan();
+        }
+    }
+
     #endregion
 
     #endregion
@@ -676,7 +706,7 @@ public class Player : MonoBehaviour
         Debug.Log("베기");
         attacking = true;
 
-        meleeAttackHitBoxes[meleeAttackIndex].SetActive(true);
+        meleeAttackHitBoxes[meleeAttackIndex].Init(skillManager.Enhanced);
 
         rigid.linearVelocity = Vector2.zero;
         if(dir.x > 0)
@@ -691,7 +721,11 @@ public class Player : MonoBehaviour
         yield return CoroutineCasher.Wait(0.1f);
 
         rigid.linearVelocity = Vector2.zero;
-        meleeAttackHitBoxes[meleeAttackIndex].SetActive(false);
+        if (meleeAttackHitBoxes[meleeAttackIndex].GetComponent<HitBox>().Trigger)
+        {
+            GetOverFlowEnergy(10f);
+        }
+        meleeAttackHitBoxes[meleeAttackIndex].gameObject.SetActive(false);
         meleeAttackIndex = (meleeAttackIndex + 1) % meleeAttackHitBoxes.Length;
 
         yield return CoroutineCasher.Wait(0.1f);
@@ -706,14 +740,18 @@ public class Player : MonoBehaviour
         Debug.Log("베기");
         attacking = true;
 
-        meleeAttackHitBoxes[meleeAttackIndex].SetActive(true);
+        meleeAttackHitBoxes[meleeAttackIndex].Init(skillManager.Enhanced);
 
         yield return CoroutineCasher.Wait(0.05f);
 
-        meleeAttackHitBoxes[meleeAttackIndex].SetActive(false);
+        if (meleeAttackHitBoxes[meleeAttackIndex].GetComponent<HitBox>().Trigger)
+        {
+            GetOverFlowEnergy(10f);
+        }
+        meleeAttackHitBoxes[meleeAttackIndex].gameObject.SetActive(false);
         meleeAttackIndex = (meleeAttackIndex + 1) % meleeAttackHitBoxes.Length;
 
-        meleeAttackHitBoxes[meleeAttackIndex].SetActive(true);
+        meleeAttackHitBoxes[meleeAttackIndex].Init(skillManager.Enhanced);
 
         rigid.linearVelocity = Vector2.zero;
         if (dir.x > 0)
@@ -728,7 +766,11 @@ public class Player : MonoBehaviour
         yield return CoroutineCasher.Wait(0.05f);
 
         rigid.linearVelocity = Vector2.zero;
-        meleeAttackHitBoxes[meleeAttackIndex].SetActive(false);
+        if (meleeAttackHitBoxes[meleeAttackIndex].GetComponent<HitBox>().Trigger)
+        {
+            GetOverFlowEnergy(10f);
+        }
+        meleeAttackHitBoxes[meleeAttackIndex].gameObject.SetActive(false);
         meleeAttackIndex = (meleeAttackIndex + 1) % meleeAttackHitBoxes.Length;
 
         yield return CoroutineCasher.Wait(0.1f);
@@ -743,7 +785,7 @@ public class Player : MonoBehaviour
         Debug.Log("근접 사격");
         attacking = true;
 
-        meleeAttackHitBoxes[meleeAttackIndex].SetActive(true);
+        meleeAttackHitBoxes[meleeAttackIndex].Init(skillManager.Enhanced);
         rigid.linearVelocity = Vector2.zero;
 
         if (dir.x > 0)
@@ -756,8 +798,11 @@ public class Player : MonoBehaviour
         }
         yield return CoroutineCasher.Wait(0.1f);
 
-        
-        meleeAttackHitBoxes[meleeAttackIndex].SetActive(false);
+        if (meleeAttackHitBoxes[meleeAttackIndex].GetComponent<HitBox>().Trigger)
+        {
+            GetOverFlowEnergy(10f);
+        }
+        meleeAttackHitBoxes[meleeAttackIndex].gameObject.SetActive(false);
         meleeAttackIndex = (meleeAttackIndex + 1) % meleeAttackHitBoxes.Length;
 
         yield return CoroutineCasher.Wait(0.1f);
@@ -774,19 +819,27 @@ public class Player : MonoBehaviour
         // 애니메이션 완성시 변경 예정
         attacking = true;
 
-        meleeAirAttackHitBox.SetActive(true);
+        meleeAirAttackHitBox.Init(skillManager.Enhanced);
         Debug.Log("에어 슬래쉬!");
         if(check.IsGround)
         {
             attacking = false;
-            meleeAirAttackHitBox.SetActive(false);
+            if (meleeAirAttackHitBox.GetComponent<HitBox>().Trigger)
+            {
+                GetOverFlowEnergy(10f);
+            }
+            meleeAirAttackHitBox.gameObject.SetActive(false);
             yield break;
         }
         rigid.linearVelocityY = 0;
         rigid.AddForce(Vector2.up * 3, ForceMode2D.Impulse);
         yield return CoroutineCasher.Wait(0.1f);
+        if(meleeAirAttackHitBox.GetComponent<HitBox>().Trigger)
+        {
+            GetOverFlowEnergy(10f);
+        }
 
-        meleeAirAttackHitBox.SetActive(false);
+        meleeAirAttackHitBox.gameObject.SetActive(false);
 
         yield return CoroutineCasher.Wait(0.1f);
         attacking = false;

@@ -15,6 +15,7 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] Image phantomBladeIcon;
     [SerializeField] Image autoTargetingIcon;
     [SerializeField] Image stamina;
+    [SerializeField] Image overFlowEnergy;
     [SerializeField] Text bulletCount;
 
     public Image playerCrossHair;
@@ -23,7 +24,7 @@ public class PlayerUI : MonoBehaviour
     private void Awake()
     {
         player = GetComponentInParent<Player>();
-        for(int i = 0; i< 10; i++)
+        for(int i = 0; i< 12; i++)
         {
             Image instance = Instantiate(targetCrossHairPrefab, transform);
             targetCrossHair.Add(instance);
@@ -40,6 +41,7 @@ public class PlayerUI : MonoBehaviour
     {
         bulletCount.text = player.BulletCount.ToString();
         stamina.fillAmount = player.Stamina / player.Stats.maxStamina;
+        overFlowEnergy.fillAmount = player.OverFlowEnergy / player.Stats.maxOverFlowEnergy;
         switch(player.CrWp)
         {
             case WeaponState.Melee:

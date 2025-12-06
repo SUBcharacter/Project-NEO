@@ -4,12 +4,12 @@ using UnityEngine;
 public class Shotgun : Weapon
 {
     [SerializeField] Transform muzzle;
-    [SerializeField] Player player;
 
     [SerializeField] int pellet;
 
     protected override void Awake()
     {
+        firing = false;
         player = FindAnyObjectByType<Player>();
         ren = GetComponentsInChildren<SpriteRenderer>();
         mag = GetComponentInChildren<Magazine>();
@@ -35,7 +35,7 @@ public class Shotgun : Weapon
             Vector2 originDir = dir;
             float rand = Random.Range(-60f, 60f);
             originDir = Quaternion.Euler(0, 0, rand) * originDir;
-            mag.Fire(originDir, muzzle.position);
+            mag.Fire(originDir, muzzle.position, player.SkMn.Enhanced);
         }
         StartCoroutine(Recoil());
         player.Rigid.linearVelocity = Vector2.zero;

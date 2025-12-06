@@ -72,5 +72,10 @@ public class PlayerInput : MonoBehaviour
         player.Skill2(context);
     }
 
+    public void OverFlowSkill(InputAction.CallbackContext context)
+    {
+        player.OverFlowSkill(context);
+    }
+
     #endregion
 }

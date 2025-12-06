@@ -53,6 +53,11 @@ public class PlayerMeleeAttackState : PlayerState
 
         // 진정 타이머 업데이트
         timer += Time.deltaTime;
+        if (timer >= player.Stats.MeleeAttackInitTime)
+        {
+            player.MeleeAttackIndex = 0;
+        }
+
         if (timer >= player.Stats.MeleeAttackRelaxTime)
         {
             player.ChangeState(player.States["Idle"]);

@@ -19,6 +19,7 @@ public class PlayerStats : ScriptableObject
     [Header("Cost Stats")]
     public int maxBullet;
     public float maxStamina;
+    public float maxOverFlowEnergy;
     public float staminaRecoveryDuration;
     public float staminaRecoveryAmount;
 
@@ -29,6 +30,7 @@ public class PlayerStats : ScriptableObject
     public float slopeLostDuration;
 
     [Header("Relax Time")]
+    public float MeleeAttackInitTime;
     public float MeleeAttackRelaxTime;
     public float RangeAttackRelaxTime;
 
