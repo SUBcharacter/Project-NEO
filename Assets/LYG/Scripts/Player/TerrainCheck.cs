@@ -39,8 +39,10 @@ public class TerrainCheck : MonoBehaviour
         player = GetComponent<Player>();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
+        if (player.CrSt is PlayerCrowdControlState)
+            return;
         GroundCheck();
         WallCheck();
     }

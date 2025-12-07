@@ -1,14 +1,13 @@
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
-public class BulletOrb : Orb
+public class EnergyOrb : Orb
 {
     protected override void Awake()
     {
         player = FindAnyObjectByType<Player>();
         rigid = GetComponent<Rigidbody2D>();
         timer = lifeTime;
-        int rand = Random.Range(1, 4);
+        int rand = Random.Range(8,12);
         amount = rand;
     }
 
@@ -21,16 +20,15 @@ public class BulletOrb : Orb
 
         if (timer <= 0)
         {
-            player.GetBullet((int)amount);
+            player.GetOverFlowEnergy(amount);
             gameObject.SetActive(false);
         }
-
     }
 
     public override void Init(Vector3 pos)
     {
         transform.position = pos;
-        int rand = Random.Range(1, 4);
+        int rand = Random.Range(8, 12);
         amount = rand;
         timer = lifeTime;
         gameObject.SetActive(true);
@@ -41,7 +39,8 @@ public class BulletOrb : Orb
         if (((1 << collision.gameObject.layer) & absorbable) == 0)
             return;
 
-        player.GetBullet((int)amount);
+        player.GetOverFlowEnergy(amount);
         gameObject.SetActive(false);
     }
+
 }

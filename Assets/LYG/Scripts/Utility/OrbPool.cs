@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class OrbPool : MonoBehaviour
 {
-    [SerializeField] GameObject orbPrefab;
-    [SerializeField] List<GameObject> pool;
+    [SerializeField] Orb orbPrefab;
+    [SerializeField] List<Orb> pool;
 
     [SerializeField] int index;
     [SerializeField] int size;
@@ -14,9 +14,9 @@ public class OrbPool : MonoBehaviour
     {
         for(int i = 0; i< size; i++)
         {
-            GameObject instance = Instantiate(orbPrefab, transform);
+            Orb instance = Instantiate(orbPrefab, transform);
             pool.Add(instance);
-            pool[i].SetActive(false);
+            pool[i].gameObject.SetActive(false);
         }
     }
 
@@ -31,7 +31,7 @@ public class OrbPool : MonoBehaviour
 
     public void SpawnOrb(Vector3 pos)
     {
-        pool[index].GetComponent<BulletOrb>().Init(pos);
+        pool[index].GetComponent<Orb>().Init(pos);
         index = (index + 1) % size;
     }
 

@@ -70,8 +70,12 @@ public class Bullet : MonoBehaviour
         switch(collision.gameObject.layer)
         {
             case (int)Layers.terrain:
+                transform.SetParent(parent);
+                gameObject.SetActive(false);
                 break;
             case (int)Layers.enviroment:
+                transform.SetParent(parent);
+                gameObject.SetActive(false);
                 break;
             case (int)Layers.enemy:
                 break;

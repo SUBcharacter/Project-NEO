@@ -162,6 +162,8 @@ public class Player : MonoBehaviour
 
     void StaminaTimer()
     {
+        if (currentState is PlayerCrowdControlState)
+            return;
         // 스태미너 리얼 타임 회복
         // 현재 초당 10% 설정
         if (isDead)
@@ -176,7 +178,7 @@ public class Player : MonoBehaviour
 
     void SpriteControl()
     {
-        if (currentState is PlayerHitState)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState)
             return;
         // 마우스 위치와 입력에 따른 스프라이트 변화 - 수정 예정
         if(aiming || attacking)
@@ -218,7 +220,8 @@ public class Player : MonoBehaviour
     void Move()
     {
         // 회피, 차지어택, 근접 공격, 피격 시 리턴
-        if (currentState is PlayerHitState || dodging || skillManager.Charging || attacking || arm.Firing)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState 
+            || dodging || skillManager.Charging || attacking || arm.Firing)
             return;
 
         // 기본 속도 최대 속도
@@ -283,7 +286,8 @@ public class Player : MonoBehaviour
     void MeleeAttack()
     {
         // 차지어택, 근접공격 중, 피격 시 리턴
-        if (currentState is PlayerHitState || skillManager.Charging || attacking)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState 
+            || skillManager.Charging || attacking)
             return;
 
         // 근접 공격 상태가 아닐 경우 진입
@@ -326,7 +330,8 @@ public class Player : MonoBehaviour
         ChangeState(states["RangeAttack"]);
 
         // 총알 없을 시, 차지 어택 시, 피격 시 리턴
-        if (currentState is PlayerHitState || skillManager.Charging || bulletCount <= 0)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState
+            || skillManager.Charging || bulletCount <= 0)
             return;
 
         // 사격 함수
@@ -509,7 +514,8 @@ public class Player : MonoBehaviour
     // 입력 함수들
     public void Jump(InputAction.CallbackContext context)
     {
-        if (currentState is PlayerHitState || skillManager.Charging || dodging)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState
+            || skillManager.Charging || dodging)
             return;
 
         if (context.started)
@@ -547,7 +553,8 @@ public class Player : MonoBehaviour
 
     public void SwitchWeapon(InputAction.CallbackContext context)
     {
-        if (currentState is PlayerHitState || skillManager.Charging || dodging)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState
+            || skillManager.Charging || dodging)
             return;
 
         if (context.performed)
@@ -573,7 +580,8 @@ public class Player : MonoBehaviour
 
     public void InitiateAttack(InputAction.CallbackContext context)
     {
-        if (currentState is PlayerHitState || dodging || skillManager.Charging)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState
+            || dodging || skillManager.Charging)
             return;
 
         if (context.performed)
@@ -611,7 +619,8 @@ public class Player : MonoBehaviour
 
     public void Dodge(InputAction.CallbackContext context)
     {
-        if (currentState is PlayerHitState || skillManager.Charging || dodging || !check.CanDodge)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState
+            || skillManager.Charging || dodging || !check.CanDodge)
             return;
         // 회피 상태 or 회피 기회 소모시 불가
         // 회피 함수
@@ -630,7 +639,7 @@ public class Player : MonoBehaviour
     public void Skill1(InputAction.CallbackContext context)
     {
         Debug.Log("스킬 1");
-        if (currentState is PlayerHitState)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState)
             return;
 
         if (context.performed)
@@ -650,7 +659,7 @@ public class Player : MonoBehaviour
     public void Skill2(InputAction.CallbackContext context)
     {
         Debug.Log("스킬 2");
-        if (currentState is PlayerHitState)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState)
             return;
 
         if (context.performed)
@@ -669,7 +678,7 @@ public class Player : MonoBehaviour
 
     public void Parrying(InputAction.CallbackContext context)
     {
-        if (currentState is PlayerHitState || skillManager.Charging)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState || skillManager.Charging)
             return;
         // 제작 중
         if (context.performed)
@@ -680,7 +689,7 @@ public class Player : MonoBehaviour
 
     public void OverFlowSkill(InputAction.CallbackContext context)
     {
-        if (currentState is PlayerHitState)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState)
             return;
 
         if(context.performed)

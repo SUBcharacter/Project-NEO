@@ -22,6 +22,9 @@ public class PlayerInput : MonoBehaviour
     #region Input System
     public void OnMove(InputAction.CallbackContext context)
     {
+        if (player.CrSt is PlayerCrowdControlState)
+            return;
+
         if (context.performed)
         {
             moveVec = context.ReadValue<Vector2>();
@@ -34,6 +37,9 @@ public class PlayerInput : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
+        if (player.CrSt is PlayerCrowdControlState)
+            return;
+
         player.Jump(context);
     }
 
@@ -49,31 +55,49 @@ public class PlayerInput : MonoBehaviour
 
     public void OnSubAttack(InputAction.CallbackContext context)
     {
+        if (player.CrSt is PlayerCrowdControlState)
+            return;
+
         player.Parrying(context);
     }
 
     public void OnDodge(InputAction.CallbackContext context)
     {
+        if (player.CrSt is PlayerCrowdControlState)
+            return;
+
         player.Dodge(context);
     }
 
     public void OnSwitch(InputAction.CallbackContext context)
     {
+        if (player.CrSt is PlayerCrowdControlState)
+            return;
+
         player.SwitchWeapon(context);
     }
 
     public void OnSkill1(InputAction.CallbackContext context)
     {
+        if (player.CrSt is PlayerCrowdControlState)
+            return;
+
         player.Skill1(context);
     }
 
     public void OnSkill2(InputAction.CallbackContext context)
     {
+        if (player.CrSt is PlayerCrowdControlState)
+            return;
+
         player.Skill2(context);
     }
 
     public void OverFlowSkill(InputAction.CallbackContext context)
     {
+        if (player.CrSt is PlayerCrowdControlState)
+            return;
+
         player.OverFlowSkill(context);
     }
 

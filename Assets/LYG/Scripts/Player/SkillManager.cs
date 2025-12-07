@@ -111,6 +111,7 @@ public class SkillManager : MonoBehaviour
     {
         enhanced = true;
         sandevistanUsable = false;
+        EventManager.Publish(Event.Stop);
         while (true)
         {
             player.GhTr.gameObject.SetActive(true);
@@ -125,6 +126,7 @@ public class SkillManager : MonoBehaviour
 
             yield return null;
         }
+        EventManager.Publish(Event.Play);
         player.GhTr.gameObject.SetActive(false);
     }
 
