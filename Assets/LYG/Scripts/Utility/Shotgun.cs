@@ -1,9 +1,11 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class Shotgun : Weapon
 {
     [SerializeField] Transform muzzle;
+    [SerializeField] Light2D muzzleFlash;
 
     [SerializeField] int pellet;
 
@@ -11,12 +13,14 @@ public class Shotgun : Weapon
     {
         firing = false;
         player = FindAnyObjectByType<Player>();
-        ren = GetComponentsInChildren<SpriteRenderer>();
         mag = GetComponentInChildren<Magazine>();
+        muzzleFlash = GetComponentInChildren<Light2D>();
+        ren = GetComponentsInChildren<SpriteRenderer>();
         foreach (var r in ren)
         {
             r.enabled = false;
         }
+        muzzleFlash.enabled = false;
     }
 
     public override void EnableSprite(bool value)
@@ -37,6 +41,7 @@ public class Shotgun : Weapon
             originDir = Quaternion.Euler(0, 0, rand) * originDir;
             mag.Fire(originDir, muzzle.position, player.SkMn.Enhanced);
         }
+        StartCoroutine(MuzzleFlash());
         StartCoroutine(Recoil());
         player.Rigid.linearVelocity = Vector2.zero;
         player.Rigid.linearVelocity += (-dir * 6);
@@ -47,5 +52,14 @@ public class Shotgun : Weapon
         firing = true;
         yield return CoroutineCasher.Wait(0.5f);
         firing = false;
+    }
+
+    IEnumerator MuzzleFlash()
+    {
+        muzzleFlash.enabled = true;
+
+        yield return CoroutineCasher.Wait(0.01f);
+
+        muzzleFlash.enabled = false;
     }
 }

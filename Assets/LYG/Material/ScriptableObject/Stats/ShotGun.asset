@@ -17,4 +17,4 @@ MonoBehaviour:
     m_Bits: 2760
   speed: 65
   damage: 3
-  lifeTime: 1.5
+  lifeTime: 3

@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UIElements;
 
 public class LaserTurret : MonoBehaviour
@@ -8,6 +9,7 @@ public class LaserTurret : MonoBehaviour
     [SerializeField] Transform target;
     [SerializeField] Transform muzzle;
     [SerializeField] LineRenderer aimLine;
+    [SerializeField] Light2D charging;
     [SerializeField] Detector detector;
     [SerializeField] Coroutine fire;
     [SerializeField] Quaternion origin;
@@ -30,6 +32,8 @@ public class LaserTurret : MonoBehaviour
         origin = transform.rotation;
         aimLine = GetComponent<LineRenderer>();
         detector = GetComponent<Detector>();
+        charging = GetComponentInChildren<Light2D>();
+        charging.intensity = 1;
     }
 
     private void OnEnable()
@@ -97,6 +101,7 @@ public class LaserTurret : MonoBehaviour
             {
                 Aiming();
                 timer += Time.deltaTime;
+                charging.intensity = Mathf.Lerp(charging.intensity, 50, 0.5f * Time.deltaTime);
             }
             else
             {
@@ -110,6 +115,7 @@ public class LaserTurret : MonoBehaviour
             {
                 Aiming();
                 timer = 0;
+                charging.intensity = Mathf.Lerp(charging.intensity, 1, Time.deltaTime * 10);
             }
         }
     }
@@ -154,6 +160,7 @@ public class LaserTurret : MonoBehaviour
         }
 
         timer = 0;
+        charging.intensity = 1;
         Destroy(hitBox);
         fire = null;
     }

@@ -47,6 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parent: {fileID: 0}
   ren: {fileID: 0}
+  lit: {fileID: 0}
   timer: 0
   lifeTime: 0.3
 --- !u!1 &8070891230753073266
@@ -122,8 +123,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1917880561
+  m_SortingLayer: 1
   m_SortingOrder: 1
   m_Sprite: {fileID: -7237264706608541097, guid: 30f013a7aef425c4985a0265daa5988a, type: 3}
   m_Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}

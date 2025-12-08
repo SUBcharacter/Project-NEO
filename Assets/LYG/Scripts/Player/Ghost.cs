@@ -1,5 +1,6 @@
 using UnityEditor.Build;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class Ghost : MonoBehaviour
 {
@@ -22,7 +23,7 @@ public class Ghost : MonoBehaviour
 
         float t = Mathf.Clamp01(timer / lifeTime);
         float hue = 1f - t;
-        Color c = Color.HSVToRGB(hue, 1f, 0.5f);
+        Color c = Color.HSVToRGB(hue, 1f, 1f);
         c.a = t;
         ren.color = c;
 
