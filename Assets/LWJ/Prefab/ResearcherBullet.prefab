@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4388087325454938299}
   - component: {fileID: 6022489960365784647}
   - component: {fileID: 3602201829359547521}
+  - component: {fileID: 3489716275953288698}
   m_Layer: 0
   m_Name: ResearcherBullet
   m_TagString: Untagged
@@ -288,3 +289,18 @@ MonoBehaviour:
   attackMask:
     serializedVersion: 2
     m_Bits: 328
+--- !u!114 &3489716275953288698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 337160583029289659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3de446919f09654c9e54f1378b14e27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  col: {fileID: 0}
+  stats: {fileID: 11400000, guid: 236de589a825acd47a0013f44351e667, type: 2}
+  triggered: 0

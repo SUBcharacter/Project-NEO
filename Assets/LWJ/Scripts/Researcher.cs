@@ -10,7 +10,7 @@ public class Researcher : MonoBehaviour
     [SerializeField] public GameObject Bullet_prefab;
     [SerializeField] public GameObject D_prefab;
 
-    public ResearcherState[] R_States = new ResearcherState[3];
+    public ResearcherState[] R_States = new ResearcherState[4];
     public ResearcherState currentStates;
 
     public SightRange sightRange;
@@ -21,27 +21,35 @@ public class Researcher : MonoBehaviour
     public LayerMask wallLayer;
 
     private SpriteRenderer spriteRenderer;
-
+    private SpriteRenderer flashrender;
     public float R_Speed = 2f;
     public float Movedistance = 1f;
-    private float wallCheckDistance = 0.5f;
+    private float wallCheckDistance = 0.8f;
     private float groundCheckDistance = 0.8f;
-    private float WaitTimer = 5f;
-    private float statetime;
+    public float WaitTimer = 3f;
+    public float statetime;
+    private float M_direction;
+    [SerializeField] private float currenthealth = 100f;
+    [SerializeField] private float knockBackXForce = 0.5f;
+
+    [SerializeField] private Color flashColor = Color.red; 
+    [SerializeField] private float flashDuration = 0.1f;    
+    [SerializeField] private float invincibilityDuration = 0.5f;
+    private Coroutine flashCoroutine;
+    private bool isInvincible = false;
+    public Rigidbody2D rb;
+
     void Awake()
     {
         sightRange = GetComponent<SightRange>();    
         spriteRenderer = GetComponent<SpriteRenderer>();
+        flashrender = GetComponent<SpriteRenderer>();   
         R_States[0] = new R_IdleState();
         R_States[1] = new R_SummonDroneState();
         R_States[2] = new R_Attackstate();
+        R_States[3] = new R_Hitstate();
         ChangeState(R_States[0]);
-
-    }
-
-    void Start()
-    {
-        statetime = Time.time + WaitTimer;
+        rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
@@ -56,6 +64,12 @@ public class Researcher : MonoBehaviour
        currentStates?.Start(this);
     }
     
+    public void PatrolMove()
+    {
+        M_direction = Mathf.Sign(transform.localScale.x);
+        float velocityX = M_direction * R_Speed;
+        rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y);    
+    }
     public void ShootBullet(Vector2 dir)
     {
         Vector2 dirToTarget = (Player_Trans.position - transform.position).normalized; 
@@ -70,7 +84,21 @@ public class Researcher : MonoBehaviour
         }
 
     }
-    #region Àå¾Ö¹° ¹× ³¶¶°·¯Áö Ã¼Å©
+
+    public void MovetoPlayer()
+    {
+        float directionToPlayer = Player_Trans.position.x - transform.position.x;
+
+        float M_direction = Mathf.Sign(directionToPlayer);
+
+        float velocityX = M_direction * R_Speed;
+
+        rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y);
+
+        FlipResearcher(this, directionToPlayer);
+
+    }
+    #region ë²½ê³¼ ë‚­ë– ëŸ¬ì§€ ì²´í¬
     public bool CheckForObstacle(Researcher researcher)
     {
         Vector2 checkDirection = (Movedistance > 0) ? Vector2.right : Vector2.left;
@@ -92,10 +120,9 @@ public class Researcher : MonoBehaviour
     }
     #endregion
 
-    #region µå·Ð ¼ÒÈ¯ ¾Ö´Ï¸ÞÀÌ¼Ç µô·¹ÀÌ¿ë
+    #region ì†Œí™˜ ëª¨ì…˜ ë”œë ˆì´
     public void StopResearcherTimer()
     {
-       
 
         if (Time.time >= statetime)
         {
@@ -104,7 +131,7 @@ public class Researcher : MonoBehaviour
     }
     #endregion
 
-    // ÇöÀç ¹Ù¶óº¸´Â ¹æÇâ º¤ÅÍ ¹ÝÈ¯
+ 
     public Vector2 GetcurrentVect2()
     {
         float directonx = Mathf.Sign(transform.localScale.x);
@@ -140,8 +167,48 @@ public class Researcher : MonoBehaviour
         }
     }
        
-    public void R_Hit()
+    public void TakeDamage(float damage)
     {
-        
+        Debug.Log("Researcherï¿½ï¿½ " + damage + "ï¿½ï¿½Å­ï¿½ï¿½ ï¿½ï¿½ï¿½Ø¸ï¿½ ï¿½Ô¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
+        currenthealth -= damage;
+
+       
+        ChangeState(R_States[3]);
+        flashCoroutine = StartCoroutine(FlashCoroutin());
+        if (currenthealth <= 0)
+        {
+            gameObject.SetActive(false);
+        }
+    }
+
+    public void Knockback()
+    {
+        Vector2 knockbackDirection = (Vector2)transform.position - (Vector2)Player_Trans.position;
+        float xDirection = Mathf.Sign(knockbackDirection.x);
+        Vector2 knockbackForce = new Vector2(xDirection * knockBackXForce, 0f); 
+        rb.AddForce(knockbackForce, ForceMode2D.Impulse);
+    }
+
+    private IEnumerator FlashCoroutin()
+    {
+        isInvincible = true;
+        Color originalColor = flashrender.color;
+
+        float endTime = Time.time + invincibilityDuration;
+
+        while (Time.time < endTime)
+        {
+    
+            spriteRenderer.color = flashColor;
+            yield return new WaitForSeconds(flashDuration);
+
+            spriteRenderer.color = originalColor;
+            yield return new WaitForSeconds(flashDuration);
+        }
+
+
+        flashrender.color = originalColor;
+        isInvincible = false;
+        flashCoroutine = null;
     }
 }

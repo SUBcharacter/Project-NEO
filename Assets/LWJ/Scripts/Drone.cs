@@ -9,6 +9,7 @@ public class Drone : MonoBehaviour
     public Transform Player_trans;
   
     bool isWait = false;
+    public bool isattack = false;
     public Vector2 offset = new Vector2(0f, 1.5f);
 
     [SerializeField] LayerMask playerLayer;
@@ -23,6 +24,7 @@ public class Drone : MonoBehaviour
     public float horizontalDirection = 1f;
     public float wallCheckDistance = 0.5f; // 전방 벽 감지 거리
     public SightRange sightRange;
+
 
     void Awake()
     {
@@ -63,6 +65,8 @@ public class Drone : MonoBehaviour
    
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (!isattack) return;
+
         if (((1 << collision.gameObject.layer) & playerLayer) != 0)
         {
             Debug.Log("드론이 플레이어와 충돌했습니다.");
@@ -83,10 +87,12 @@ public class Drone : MonoBehaviour
     IEnumerator Waitone()
     {
         yield return CoroutineCasher.Wait(1f);
-        ChangeState(droneStates[1]);
-        isWait = false;
-    }
 
+        ChangeState(droneStates[1]);
+  
+        isWait = false;
+        
+    }
 
     #endregion
 
@@ -104,12 +110,20 @@ public class Drone : MonoBehaviour
     }
     void PerformExplosion()
     {
-        Collider2D[] objectsInRange = Physics2D.OverlapCircleAll(transform.position, explosionRadius, damagelayer);
+        if (!isattack) return;
 
-        foreach (Collider2D col in objectsInRange)
-        {
-            Debug.Log($"{col.gameObject.name} 폭발 데미지 받음.");
-        }
+       //Collider2D[] objectsInRange = Physics2D.OverlapCircleAll(transform.position, explosionRadius, damagelayer);
+       //
+       //foreach (Collider2D col in objectsInRange)
+       //{
+       //    Debug.Log($"{col.gameObject.name} 폭발 데미지 받음.");
+       //    Player player = col.GetComponent<Player>();
+       //
+       //    if (player != null)
+       //    {
+       //        player.Hit(1); 
+       //    }   
+       //}
 
     }
 

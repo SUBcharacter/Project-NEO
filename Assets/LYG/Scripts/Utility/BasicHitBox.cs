@@ -1,3 +1,4 @@
+using UnityEditor.Searcher;
 using UnityEngine;
 
 public class BasicHitBox : HitBox
@@ -18,7 +19,7 @@ public class BasicHitBox : HitBox
     {
         if (((1 << collision.gameObject.layer) & stats.attackable) == 0)
             return;
-
+        Researcher researcher = collision.gameObject.GetComponent<Researcher>();
         switch (collision.gameObject.layer)
         {
             case (int)Layers.terrain:
@@ -30,7 +31,7 @@ public class BasicHitBox : HitBox
                 Debug.Log("충돌");
                 break;
             case (int)Layers.enemy:
-                collision.gameObject.SetActive(false);
+                researcher.TakeDamage(stats.damage);
                 triggered = true;
                 break;
             case (int)Layers.player:
@@ -50,6 +51,8 @@ public class BasicHitBox : HitBox
         if (((1 << collision.gameObject.layer) & stats.attackable) == 0)
             return;
 
+        Researcher researcher = collision.gameObject.GetComponent<Researcher>();
+
         switch (collision.gameObject.layer)
         {
             case (int)Layers.terrain:
@@ -61,7 +64,7 @@ public class BasicHitBox : HitBox
                 Debug.Log("충돌");
                 break;
             case (int)Layers.enemy:
-                collision.gameObject.SetActive(false);
+                researcher.TakeDamage(stats.damage);    
                 triggered = true;
                 break;
             case (int)Layers.player:

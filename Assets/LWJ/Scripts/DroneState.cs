@@ -51,6 +51,8 @@ public class D_Summonstate : DroneState
     public override void Start(Drone drone)
     {
         Debug.Log("Summon State 시작");
+
+ 
     }
     public override void Update(Drone drone)
     {
@@ -71,6 +73,7 @@ public class D_Summonstate : DroneState
     public override void Start(Drone drone) 
     {
         drone.SetDroneActive(true);
+        drone.isattack = true;
         drone.StartExplosionTimer();
         Debug.Log("Attack State 시작");
     }

@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 955663113596821488}
   - component: {fileID: 4378209303580859666}
   - component: {fileID: 2377045625389102038}
-  - component: {fileID: 6696158493603564014}
   - component: {fileID: 6159800660571566954}
+  - component: {fileID: 4826235969682355158}
+  - component: {fileID: -436733721144367217}
   m_Layer: 7
   m_Name: Drone
   m_TagString: Untagged
@@ -104,6 +105,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Resear_trans: {fileID: 0}
   Player_trans: {fileID: 0}
+  isattack: 0
   offset: {x: 0, y: 1.5}
   playerLayer:
     serializedVersion: 2
@@ -120,9 +122,47 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   Movedistance: 1
+  D_Speed: 2
+  horizontalDirection: 1
+  wallCheckDistance: 0.5
   sightRange: {fileID: 0}
---- !u!61 &6696158493603564014
-BoxCollider2D:
+--- !u!114 &6159800660571566954
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 773931948723233161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73b05a475105daa47bc9d0bbc0328dcf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  viewRadius: 5
+  viewAngle: 90
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 8
+--- !u!114 &4826235969682355158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 773931948723233161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3de446919f09654c9e54f1378b14e27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  col: {fileID: 0}
+  stats: {fileID: 11400000, guid: 236de589a825acd47a0013f44351e667, type: 2}
+  triggered: 0
+--- !u!70 &-436733721144367217
+CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -155,35 +195,6 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.0058531165, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.908, y: 0.8}
-    newSize: {x: 2.27, y: 2}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 0.5919336, y: 0.8}
-  m_EdgeRadius: 0
---- !u!114 &6159800660571566954
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 773931948723233161}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73b05a475105daa47bc9d0bbc0328dcf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  viewRadius: 5
-  viewAngle: 90
-  targetLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  obstacleLayer:
-    serializedVersion: 2
-    m_Bits: 8
+  m_Offset: {x: 0, y: 0}
+  m_Size: {x: 0.908, y: 0.8}
+  m_Direction: 0

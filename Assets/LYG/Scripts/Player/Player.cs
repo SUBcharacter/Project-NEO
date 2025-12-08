@@ -437,12 +437,11 @@ public class Player : MonoBehaviour
 
     public void Hit(int damage)
     {
-        // 피격 함수
-
+        // 피격 함수 
         health -= damage;
 
         // 체력 검사 후 사망 판정
-        if(health <= 0)
+        if (health <= 0)
         {
             Death();
             return;
