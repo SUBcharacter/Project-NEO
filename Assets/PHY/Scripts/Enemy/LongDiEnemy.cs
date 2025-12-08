@@ -8,30 +8,36 @@ using UnityEngine;
 /// </summary>
 /// 
 
-/// 리셋이 가능하게 IResetable 만들어서 초기화 할 수 잇게 수정하기 
-public class LongDiEnemy : LongDiEnemyBase
+// 리셋이 가능하게 IResetable 만들어서 초기화 할 수 잇게 수정하기 
+// 변수들은 스크립터블로 만들어서 관리하기
+// 충돌 감지는 트리거가 아닌 오버랩 스피어를 사용하기 
+// 시야범위, 공격범위 따로 두지말고 하나로 합쳐서 레이어마스크로 처리하기
+// 에너미 추상 클래스 만들어서 처리하도록 수정하기(오버라이딩 이용하라는거 같음)
+// IResetable 인터페이스를 내가 직접 만들어야하는거임? 시발? 일단 이것도 추후에 하기
+// 히트박스 스크립트가 유틸 스크립트로 있으니 일단 써봐도 될거같음 (맨마지막에 해보기)
+
+public class LongDiEnemy : Enemy
 {
-    // 변수들은 스크립터블로 만들어서 관리. 
+
     [Header("Enemy 총알 발사 관련 변수")]
     [SerializeField] private GameObject enemyBulletPrefab;
     [SerializeField] private Transform firePoint;
-    [SerializeField] private int bulletCount = 4;                // 한 번에 발사할 총알 개수
-    [SerializeField] private float bulletInterval = 0.15f;       // 총알 간 간격 (연사 속도)
+   // [SerializeField] private int bulletCount = 4;                // 한 번에 발사할 총알 개수
+   // [SerializeField] private float bulletInterval = 0.15f;       // 총알 간 간격 (연사 속도)
     private Vector3 fixedFirePointPosition;                      // 원본 firePoint 위치 저장 (좌우 반전 시 보정용)
     private Vector3 fixedEnemyPos;                               // 애니메이션 중 위치 흔들림 방지용 고정 좌표
 
     [Header("Player 감지 관련 변수")]
     [SerializeField] private DetectionRange detectionRange;      // 플레이어 감지 범위
-    [SerializeField] private AttackRange attackRange;            // 공격 가능 범위
 
-    [SerializeField] private float fireCooldown = 1f;            // 공격 쿨타임 (연사 후 대기 시간)
+    //[SerializeField] private float fireCooldown = 1f;            // 공격 쿨타임 (연사 후 대기 시간)
     private float fireTimer = 0f;                                // 쿨타임 타이머
 
     [Header("애니메이션 관련 변수")]
     private Animator animator;
     private bool isAiming = false;                               // 조준 상태 여부
     private bool isFiring = false;                               // 현재 발사 중인지 여부
-    private float readytoFireTime = 0.5f;                        // 조준 완료까지 걸리는 시간
+   // private float readytoFireTime = 0.5f;                        // 조준 완료까지 걸리는 시간
     private float readyTimer = 0f;                               // 조준 시간 누적용 타이머
     private bool isReadyToFire = false;                          // 조준 완료 플래그
 
@@ -233,5 +239,25 @@ public class LongDiEnemy : LongDiEnemyBase
             Gizmos.color = Color.red;
             Gizmos.DrawSphere(firePoint.position, 0.05f);
         }
+    }
+
+    protected override void Move()
+    {
+        float moveDir = isMovingRight ? 1f : -1f;
+        rigid.linearVelocity = new Vector2(moveDir * enemyData.moveSpeed, rigid.linearVelocity.y);
+
+        float dis = transform.position.x - startPos.x;
+        // Mathf.Abs : 절댓값 반환 (양수 음수 안가리고 이동한 거리 비교를 위해 사용
+        if (Mathf.Abs(dis) >= enemyData.moveDistance)
+        {
+            isMovingRight = !isMovingRight;
+            startPos = transform.position;
+            spriteRenderer.flipX = !spriteRenderer.flipX;
+        }
+    }
+
+    protected override void Attack()
+    {
+        throw new System.NotImplementedException();
     }
 }
