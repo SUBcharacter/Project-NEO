@@ -1,13 +1,11 @@
 using UnityEngine;
 
-public class R_hitbox : HitBox
+public class D_hitbox : HitBox
 {
-
-
-    protected override void Awake() 
+    protected override void Awake()
     {
         col = GetComponent<Collider2D>();
-    }   
+    }
 
     public override void Init(bool enhanced = false)
     {
@@ -16,13 +14,13 @@ public class R_hitbox : HitBox
 
     protected override void Triggered(Collision2D collision)
     {
-      
+
     }
 
     protected override void Triggered(Collider2D collision)
     {
         if (((1 << collision.gameObject.layer) & stats.attackable) == 0) return;
-    
+
 
         Player player = collision.GetComponent<Player>();
 

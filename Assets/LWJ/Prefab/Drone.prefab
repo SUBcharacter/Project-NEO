@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 4378209303580859666}
   - component: {fileID: 2377045625389102038}
   - component: {fileID: 6159800660571566954}
-  - component: {fileID: 4826235969682355158}
   - component: {fileID: -436733721144367217}
+  - component: {fileID: 8537667209811710474}
   m_Layer: 7
   m_Name: Drone
   m_TagString: Untagged
@@ -146,21 +146,6 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 8
---- !u!114 &4826235969682355158
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 773931948723233161}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d3de446919f09654c9e54f1378b14e27, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  col: {fileID: 0}
-  stats: {fileID: 11400000, guid: 236de589a825acd47a0013f44351e667, type: 2}
-  triggered: 0
 --- !u!70 &-436733721144367217
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -198,3 +183,18 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 0.908, y: 0.8}
   m_Direction: 0
+--- !u!114 &8537667209811710474
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 773931948723233161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43b6790a9d5374a43ae89d10afbb6bd7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  col: {fileID: 0}
+  stats: {fileID: 11400000, guid: c5bb9cd7e2e8b0b469fb08394902ec40, type: 2}
+  triggered: 0

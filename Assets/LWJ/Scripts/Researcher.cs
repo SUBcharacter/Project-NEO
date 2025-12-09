@@ -2,15 +2,17 @@ using System.Collections;
 using UnityEditor.Searcher;
 using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
-public class Researcher : MonoBehaviour
+public class Researcher : MonoBehaviour, IDamageable
 {
     [SerializeField] public Transform[] dronespawnpoints;
     [SerializeField] public Transform Player_Trans;
+    [SerializeField] public Transform arm;
+    [SerializeField] public Transform Gunfire;
 
     [SerializeField] public GameObject Bullet_prefab;
     [SerializeField] public GameObject D_prefab;
 
-    public ResearcherState[] R_States = new ResearcherState[4];
+    public ResearcherState[] R_States = new ResearcherState[5];
     public ResearcherState currentStates;
 
     public SightRange sightRange;
@@ -29,6 +31,7 @@ public class Researcher : MonoBehaviour
     public float WaitTimer = 3f;
     public float statetime;
     private float M_direction;
+    public float Idlewaittime;
     [SerializeField] private float currenthealth = 100f;
     [SerializeField] private float knockBackXForce = 0.5f;
 
@@ -37,7 +40,14 @@ public class Researcher : MonoBehaviour
     [SerializeField] private float invincibilityDuration = 0.5f;
     private Coroutine flashCoroutine;
     private bool isInvincible = false;
+    private bool ismove = false;
+    private bool isSummon = false;
+    private bool isDead = false;
+    private bool isAttack = false;
     public Rigidbody2D rb;
+    private float originalArmLocalX;
+    private float originalArmLocalY;
+    private Animator animator;
 
     void Awake()
     {
@@ -45,11 +55,18 @@ public class Researcher : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         flashrender = GetComponent<SpriteRenderer>();   
         R_States[0] = new R_IdleState();
-        R_States[1] = new R_SummonDroneState();
-        R_States[2] = new R_Attackstate();
-        R_States[3] = new R_Hitstate();
+        R_States[1] = new R_WalkState();
+        R_States[2] = new R_SummonDroneState();
+        R_States[3] = new R_Attackstate();
+        R_States[4] = new R_Hitstate();
         ChangeState(R_States[0]);
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+        arm = transform.Find("Armposition");
+        Gunfire = transform.Find("GunTip");
+        originalArmLocalX = Mathf.Abs(arm.localPosition.x);
+        // Y는 그대로 저장합니다.
+        originalArmLocalY = arm.localPosition.y;
     }
 
     void Update()
@@ -70,19 +87,23 @@ public class Researcher : MonoBehaviour
         float velocityX = M_direction * R_Speed;
         rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y);    
     }
-    public void ShootBullet(Vector2 dir)
-    {
-        Vector2 dirToTarget = (Player_Trans.position - transform.position).normalized; 
 
-        GameObject bulletObject = Instantiate(Bullet_prefab, transform.position, Quaternion.identity);
+    public void ShootBullet() // 매개변수 (Vector2 dir) 제거
+    {
+        // 1. 발사 위치는 GunTip (또는 ArmPivot)으로 설정
+        Vector3 startPosition = Gunfire != null ? Gunfire.position : arm.position;
+
+        // 2. 발사 방향은 팔의 Forward 방향 (Quaternion.Euler로 계산된 회전 방향)
+        Vector2 dirToTarget = (Player_Trans.position - startPosition).normalized;
+
+        GameObject bulletObject = Instantiate(Bullet_prefab, startPosition, Quaternion.identity);
         R_Bullet bulletComponent = bulletObject.GetComponent<R_Bullet>();
 
-
-        if(bulletComponent != null)
+        if (bulletComponent != null)
         {
-            bulletComponent.Init(dirToTarget,transform.position);
+            // 플레이어를 향하는 벡터를 직접 전달
+            bulletComponent.Init(dirToTarget, startPosition);
         }
-
     }
 
     public void MovetoPlayer()
@@ -96,8 +117,61 @@ public class Researcher : MonoBehaviour
         rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y);
 
         FlipResearcher(this, directionToPlayer);
+        FlipArm(directionToPlayer); 
 
     }
+
+    #region 애니메이션 함수
+    public void PlayWalk()
+    {
+        ismove = true;
+        animator.SetBool("R_Move", ismove);
+    }
+
+    public void StopWalk()
+    {
+        ismove = false;
+        animator.SetBool("R_Move", ismove);
+        
+    }
+
+    public void PlayDeath()
+    {
+        isDead = true;
+        animator.SetBool("R_Death",isDead);
+    }
+
+    public void PlayAttack()
+    {
+        isAttack = true;
+        animator.SetBool("R_Attack", isAttack);
+    }
+    public void StopAttack()
+    {
+        isAttack = false;
+        animator.SetBool("R_Attack", isAttack);
+    }
+
+    public void PlaySummon()
+    {
+        isSummon = true;
+        animator.SetBool("R_Summon",isSummon);    
+    }
+
+    public void StopSummon()
+    {
+        isSummon = false;
+        animator.SetBool("R_Summon", isSummon);
+    }
+
+    #endregion
+
+    public void Idletowalk()
+    {
+        ChangeState(R_States[1]);
+    }
+
+
     #region 벽과 낭떠러지 체크
     public bool CheckForObstacle(Researcher researcher)
     {
@@ -120,18 +194,56 @@ public class Researcher : MonoBehaviour
     }
     #endregion
 
-    #region 소환 모션 딜레이
-    public void StopResearcherTimer()
-    {
+    #region 팔 관련 함수
 
-        if (Time.time >= statetime)
-        {
-            ChangeState(R_States[2]);
-        }
+    public void Armsetactive(bool isactive)
+    {
+        arm.gameObject.SetActive(isactive);
+    }
+    public void Aimatplayer()
+    {
+        Vector3 dir = Player_Trans.position - arm.position;
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+
+        // FlipArm()으로 Y축 반전했기 때문에 회전 적용 방식 구분
+        if (arm.localRotation.y < 0) // 왼쪽 보는 중
+            arm.rotation = Quaternion.Euler(0, 0, 180 + angle);
+        else
+            arm.rotation = Quaternion.Euler(0, 0, angle);
     }
     #endregion
 
- 
+    public void FlipArm(float direction)
+    {
+
+        Vector3 armLocalScale = arm.localScale;
+        Vector3 armLocalPosition = arm.localPosition;
+
+        // 1. 방향에 따른 Y 스케일 및 X 위치 설정
+        if (direction < 0) // 왼쪽을 바라볼 때
+        {
+            armLocalScale.y = -1;
+            armLocalPosition.x = -originalArmLocalX; //  X 위치 반전 (왼쪽 어깨 고정)
+        }
+        else // 오른쪽을 바라볼 때
+        {
+            armLocalScale.y = 1;
+            armLocalPosition.x = originalArmLocalX; //  X 위치 정상화 (오른쪽 어깨 고정)
+        }
+
+        // 2. Y 위치를 기본값으로 고정 (Aimatplayer에서 오프셋 적용을 위한 베이스)
+        armLocalPosition.y = originalArmLocalY; //  Y 위치 고정
+
+        // 3. 변경된 값 적용
+        arm.localScale = armLocalScale;
+        arm.localPosition = armLocalPosition;
+
+    }
+    public void summontoattack()
+    {
+       ChangeState(R_States[3]);
+    }
+
     public Vector2 GetcurrentVect2()
     {
         float directonx = Mathf.Sign(transform.localScale.x);
@@ -152,7 +264,9 @@ public class Researcher : MonoBehaviour
         {
             researcher.transform.localScale = new Vector3(-Mathf.Abs(currentScale.x), currentScale.y, currentScale.z);
         }
+
     }
+
 
     public void SummonDrone()
     {
@@ -169,7 +283,7 @@ public class Researcher : MonoBehaviour
        
     public void TakeDamage(float damage)
     {
-        Debug.Log("Researcher�� " + damage + "��ŭ�� ���ظ� �Ծ����ϴ�.");
+        Debug.Log("Researcher " + damage);
         currenthealth -= damage;
 
        
@@ -177,7 +291,7 @@ public class Researcher : MonoBehaviour
         flashCoroutine = StartCoroutine(FlashCoroutin());
         if (currenthealth <= 0)
         {
-            gameObject.SetActive(false);
+            PlayDeath();
         }
     }
 

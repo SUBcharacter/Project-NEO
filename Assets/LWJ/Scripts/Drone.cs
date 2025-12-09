@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class Drone : MonoBehaviour
+public class Drone : MonoBehaviour,IDamageable
 {
     public DroneState[] droneStates = new DroneState[3];
     DroneState currentstates;
@@ -23,7 +23,9 @@ public class Drone : MonoBehaviour
     public float D_Speed = 2f;
     public float horizontalDirection = 1f;
     public float wallCheckDistance = 0.5f; // 전방 벽 감지 거리
+    float CurrentHealth = 10f;
     public SightRange sightRange;
+
 
 
     void Awake()
@@ -74,7 +76,17 @@ public class Drone : MonoBehaviour
         }
 
     }
-
+    public void TakeDamage(float damage)
+    {
+        Debug.Log("드론이 데미지를 입었습니다.");
+        
+        CurrentHealth -= damage;
+        if(CurrentHealth <= 0)
+        {
+            Debug.Log("드론 파괴");
+           gameObject.SetActive(false);
+        }   
+    }
 
     #region 드론 공격 대기 코루틴
     public void WaitDroneandattackstate()

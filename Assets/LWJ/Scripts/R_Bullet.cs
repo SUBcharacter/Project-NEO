@@ -8,11 +8,8 @@ public class R_Bullet : Bullet
     protected override void Awake()
     {
         base.Awake();
-       
         stats.attackable = attackMask;
-        stats.damage = 5f;
-        stats.speed = 15f;
-        stats.lifeTime = 3f;
+
     }
 
     protected override void Update()
@@ -20,35 +17,31 @@ public class R_Bullet : Bullet
         base.Update();
     }
 
-    public override void Init(Vector2 dir, Vector3 pos)
+    public override void Init(Vector2 dir, Vector3 pos, bool enhanced = false)
     {
-        base.Init(dir, pos);    
+        base.Init(dir, pos);
         Rotating(dir);
     }
 
     protected override void Triggered(Collider2D collision)
     {
-        if (((1 << collision.gameObject.layer) & stats.attackable) == 0) return;
-        switch(collision.gameObject.layer)
+
+        if (((1 << collision.gameObject.layer) & stats.attackable) == 0) return; // 공격 가능한 레이어 체크 유지
+
+        if (collision.gameObject.layer == (int)Layers.player)
         {
-            case (int)Layers.terrain:
+            // R_Bullet은 Player에게 데미지를 입혀야 하므로 여기서 처리
+            Player player = collision.GetComponent<Player>();
+            if (player != null)
+            {
+                // Player 데미지 처리
+                player.Hit((int)stats.damage); // 단순 데미지 적용
+
                 transform.SetParent(parent);
                 gameObject.SetActive(false);
-                break;
-            case (int)Layers.enviroment:
-                break;
-            case (int)Layers.enemy:
-                break;
-            case (int)Layers.player:
-                transform.SetParent(parent);
-                gameObject.SetActive(false);
-                break;
-            case (int)Layers.border:
-                break;
-            case (int)Layers.invincible:
-                break;
+                return; // Player 처리 후 기본 Bullet 로직 호출 방지
+            }
         }
-
+        base.Triggered(collision);
     }
-
 }

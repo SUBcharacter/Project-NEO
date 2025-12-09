@@ -15,6 +15,6 @@ MonoBehaviour:
   attackable:
     serializedVersion: 2
     m_Bits: 328
-  speed: 20
-  damage: 5
+  speed: 15
+  damage: 1
   lifeTime: 3
