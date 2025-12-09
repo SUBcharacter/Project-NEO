@@ -39,8 +39,10 @@ public class TerrainCheck : MonoBehaviour
         player = GetComponent<Player>();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
+        if (player.CrSt is PlayerCrowdControlState)
+            return;
         GroundCheck();
         WallCheck();
     }
@@ -263,6 +265,15 @@ public class TerrainCheck : MonoBehaviour
             {
                 player.ChangeState(player.States["Idle"]);
             }
+        }
+
+        if(hitLeft || hitRight)
+        {
+            player.Rigid.sharedMaterial = player.Stats.noFriction;
+        }
+        else
+        {
+            player.Rigid.sharedMaterial = player.Stats.fullFriction;
         }
     }
     private void OnDrawGizmosSelected()

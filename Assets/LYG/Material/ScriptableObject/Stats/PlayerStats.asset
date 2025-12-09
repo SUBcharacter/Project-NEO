@@ -23,6 +23,7 @@ MonoBehaviour:
   wallJumpY: 10
   maxBullet: 300
   maxStamina: 40
+  maxOverFlowEnergy: 100
   staminaRecoveryDuration: 1
   staminaRecoveryAmount: 3.2
   groundMask:
@@ -31,7 +32,8 @@ MonoBehaviour:
   maxSlopeAngle: 45
   slopeRayLength: 2
   slopeLostDuration: 0.1
-  MeleeAttackRelaxTime: 0.4
+  MeleeAttackInitTime: 0.4
+  MeleeAttackRelaxTime: 3
   RangeAttackRelaxTime: 3
   wallJumpDuration: 0.15
   returnVelocity: 3

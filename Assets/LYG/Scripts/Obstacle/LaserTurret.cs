@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UIElements;
 
 public class LaserTurret : MonoBehaviour
@@ -8,6 +9,7 @@ public class LaserTurret : MonoBehaviour
     [SerializeField] Transform target;
     [SerializeField] Transform muzzle;
     [SerializeField] LineRenderer aimLine;
+    [SerializeField] Light2D charging;
     [SerializeField] Detector detector;
     [SerializeField] Coroutine fire;
     [SerializeField] Quaternion origin;
@@ -22,16 +24,47 @@ public class LaserTurret : MonoBehaviour
     [SerializeField] int health;
     [SerializeField] int maxHealth;
 
+    [SerializeField] bool stop;
+
     private void Awake()
     {
+        stop = false;
         origin = transform.rotation;
         aimLine = GetComponent<LineRenderer>();
         detector = GetComponent<Detector>();
+        charging = GetComponentInChildren<Light2D>();
+        charging.intensity = 1;
+    }
+
+    private void OnEnable()
+    {
+        EventManager.Subscribe(Event.Stop, Stop);
+        EventManager.Subscribe(Event.Play, Play);
+    }
+
+    private void OnDisable()
+    {
+        EventManager.Unsubscribe(Event.Stop, Stop);
+        EventManager.Unsubscribe(Event.Play, Play);
     }
 
     private void Update()
     {
+        if (stop)
+            return;
         Activate();
+    }
+
+    void Stop()
+    {
+        Debug.Log("ÅÍ·¿ Á¤Áö");
+        stop = true;
+    }
+
+    void Play()
+    {
+        Debug.Log("ÅÍ·¿ °¡µ¿");
+        stop = false;
     }
 
     void Aiming()
@@ -68,6 +101,7 @@ public class LaserTurret : MonoBehaviour
             {
                 Aiming();
                 timer += Time.deltaTime;
+                charging.intensity = Mathf.Lerp(charging.intensity, 50, 0.5f * Time.deltaTime);
             }
             else
             {
@@ -77,8 +111,12 @@ public class LaserTurret : MonoBehaviour
         }
         else
         {
-            Aiming();
-            timer = 0;
+            if(fire == null)
+            {
+                Aiming();
+                timer = 0;
+                charging.intensity = Mathf.Lerp(charging.intensity, 1, Time.deltaTime * 10);
+            }
         }
     }
 
@@ -88,7 +126,7 @@ public class LaserTurret : MonoBehaviour
         yield return CoroutineCasher.Wait(0.5f);
 
         RaycastHit2D hit = Physics2D.Raycast(muzzle.position, transform.up, laserLength, hitMask);
-
+        float waitTimer = 0;
         GameObject hitBox;
         if(hit.collider != null)
         {
@@ -106,9 +144,23 @@ public class LaserTurret : MonoBehaviour
             hitBox.transform.localScale = new Vector3(1, laserLength + 1, 1);
         }
 
-        yield return CoroutineCasher.Wait(2f);
+        while(true)
+        {
+            if (stop)
+            {
+                yield return null;
+                continue;
+            }
+
+            waitTimer += Time.deltaTime;
+            if (waitTimer >= 2f)
+                break;
+
+            yield return null;
+        }
 
         timer = 0;
+        charging.intensity = 1;
         Destroy(hitBox);
         fire = null;
     }

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cc69c584d200c74bb11382c26bdb989, type: 3}
   m_Name: FlashBlade
   m_EditorClassIdentifier: 
-  staminaCost: 0
+  staminaCost: 20
   coolTime: 6
   bulletCost: 0
   damage: 0

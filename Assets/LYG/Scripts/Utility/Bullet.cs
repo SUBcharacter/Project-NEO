@@ -11,6 +11,8 @@ public class Bullet : MonoBehaviour
     
     protected float timer;
 
+    private bool enhance;
+
     protected virtual void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
@@ -33,11 +35,12 @@ public class Bullet : MonoBehaviour
         }
     }
 
-    public virtual void Init(Vector2 dir, Vector3 pos)
+    public virtual void Init(Vector2 dir, Vector3 pos, bool enhanced = false)
     {
         // Bullet 속성의 투사체 초기화
         parent = GetComponentInParent<Transform>();
         timer = 0;
+        enhance = enhanced;
         transform.position = pos;
         gameObject.SetActive(true);
         Shoot(dir);
@@ -61,15 +64,25 @@ public class Bullet : MonoBehaviour
     protected virtual void Triggered(Collider2D collision)
     {
         // 각 레이어에 맞게 작용하게끔 작성할 것
+        // 데미지 함수 매개변수 작성시 enhance 여부를 판단하는 로직을 넣을 것;
         if (((1 << collision.gameObject.layer) & stats.attackable) == 0)
             return;
+        float enhancing = enhance ? 2 : 1;
+        float damage = stats.damage * enhancing;
         switch(collision.gameObject.layer)
         {
             case (int)Layers.terrain:
+                transform.SetParent(parent);
+                gameObject.SetActive(false);
                 break;
             case (int)Layers.enviroment:
+                
+                gameObject.SetActive(false);
                 break;
             case (int)Layers.enemy:
+                transform.SetParent(parent);
+                collision.GetComponent<IDamageable>().TakeDamage(damage);
+                gameObject.SetActive(false);
                 break;
             case (int)Layers.player:
                 break;

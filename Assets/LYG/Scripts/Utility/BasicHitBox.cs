@@ -3,14 +3,17 @@ using UnityEngine;
 
 public class BasicHitBox : HitBox
 {
+    bool enhance;
+
     protected override void Awake()
     {
         triggered = false;
         col = GetComponent<Collider2D>();
     }
 
-    public override void Init()
+    public override void Init(bool enhanced = false)
     {
+        enhance = enhanced;
         triggered = false;
         gameObject.SetActive(true);
     }
@@ -19,7 +22,10 @@ public class BasicHitBox : HitBox
     {
         if (((1 << collision.gameObject.layer) & stats.attackable) == 0)
             return;
-        Researcher researcher = collision.gameObject.GetComponent<Researcher>();
+
+        float enhancing = enhance ? 2 : 1;
+        float damage = stats.damage * enhancing;
+
         switch (collision.gameObject.layer)
         {
             case (int)Layers.terrain:
@@ -31,7 +37,7 @@ public class BasicHitBox : HitBox
                 Debug.Log("충돌");
                 break;
             case (int)Layers.enemy:
-                researcher.TakeDamage(stats.damage);
+                collision.GetComponent<IDamageable>().TakeDamage(damage);
                 triggered = true;
                 break;
             case (int)Layers.player:
@@ -51,7 +57,8 @@ public class BasicHitBox : HitBox
         if (((1 << collision.gameObject.layer) & stats.attackable) == 0)
             return;
 
-        Researcher researcher = collision.gameObject.GetComponent<Researcher>();
+        float enhancing = enhance ? 2 : 1;
+        float damage = stats.damage * enhancing;
 
         switch (collision.gameObject.layer)
         {
@@ -64,7 +71,7 @@ public class BasicHitBox : HitBox
                 Debug.Log("충돌");
                 break;
             case (int)Layers.enemy:
-                researcher.TakeDamage(stats.damage);    
+                collision.gameObject.GetComponent<IDamageable>().TakeDamage(damage);
                 triggered = true;
                 break;
             case (int)Layers.player:

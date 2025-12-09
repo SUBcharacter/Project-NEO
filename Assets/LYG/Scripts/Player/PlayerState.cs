@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Xml.Schema;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
+using UnityEngine.LowLevel;
 using UnityEngine.XR;
 
 public abstract class PlayerState
@@ -53,6 +55,11 @@ public class PlayerMeleeAttackState : PlayerState
 
         // 진정 타이머 업데이트
         timer += Time.deltaTime;
+        if (timer >= player.Stats.MeleeAttackInitTime)
+        {
+            player.MeleeAttackIndex = 0;
+        }
+
         if (timer >= player.Stats.MeleeAttackRelaxTime)
         {
             player.ChangeState(player.States["Idle"]);
@@ -295,3 +302,23 @@ public class PlayerHitState : PlayerState
         player.gameObject.layer = originMask;
     }
 }
+
+public class PlayerCrowdControlState : PlayerState
+{
+
+    public override void Start(Player player)
+    {
+        player.Rigid.simulated = false;
+    }
+
+    public override void Update(Player player)
+    {
+
+    }
+
+    public override void Exit(Player player)
+    {
+        player.Rigid.simulated = true;
+    }
+}
+

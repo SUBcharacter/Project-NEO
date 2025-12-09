@@ -26,8 +26,8 @@ public class Player : MonoBehaviour
     [SerializeField] SpriteRenderer ren;
     [SerializeField] Dictionary<string, PlayerState> states = new();
     [SerializeField] GameObject meleeAttackHitBox;
-    [SerializeField] GameObject meleeAirAttackHitBox;
-    [SerializeField] GameObject[] meleeAttackHitBoxes;
+    [SerializeField] HitBox meleeAirAttackHitBox;
+    [SerializeField] HitBox[] meleeAttackHitBoxes;
     [SerializeField] Transform armPositon;
     [SerializeField] Transform[] knifeSpawnPointUpper;
     [SerializeField] Transform[] knifeSpawnPoint;
@@ -45,10 +45,10 @@ public class Player : MonoBehaviour
     [SerializeField] Vector2 mousePos;
     [SerializeField] WeaponState currentWeapon;
 
-    [SerializeField] float staminaTimer;
+    [SerializeField] float health;
     [SerializeField] float stamina;
+    [SerializeField] float overFlowEnergy;
 
-    [SerializeField] int health;
     [SerializeField] int meleeAttackIndex;
     [SerializeField] int bulletCount;
 
@@ -58,6 +58,7 @@ public class Player : MonoBehaviour
     [SerializeField] bool hit;
     [SerializeField] bool attacking;
     [SerializeField] bool isDead;
+    
 
     public SpriteRenderer Ren => ren;
     public SkillManager SkMn => skillManager;
@@ -76,6 +77,7 @@ public class Player : MonoBehaviour
     public WeaponState CrWp => currentWeapon;
 
     public float Stamina { get => stamina; set => stamina = value; }
+    public float OverFlowEnergy { get => overFlowEnergy; set => overFlowEnergy = value; }
 
     public int MeleeAttackIndex { get => meleeAttackIndex; set => meleeAttackIndex = value; }
     public int BulletCount { get => bulletCount; set => bulletCount = value; }
@@ -110,10 +112,12 @@ public class Player : MonoBehaviour
     {
         if (isDead)
             return;
-
+        if(Input.GetKeyDown(KeyCode.P))
+        {
+            GetOverFlowEnergy(10f);
+        }
         currentState?.Update(this);
         StaminaTimer();
-
 
         if (hit)
             return;
@@ -150,6 +154,7 @@ public class Player : MonoBehaviour
         bulletCount = stats.maxBullet;
         meleeAttackIndex = 0;
         stamina = stats.maxStamina;
+        overFlowEnergy = 0;
         isDead = false;
         currentWeapon = WeaponState.Melee;
         ChangeState(states["Idle"]);
@@ -157,26 +162,23 @@ public class Player : MonoBehaviour
 
     void StaminaTimer()
     {
+        if (currentState is PlayerCrowdControlState)
+            return;
         // 스태미너 리얼 타임 회복
         // 현재 초당 10% 설정
         if (isDead)
             return;
-        staminaTimer += Time.deltaTime;
+        stamina += stats.staminaRecoveryAmount * Time.deltaTime;
 
-        if(staminaTimer > stats.staminaRecoveryDuration)
+        if(stamina >= stats.maxStamina)
         {
-            staminaTimer = 0;
-            stamina += stats.staminaRecoveryAmount;
-            if(stamina >= stats.maxStamina)
-            {
-                stamina = stats.maxStamina;
-            }
+            stamina = stats.maxStamina;
         }
     }
 
     void SpriteControl()
     {
-        if (currentState is PlayerHitState)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState)
             return;
         // 마우스 위치와 입력에 따른 스프라이트 변화 - 수정 예정
         if(aiming || attacking)
@@ -218,7 +220,8 @@ public class Player : MonoBehaviour
     void Move()
     {
         // 회피, 차지어택, 근접 공격, 피격 시 리턴
-        if (currentState is PlayerHitState || dodging || skillManager.Charging || attacking)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState 
+            || dodging || skillManager.Charging || attacking || arm.Firing)
             return;
 
         // 기본 속도 최대 속도
@@ -229,7 +232,8 @@ public class Player : MonoBehaviour
         }
         else
         {
-            speed = stats.speed;
+
+            speed = skillManager.Enhanced ? stats.speed*2 : stats.speed;
         }
 
         Vector2 moveVelocity = input.MoveVec * speed;
@@ -282,7 +286,8 @@ public class Player : MonoBehaviour
     void MeleeAttack()
     {
         // 차지어택, 근접공격 중, 피격 시 리턴
-        if (currentState is PlayerHitState || skillManager.Charging || attacking)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState 
+            || skillManager.Charging || attacking)
             return;
 
         // 근접 공격 상태가 아닐 경우 진입
@@ -325,7 +330,8 @@ public class Player : MonoBehaviour
         ChangeState(states["RangeAttack"]);
 
         // 총알 없을 시, 차지 어택 시, 피격 시 리턴
-        if (currentState is PlayerHitState || skillManager.Charging || bulletCount <= 0)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState
+            || skillManager.Charging || bulletCount <= 0)
             return;
 
         // 사격 함수
@@ -410,6 +416,13 @@ public class Player : MonoBehaviour
         skillManager.InitiatingFlashAttack(facingRight);
     }
 
+    void Sandevistan()
+    {
+        if (skillManager.Enhanced)
+            return;
+        skillManager.SandevistanON();
+    }
+
     #endregion
 
     #region public Function
@@ -484,11 +497,24 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void GetOverFlowEnergy(float amount)
+    {
+        if (skillManager.Enhanced)
+            return;
+        overFlowEnergy += amount;
+
+        if(overFlowEnergy >= stats.maxOverFlowEnergy)
+        {
+            overFlowEnergy = stats.maxOverFlowEnergy;
+        }
+    }
+
     #region Input Function
     // 입력 함수들
     public void Jump(InputAction.CallbackContext context)
     {
-        if (currentState is PlayerHitState || skillManager.Charging || dodging)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState
+            || skillManager.Charging || dodging)
             return;
 
         if (context.started)
@@ -526,7 +552,8 @@ public class Player : MonoBehaviour
 
     public void SwitchWeapon(InputAction.CallbackContext context)
     {
-        if (currentState is PlayerHitState || skillManager.Charging || dodging)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState
+            || skillManager.Charging || dodging)
             return;
 
         if (context.performed)
@@ -552,7 +579,8 @@ public class Player : MonoBehaviour
 
     public void InitiateAttack(InputAction.CallbackContext context)
     {
-        if (currentState is PlayerHitState || dodging || skillManager.Charging)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState
+            || dodging || skillManager.Charging)
             return;
 
         if (context.performed)
@@ -590,7 +618,8 @@ public class Player : MonoBehaviour
 
     public void Dodge(InputAction.CallbackContext context)
     {
-        if (currentState is PlayerHitState || skillManager.Charging || dodging || !check.CanDodge)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState
+            || skillManager.Charging || dodging || !check.CanDodge)
             return;
         // 회피 상태 or 회피 기회 소모시 불가
         // 회피 함수
@@ -609,7 +638,7 @@ public class Player : MonoBehaviour
     public void Skill1(InputAction.CallbackContext context)
     {
         Debug.Log("스킬 1");
-        if (currentState is PlayerHitState)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState)
             return;
 
         if (context.performed)
@@ -629,7 +658,7 @@ public class Player : MonoBehaviour
     public void Skill2(InputAction.CallbackContext context)
     {
         Debug.Log("스킬 2");
-        if (currentState is PlayerHitState)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState)
             return;
 
         if (context.performed)
@@ -648,12 +677,23 @@ public class Player : MonoBehaviour
 
     public void Parrying(InputAction.CallbackContext context)
     {
-        if (currentState is PlayerHitState || skillManager.Charging)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState || skillManager.Charging)
             return;
         // 제작 중
         if (context.performed)
         {
             Debug.Log("패링");
+        }
+    }
+
+    public void OverFlowSkill(InputAction.CallbackContext context)
+    {
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState)
+            return;
+
+        if(context.performed)
+        {
+            Sandevistan();
         }
     }
 
@@ -674,7 +714,7 @@ public class Player : MonoBehaviour
         Debug.Log("베기");
         attacking = true;
 
-        meleeAttackHitBoxes[meleeAttackIndex].SetActive(true);
+        meleeAttackHitBoxes[meleeAttackIndex].Init(skillManager.Enhanced);
 
         rigid.linearVelocity = Vector2.zero;
         if(dir.x > 0)
@@ -689,7 +729,11 @@ public class Player : MonoBehaviour
         yield return CoroutineCasher.Wait(0.1f);
 
         rigid.linearVelocity = Vector2.zero;
-        meleeAttackHitBoxes[meleeAttackIndex].SetActive(false);
+        if (meleeAttackHitBoxes[meleeAttackIndex].GetComponent<HitBox>().Trigger)
+        {
+            GetOverFlowEnergy(10f);
+        }
+        meleeAttackHitBoxes[meleeAttackIndex].gameObject.SetActive(false);
         meleeAttackIndex = (meleeAttackIndex + 1) % meleeAttackHitBoxes.Length;
 
         yield return CoroutineCasher.Wait(0.1f);
@@ -704,14 +748,18 @@ public class Player : MonoBehaviour
         Debug.Log("베기");
         attacking = true;
 
-        meleeAttackHitBoxes[meleeAttackIndex].SetActive(true);
+        meleeAttackHitBoxes[meleeAttackIndex].Init(skillManager.Enhanced);
 
         yield return CoroutineCasher.Wait(0.05f);
 
-        meleeAttackHitBoxes[meleeAttackIndex].SetActive(false);
+        if (meleeAttackHitBoxes[meleeAttackIndex].GetComponent<HitBox>().Trigger)
+        {
+            GetOverFlowEnergy(10f);
+        }
+        meleeAttackHitBoxes[meleeAttackIndex].gameObject.SetActive(false);
         meleeAttackIndex = (meleeAttackIndex + 1) % meleeAttackHitBoxes.Length;
 
-        meleeAttackHitBoxes[meleeAttackIndex].SetActive(true);
+        meleeAttackHitBoxes[meleeAttackIndex].Init(skillManager.Enhanced);
 
         rigid.linearVelocity = Vector2.zero;
         if (dir.x > 0)
@@ -726,7 +774,11 @@ public class Player : MonoBehaviour
         yield return CoroutineCasher.Wait(0.05f);
 
         rigid.linearVelocity = Vector2.zero;
-        meleeAttackHitBoxes[meleeAttackIndex].SetActive(false);
+        if (meleeAttackHitBoxes[meleeAttackIndex].GetComponent<HitBox>().Trigger)
+        {
+            GetOverFlowEnergy(10f);
+        }
+        meleeAttackHitBoxes[meleeAttackIndex].gameObject.SetActive(false);
         meleeAttackIndex = (meleeAttackIndex + 1) % meleeAttackHitBoxes.Length;
 
         yield return CoroutineCasher.Wait(0.1f);
@@ -741,7 +793,7 @@ public class Player : MonoBehaviour
         Debug.Log("근접 사격");
         attacking = true;
 
-        meleeAttackHitBoxes[meleeAttackIndex].SetActive(true);
+        meleeAttackHitBoxes[meleeAttackIndex].Init(skillManager.Enhanced);
         rigid.linearVelocity = Vector2.zero;
 
         if (dir.x > 0)
@@ -754,8 +806,11 @@ public class Player : MonoBehaviour
         }
         yield return CoroutineCasher.Wait(0.1f);
 
-        
-        meleeAttackHitBoxes[meleeAttackIndex].SetActive(false);
+        if (meleeAttackHitBoxes[meleeAttackIndex].GetComponent<HitBox>().Trigger)
+        {
+            GetOverFlowEnergy(10f);
+        }
+        meleeAttackHitBoxes[meleeAttackIndex].gameObject.SetActive(false);
         meleeAttackIndex = (meleeAttackIndex + 1) % meleeAttackHitBoxes.Length;
 
         yield return CoroutineCasher.Wait(0.1f);
@@ -772,19 +827,27 @@ public class Player : MonoBehaviour
         // 애니메이션 완성시 변경 예정
         attacking = true;
 
-        meleeAirAttackHitBox.SetActive(true);
+        meleeAirAttackHitBox.Init(skillManager.Enhanced);
         Debug.Log("에어 슬래쉬!");
         if(check.IsGround)
         {
             attacking = false;
-            meleeAirAttackHitBox.SetActive(false);
+            if (meleeAirAttackHitBox.GetComponent<HitBox>().Trigger)
+            {
+                GetOverFlowEnergy(10f);
+            }
+            meleeAirAttackHitBox.gameObject.SetActive(false);
             yield break;
         }
         rigid.linearVelocityY = 0;
         rigid.AddForce(Vector2.up * 3, ForceMode2D.Impulse);
         yield return CoroutineCasher.Wait(0.1f);
+        if(meleeAirAttackHitBox.GetComponent<HitBox>().Trigger)
+        {
+            GetOverFlowEnergy(10f);
+        }
 
-        meleeAirAttackHitBox.SetActive(false);
+        meleeAirAttackHitBox.gameObject.SetActive(false);
 
         yield return CoroutineCasher.Wait(0.1f);
         attacking = false;

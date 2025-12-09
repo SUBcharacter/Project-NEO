@@ -15,4 +15,4 @@ MonoBehaviour:
   attackable:
     serializedVersion: 2
     m_Bits: 2176
-  damage: 40
+  damage: 30

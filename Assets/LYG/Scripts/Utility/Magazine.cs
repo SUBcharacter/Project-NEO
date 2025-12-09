@@ -21,10 +21,10 @@ public class Magazine : MonoBehaviour
         }
     }
 
-    public GameObject Fire(Vector2 dir, Vector3 pos)
+    public GameObject Fire(Vector2 dir, Vector3 pos, bool enhanced = false)
     {
         
-        pools[index].GetComponent<Bullet>().Init(dir, pos);
+        pools[index].GetComponent<Bullet>().Init(dir, pos,enhanced);
         GameObject returnValue = pools[index];
         index = (index + 1) % size;
 
