@@ -35,7 +35,7 @@ public class BasicHitBox : HitBox
                 Debug.Log("충돌");
                 break;
             case (int)Layers.enemy:
-                collision.gameObject.SetActive(false);
+                collision.GetComponent<IDamageable>().TakeDamage(damage);
                 triggered = true;
                 break;
             case (int)Layers.player:
@@ -55,6 +55,9 @@ public class BasicHitBox : HitBox
         if (((1 << collision.gameObject.layer) & stats.attackable) == 0)
             return;
 
+        float enhancing = enhance ? 2 : 1;
+        float damage = stats.damage * enhancing;
+
         switch (collision.gameObject.layer)
         {
             case (int)Layers.terrain:
@@ -66,7 +69,7 @@ public class BasicHitBox : HitBox
                 Debug.Log("충돌");
                 break;
             case (int)Layers.enemy:
-                collision.gameObject.SetActive(false);
+                collision.gameObject.GetComponent<IDamageable>().TakeDamage(damage);
                 triggered = true;
                 break;
             case (int)Layers.player:

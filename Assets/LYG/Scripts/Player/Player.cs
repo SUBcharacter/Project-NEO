@@ -45,10 +45,10 @@ public class Player : MonoBehaviour
     [SerializeField] Vector2 mousePos;
     [SerializeField] WeaponState currentWeapon;
 
+    [SerializeField] float health;
     [SerializeField] float stamina;
     [SerializeField] float overFlowEnergy;
 
-    [SerializeField] int health;
     [SerializeField] int meleeAttackIndex;
     [SerializeField] int bulletCount;
 

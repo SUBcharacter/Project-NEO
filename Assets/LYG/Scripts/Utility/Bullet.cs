@@ -67,6 +67,8 @@ public class Bullet : MonoBehaviour
         // 데미지 함수 매개변수 작성시 enhance 여부를 판단하는 로직을 넣을 것;
         if (((1 << collision.gameObject.layer) & stats.attackable) == 0)
             return;
+        float enhancing = enhance ? 2 : 1;
+        float damage = stats.damage * enhancing;
         switch(collision.gameObject.layer)
         {
             case (int)Layers.terrain:
@@ -74,10 +76,13 @@ public class Bullet : MonoBehaviour
                 gameObject.SetActive(false);
                 break;
             case (int)Layers.enviroment:
-                transform.SetParent(parent);
+                
                 gameObject.SetActive(false);
                 break;
             case (int)Layers.enemy:
+                transform.SetParent(parent);
+                collision.GetComponent<IDamageable>().TakeDamage(damage);
+                gameObject.SetActive(false);
                 break;
             case (int)Layers.player:
                 break;

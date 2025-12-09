@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum Event
 {
-    Start, Pause, Stop, Play
+    Start, Pause, Stop, Play, Enemy_Enhance
 }
 
 
