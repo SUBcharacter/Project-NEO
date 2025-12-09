@@ -18,7 +18,7 @@ public abstract class Enemy : MonoBehaviour, IResetable
     protected virtual void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
         Init(); // 체력, 위치 등 초기화
     }
@@ -35,6 +35,7 @@ public abstract class Enemy : MonoBehaviour, IResetable
     public virtual void TakeDamage()
     {
         currentHits++;
+        Debug.Log($"맞은 횟수" + currentHits);
 
         if (currentHits >= enemyData.maxHits)
             Die();
@@ -44,9 +45,12 @@ public abstract class Enemy : MonoBehaviour, IResetable
     public virtual void Die()
     {
         gameObject.SetActive(false);
+        Debug.Log("뒤짐");
     }
 
     // 적마다 구현하는 행동
     protected abstract void Move();
     protected abstract void Attack();
+
+    protected abstract void Chase();
 }
