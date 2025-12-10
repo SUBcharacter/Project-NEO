@@ -50,7 +50,7 @@ public abstract class Enemy : MonoBehaviour, IResetable, IDamageable
     public virtual void Die()
     {
         gameObject.SetActive(false);
-        Debug.Log("뒤짐");
+        Debug.Log("뒤짐"); // ㅋㅋㅋ
     }
 
     // 적마다 구현하는 행동

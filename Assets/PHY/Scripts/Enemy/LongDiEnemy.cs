@@ -9,6 +9,8 @@ using UnityEngine;
 // IResetable 인터페이스를 내가 직접 만들어야하는거임? 시발? 일단 이것도 추후에 하기
 // 히트박스 스크립트가 유틸 스크립트로 있으니 일단 써봐도 될거같음 (맨마지막에 해보기)
 
+// 적 상태에 관련한 부분은 PD와 의논할 것, 필요시 도와줌
+
 public class LongDiEnemy : Enemy
 {
     [Header("컴포넌트 & 참조 관련 변수")]
