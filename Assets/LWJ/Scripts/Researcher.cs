@@ -12,46 +12,55 @@ public class Researcher : MonoBehaviour, IDamageable
     [SerializeField] public GameObject Bullet_prefab;
     [SerializeField] public GameObject D_prefab;
 
-    public ResearcherState[] R_States = new ResearcherState[5];
+    public ResearcherState[] R_States = new ResearcherState[6];
     public ResearcherState currentStates;
 
     public SightRange sightRange;
-
-    public bool isDroneSummoned = false;
+    public AimRange aimRange;
 
     public LayerMask groundLayer;
     public LayerMask wallLayer;
 
     private SpriteRenderer spriteRenderer;
     private SpriteRenderer flashrender;
+
     public float R_Speed = 2f;
     public float Movedistance = 1f;
-    private float wallCheckDistance = 0.8f;
-    private float groundCheckDistance = 0.8f;
     public float WaitTimer = 3f;
     public float statetime;
-    private float M_direction;
     public float Idlewaittime;
-    [SerializeField] private float currenthealth = 100f;
-    [SerializeField] private float knockBackXForce = 0.5f;
+    private float currenthealth = 100f;
+    private float knockBackXForce = 0.5f;
+    private float flashDuration = 0.1f;    
+    private float invincibilityDuration = 0.5f;
+    private float wallCheckDistance = 0.8f;
+    private float groundCheckDistance = 0.8f;
+    private float M_direction;
 
-    [SerializeField] private Color flashColor = Color.red; 
-    [SerializeField] private float flashDuration = 0.1f;    
-    [SerializeField] private float invincibilityDuration = 0.5f;
     private Coroutine flashCoroutine;
+
+    public bool isDroneSummoned = false;
     private bool isInvincible = false;
     private bool ismove = false;
     private bool isSummon = false;
     private bool isDead = false;
     private bool isAttack = false;
+    
     public Rigidbody2D rb;
-    private float originalArmLocalX;
-    private float originalArmLocalY;
+
+    [SerializeField] private Color flashColor = Color.red;
+
     private Animator animator;
+    private Animator Armanima;
+    
 
     void Awake()
     {
-        sightRange = GetComponent<SightRange>();    
+        Transform ch_Trans = transform.Find("Armposition");
+        Transform arm_trans = ch_Trans.Find("ArmSprite");
+        Armanima = arm_trans.GetComponent<Animator>();
+        sightRange = GetComponent<SightRange>();   
+        aimRange = GetComponent<AimRange>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         flashrender = GetComponent<SpriteRenderer>();   
         R_States[0] = new R_IdleState();
@@ -59,14 +68,13 @@ public class Researcher : MonoBehaviour, IDamageable
         R_States[2] = new R_SummonDroneState();
         R_States[3] = new R_Attackstate();
         R_States[4] = new R_Hitstate();
+        R_States[5] = new R_ChaseState();
         ChangeState(R_States[0]);
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         arm = transform.Find("Armposition");
         Gunfire = transform.Find("GunTip");
-        originalArmLocalX = Mathf.Abs(arm.localPosition.x);
-        // Y는 그대로 저장합니다.
-        originalArmLocalY = arm.localPosition.y;
+        Armanima = GetComponentInChildren<Animator>();
     }
 
     void Update()
@@ -88,12 +96,12 @@ public class Researcher : MonoBehaviour, IDamageable
         rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y);    
     }
 
-    public void ShootBullet() // 매개변수 (Vector2 dir) 제거
+    public void ShootBullet() 
     {
-        // 1. 발사 위치는 GunTip (또는 ArmPivot)으로 설정
+     
         Vector3 startPosition = Gunfire != null ? Gunfire.position : arm.position;
 
-        // 2. 발사 방향은 팔의 Forward 방향 (Quaternion.Euler로 계산된 회전 방향)
+      
         Vector2 dirToTarget = (Player_Trans.position - startPosition).normalized;
 
         GameObject bulletObject = Instantiate(Bullet_prefab, startPosition, Quaternion.identity);
@@ -101,7 +109,7 @@ public class Researcher : MonoBehaviour, IDamageable
 
         if (bulletComponent != null)
         {
-            // 플레이어를 향하는 벡터를 직접 전달
+ 
             bulletComponent.Init(dirToTarget, startPosition);
         }
     }
@@ -164,6 +172,21 @@ public class Researcher : MonoBehaviour, IDamageable
         animator.SetBool("R_Summon", isSummon);
     }
 
+    public void PlayShot()
+    {
+         Armanima.Play("R_Shot");
+    }
+
+
+    public void Playtriggeranima()
+    {
+        animator.SetTrigger("R_attack");
+    }
+
+    public void PlayIdletoattack()
+    {
+        animator.SetTrigger("R_ItoA");
+    }
     #endregion
 
     public void Idletowalk()
@@ -204,12 +227,7 @@ public class Researcher : MonoBehaviour, IDamageable
     {
         Vector3 dir = Player_Trans.position - arm.position;
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-
-        // FlipArm()으로 Y축 반전했기 때문에 회전 적용 방식 구분
-        if (arm.localRotation.y < 0) // 왼쪽 보는 중
-            arm.rotation = Quaternion.Euler(0, 0, 180 + angle);
-        else
-            arm.rotation = Quaternion.Euler(0, 0, angle);
+        arm.rotation = Quaternion.Euler(0, 0, angle);
     }
     #endregion
 
@@ -217,26 +235,25 @@ public class Researcher : MonoBehaviour, IDamageable
     {
 
         Vector3 armLocalScale = arm.localScale;
-        Vector3 armLocalPosition = arm.localPosition;
 
         // 1. 방향에 따른 Y 스케일 및 X 위치 설정
         if (direction < 0) // 왼쪽을 바라볼 때
         {
+
+            armLocalScale.x = -1;
             armLocalScale.y = -1;
-            armLocalPosition.x = -originalArmLocalX; //  X 위치 반전 (왼쪽 어깨 고정)
+
         }
         else // 오른쪽을 바라볼 때
         {
+
+            armLocalScale.x = 1;
             armLocalScale.y = 1;
-            armLocalPosition.x = originalArmLocalX; //  X 위치 정상화 (오른쪽 어깨 고정)
+   
         }
 
-        // 2. Y 위치를 기본값으로 고정 (Aimatplayer에서 오프셋 적용을 위한 베이스)
-        armLocalPosition.y = originalArmLocalY; //  Y 위치 고정
-
-        // 3. 변경된 값 적용
         arm.localScale = armLocalScale;
-        arm.localPosition = armLocalPosition;
+
 
     }
     public void summontoattack()

@@ -16,6 +16,8 @@ public class R_IdleState : ResearcherState
     {
         Debug.Log("Researcher Idle State 시작");
         researcher.statetime = Time.time + researcher.Idlewaittime;
+        Debug.Log($"Idlewaittime 값: {researcher.Idlewaittime}");
+        Debug.Log($"Idle 종료 예상 시각: {researcher.statetime}, 현재 Time.time: {Time.time}");
 
     }
     public override void Update(Researcher researcher)
@@ -41,7 +43,11 @@ public class R_IdleState : ResearcherState
 
        
         researcher.rb.linearVelocity = Vector2.zero;
-
+        if (Time.time >= researcher.statetime)
+        {
+            researcher.ChangeState(researcher.R_States[1]); 
+            return; 
+        }
     }
 
 
@@ -121,20 +127,61 @@ public class R_SummonDroneState : ResearcherState
     }
     public override void Update(Researcher researcher)
     {
-    
+        //if (researcher.sightRange != null && researcher.sightRange.IsPlayerInSight)
+        //{
+        //    researcher.PlayIdletoattack();
+        //    researcher.ChangeState(researcher.R_States[3]);
+        //    return;
+        //}
+        //else
+        //{
+        //    researcher.PlayIdletoattack();
+        //    researcher.ChangeState(researcher.R_States[5]);
+        //    return;
+        //}
     }
     public override void Exit(Researcher researcher)
     {
         Debug.Log("Summon Drone State 종료");
         researcher.StopSummon();
     }
-}   
+}
 
+public class  R_ChaseState : ResearcherState
+{
+    public override void Start(Researcher researcher)
+    {
+        Debug.Log("추적");
+        researcher.PlayWalk();
+    }
+    public override void Update(Researcher researcher)
+    {
+
+        if (researcher.CheckForObstacle(researcher) || researcher.CheckForLedge(researcher))
+        {
+            researcher.StopWalk();
+            researcher.ChangeState(researcher.R_States[0]);
+            return;
+        }
+        researcher.MovetoPlayer();
+
+        if(researcher.aimRange != null && researcher.aimRange.IsPlayerInSight)
+        {
+            researcher.Playtriggeranima();
+            researcher.ChangeState(researcher.R_States[3]);
+            return;
+        }   
+    }
+    public override void Exit(Researcher researcher)
+    {
+        Debug.Log("추적 상태 종료");
+       
+    }
+}
 public class R_Attackstate : ResearcherState
 {
     private float fireRate = 1f; 
     private float nextFireTime;
-    private float directionToPlayer;
     private bool active;
     public override void Start(Researcher researcher)
     {
@@ -142,31 +189,30 @@ public class R_Attackstate : ResearcherState
         Debug.Log("연구원 공격!");
         nextFireTime = fireRate;
         researcher.Armsetactive(active);  
-        researcher.PlayAttack();    
+        researcher.PlayAttack();  
+        researcher.rb.linearVelocity = Vector2.zero;
     }
     public override void Update(Researcher researcher)
-    {
+    {   
+        researcher.Aimatplayer(); 
 
-        if (researcher.CheckForObstacle(researcher) || researcher.CheckForLedge(researcher))
+        if (researcher.aimRange != null && researcher.aimRange.IsPlayerInSight)
         {
-
-            researcher.rb.linearVelocity = new Vector2(0, researcher.rb.linearVelocity.y);
-            researcher.StopAttack();
-            researcher.ChangeState(researcher.R_States[0]); 
-            return;
-        }
-
-        researcher.MovetoPlayer();
-        researcher.Aimatplayer();
-        if (researcher.sightRange != null && researcher.sightRange.IsPlayerInSight)
-        { 
             nextFireTime -= Time.deltaTime;
             if (0 >= nextFireTime)
             {
-                researcher.ShootBullet();
-                nextFireTime = fireRate; 
+                researcher.PlayShot();
+                nextFireTime = fireRate;
             }
         }
+        else
+        {   
+                Debug.Log("사격 범위 이탈, 시야 유지. 추적으로 전환.");
+                researcher.ChangeState(researcher.R_States[5]); 
+                
+        }
+
+        
 
     }
     public override void Exit(Researcher researcher)
@@ -197,10 +243,21 @@ public class R_Hitstate : ResearcherState
     {
         if (Time.time >= exitTime)
         {
-         
             researcher.FlipResearcher(researcher, directionToPlayer);
             researcher.rb.linearVelocity = Vector2.zero;
-            researcher.ChangeState(researcher.R_States[3]);
+            if (researcher.sightRange != null && researcher.sightRange.IsPlayerInSight)
+            {
+
+                if (researcher.aimRange != null && researcher.aimRange.IsPlayerInSight)
+                { 
+                    researcher.ChangeState(researcher.R_States[3]); 
+                }
+                else
+                {               
+                    researcher.ChangeState(researcher.R_States[5]); 
+                }
+            }
+     
         }
     }
     public override void Exit(Researcher researcher)

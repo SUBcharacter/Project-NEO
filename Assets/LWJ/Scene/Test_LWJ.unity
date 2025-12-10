@@ -135,6 +135,7 @@ GameObject:
   - component: {fileID: 34134128}
   - component: {fileID: 34134129}
   - component: {fileID: 34134130}
+  - component: {fileID: 34134131}
   m_Layer: 7
   m_Name: Researcher
   m_TagString: Untagged
@@ -165,7 +166,7 @@ MonoBehaviour:
   Bullet_prefab: {fileID: 337160583029289659, guid: 78080b7173b949c40b674e48964acdb1, type: 3}
   D_prefab: {fileID: 773931948723233161, guid: 9cac8ed1b490586498e9b630ffc2f932, type: 3}
   sightRange: {fileID: 0}
-  isDroneSummoned: 0
+  aimRange: {fileID: 0}
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -176,13 +177,10 @@ MonoBehaviour:
   Movedistance: 1
   WaitTimer: 3
   statetime: 0
-  Idlewaittime: 0
-  currenthealth: 100
-  knockBackXForce: 5
-  flashColor: {r: 1, g: 0, b: 0, a: 1}
-  flashDuration: 0.1
-  invincibilityDuration: 0.5
+  Idlewaittime: 2
+  isDroneSummoned: 0
   rb: {fileID: 0}
+  flashColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!4 &34134124
 Transform:
   m_ObjectHideFlags: 0
@@ -211,7 +209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73b05a475105daa47bc9d0bbc0328dcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  viewRadius: 6
+  viewRadius: 8
   viewAngle: 180
   targetLayer:
     serializedVersion: 2
@@ -375,6 +373,26 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &34134131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 34134121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 783f33a37e2637c43a47451327e4a3f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  viewRadius: 5
+  viewAngle: 180
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!1 &185198184
 GameObject:
   m_ObjectHideFlags: 0
@@ -897,7 +915,7 @@ Transform:
   m_GameObject: {fileID: 824166030}
   serializedVersion: 2
   m_LocalRotation: {x: -0.0034073598, y: 0.0015619887, z: -0.0025721989, w: 0.9999897}
-  m_LocalPosition: {x: 0.2249999, y: 0.13699996, z: -1.3}
+  m_LocalPosition: {x: -0.037, y: 0.138, z: -1.299}
   m_LocalScale: {x: 1, y: 1, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1652,6 +1670,7 @@ GameObject:
   - component: {fileID: 1973477362}
   - component: {fileID: 1973477364}
   - component: {fileID: 1973477363}
+  - component: {fileID: 1973477365}
   m_Layer: 0
   m_Name: ArmSprite
   m_TagString: Untagged
@@ -1684,7 +1703,7 @@ Animator:
   m_GameObject: {fileID: 1973477361}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: f4ff19b7bbcaa1c4da41fd72a3c209e0, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -1751,6 +1770,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1973477365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973477361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6815d8fed6034645a9fedb73ec5dc83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2036815463
 GameObject:
   m_ObjectHideFlags: 0
