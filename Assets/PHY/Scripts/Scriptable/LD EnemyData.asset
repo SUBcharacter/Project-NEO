@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 1.5
   moveDistance: 2.5
-  maxHits: 4
+  maxHits: 5
   bulletCount: 4
   bulletInterval: 0.15
   fireCooldown: 1

@@ -79,13 +79,13 @@ public class LongDiEnemy : Enemy
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("플레이어 총알이 감지됨");
+        //Debug.Log("플레이어 총알이 감지됨");
         // 플레이어 총알 레이어(Default)만 맞았을 때
         if (collision.gameObject.layer == LayerMask.NameToLayer("Default"))
         {
             // 적의 총알인지 체크 (같은 Default라서 분리 필요)
             if (collision.GetComponent<EnemyBullet>() != null)
-                return; // 이건 적 총알 → 무시
+                return; // 적 총알 → 무시
 
             TakeDamage();
             Destroy(collision.gameObject);

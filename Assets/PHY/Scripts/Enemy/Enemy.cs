@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class Enemy : MonoBehaviour, IResetable
+public abstract class Enemy : MonoBehaviour, IResetable, IDamageable
 {
     [Header("Enemy 데이터")]
     [SerializeField] protected EnemyData enemyData;
@@ -31,11 +31,16 @@ public abstract class Enemy : MonoBehaviour, IResetable
         startPos = transform.position;
     }
 
+    public virtual void TakeDamage(float damage)
+    {
+
+    }
+
     // 공통 데미지 처리
     public virtual void TakeDamage()
     {
         currentHits++;
-        Debug.Log($"맞은 횟수" + currentHits);
+        Debug.Log($"맞은 횟수 : " + currentHits);
 
         if (currentHits >= enemyData.maxHits)
             Die();
@@ -51,6 +56,5 @@ public abstract class Enemy : MonoBehaviour, IResetable
     // 적마다 구현하는 행동
     protected abstract void Move();
     protected abstract void Attack();
-
     protected abstract void Chase();
 }
