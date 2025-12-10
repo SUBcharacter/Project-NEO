@@ -33,12 +33,6 @@ public abstract class Enemy : MonoBehaviour, IResetable, IDamageable
 
     public virtual void TakeDamage(float damage)
     {
-
-    }
-
-    // 공통 데미지 처리
-    public virtual void TakeDamage()
-    {
         currentHits++;
         Debug.Log($"맞은 횟수 : " + currentHits);
 

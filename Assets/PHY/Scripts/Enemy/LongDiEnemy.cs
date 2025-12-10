@@ -19,15 +19,15 @@ public class LongDiEnemy : Enemy
     private Animator animator;
     private Transform targetPlayer = null;             // 타겟 플레이어 위치
 
-    [Header("프리팹 & 위치 관련")] 
+    [Header("프리팹 & 위치 관련")]
     [SerializeField] private GameObject enemyBulletPrefab;
     [SerializeField] private Transform firePoint;
 
-   [Header("위치 & 연산용 변수")] 
+    [Header("위치 & 연산용 변수")]
     private Vector3 fixedFirePointPosition;            // 좌우 반전 대비 firePoint 원본 로컬 위치
     private Vector3 fixedEnemyPos;                     // 애니메이션 중 위치 흔들림 방지용
 
-    [Header("시간 관련 변수")] 
+    [Header("시간 관련 변수")]
     private float fireTimer = 0f;                      // 발사 쿨타임 타이머
     private float readyTimer = 0f;                     // 조준 시간 누적
 
@@ -54,7 +54,7 @@ public class LongDiEnemy : Enemy
         if (!isAttackMode && sensor.IsPlayerDetected)
         {
             isAttackMode = true;
-            targetPlayer = sensor.Player;
+            targetPlayer = sensor.detectedPlayer;
         }
 
         fireTimer += Time.deltaTime;
@@ -89,7 +89,7 @@ public class LongDiEnemy : Enemy
             if (collision.GetComponent<EnemyBullet>() != null)
                 return; // 적 총알 → 무시
 
-            TakeDamage();
+            TakeDamage(5f);
             Destroy(collision.gameObject);
 
             // 이미 공격 모드면 추적 불필요
@@ -99,6 +99,28 @@ public class LongDiEnemy : Enemy
                 Debug.Log("플레이어 추적시작");
             }
         }
+    }
+    /// <summary>
+    /// 언제 리셋할지 모르기 때문에 만들어놓기만하고 사용은 추후에 할 예정
+    /// </summary>
+    public override void Init()
+    {
+        base.Init();
+
+        isAiming = false;
+        isFiring = false;
+        isReadyToFire = false;
+        isAttackMode = false;
+        isChaseMode = false;
+
+        targetPlayer = null;
+
+        fireTimer = 0f;
+        readyTimer = 0f;
+
+        rigid.linearVelocity = Vector2.zero;
+
+        firePoint.localPosition = fixedFirePointPosition;
     }
 
 
@@ -235,9 +257,26 @@ public class LongDiEnemy : Enemy
     {
         if (isAttackMode) return;
 
+
+        Transform dectected = sensor != null ? sensor.GetDetectedPlayer() : null;
+
+
+        if (dectected == null)
+        {
+            Vector2 dir = player.position - transform.position;
+            float distance = Vector2.Distance(transform.position, player.position);
+
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, dir, distance, sensor.obstacleLayer);
+
+            if (hit) return;
+
+            isChaseMode = true;
+            targetPlayer = player;
+            return;
+        }
         isChaseMode = true;
 
-        targetPlayer = player;
+        targetPlayer = dectected;
     }
 
     #region Enemy 추상 클래스 구현

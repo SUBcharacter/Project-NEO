@@ -1341,7 +1341,7 @@ Transform:
   m_GameObject: {fileID: 1567340410}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.11, y: -0.53, z: -10}
+  m_LocalPosition: {x: -4.11, y: -0.99, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2972,7 +2972,7 @@ Transform:
   m_GameObject: {fileID: 1870467579}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4.11, y: -0.53, z: -10}
+  m_LocalPosition: {x: -4.1100006, y: -0.99, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3090,11 +3090,15 @@ PrefabInstance:
       objectReference: {fileID: 1072393683}
     - target: {fileID: 6031841012303717104, guid: 1cb9b9a99bfd9ff469c880abe2931d22, type: 3}
       propertyPath: attackRadius
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6031841012303717104, guid: 1cb9b9a99bfd9ff469c880abe2931d22, type: 3}
       propertyPath: detectionRadius
-      value: 4
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6031841012303717104, guid: 1cb9b9a99bfd9ff469c880abe2931d22, type: 3}
+      propertyPath: obstacleLayer.m_Bits
+      value: 1096
       objectReference: {fileID: 0}
     - target: {fileID: 6422049647380055096, guid: 1cb9b9a99bfd9ff469c880abe2931d22, type: 3}
       propertyPath: m_LocalPosition.x
