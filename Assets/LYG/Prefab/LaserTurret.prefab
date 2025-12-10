@@ -219,6 +219,7 @@ MonoBehaviour:
   detectable:
     serializedVersion: 2
     m_Bits: 1280
+  radius: 8
 --- !u!1 &6501588420452974752
 GameObject:
   m_ObjectHideFlags: 0
