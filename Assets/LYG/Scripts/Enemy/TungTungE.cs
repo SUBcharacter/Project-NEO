@@ -43,7 +43,7 @@ public class TungTungE : MonoBehaviour, IDamageable
         col = GetComponent<CapsuleCollider2D>();
         detector = GetComponent<Detector>();
         ren = GetComponentInChildren<SpriteRenderer>();
-        
+        health = stat.maxHealth;
         StateInit();
         target = detector.Detect();
         
@@ -51,7 +51,7 @@ public class TungTungE : MonoBehaviour, IDamageable
 
     private void Update()
     {
-        SpriteControl();
+        
         currentState?.Update(this);
     }
 
@@ -62,13 +62,14 @@ public class TungTungE : MonoBehaviour, IDamageable
         states["Chase"] = new TTEChasingState();
         states["Sway"] = new TTESwayState();
         states["Hit"] = new TTEHitState();
+        states["Death"] = new TTEDeathState();
         ChangeState(states["BattleIdle"]);
     }
 
     void Death()
     {
         health = 0;
-        gameObject.layer = LayerMask.NameToLayer("Invincible");
+        ChangeState(states["Death"]);
     }
 
     public void ChangeState(TungTungEState state)

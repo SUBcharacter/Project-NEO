@@ -21,6 +21,7 @@ public class TTEBattleIdleState : TungTungEState
 
     public override void Update(TungTungE tte)
     {
+        tte.SpriteControl();
         timer += Time.deltaTime;
         if(timer >= tte.Stat.waitTime)
         {
@@ -46,7 +47,7 @@ public class TTEBattleIdleState : TungTungEState
 
 public class TTEAttackState : TungTungEState
 {
-
+    float timer;
     public override void Start(TungTungE tte)
     {
         tte.StartAttack();
@@ -56,7 +57,11 @@ public class TTEAttackState : TungTungEState
     {
         if (!tte.Attacking)
         {
-            tte.ChangeState(tte.State["BattleIdle"]);
+            timer += Time.deltaTime;
+            if(timer >= tte.Stat.attackDuration)
+            {
+                tte.ChangeState(tte.State["BattleIdle"]);
+            }
         }
     }
 
@@ -86,6 +91,7 @@ public class TTEChasingState : TungTungEState
         //    tte.Rigid.linearVelocity = Vector2.zero;
         //    tte.ChangeState(tte.State["Attack"]);
         //{
+        tte.SpriteControl();
         if (tte.DistanceToPlayer() <= tte.Stat.attackDistance)
         {
             tte.ChangeState(tte.State["Attack"]);
@@ -161,7 +167,8 @@ public class TTEDeathState : TungTungEState
 
     public override void Start(TungTungE tte)
     {
-
+        tte.gameObject.layer = LayerMask.NameToLayer("Invincible");
+        tte.Rigid.linearVelocity = Vector2.zero;
     }
 
     public override void Update(TungTungE tte)
