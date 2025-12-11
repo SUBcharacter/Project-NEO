@@ -79,7 +79,6 @@ public class TTEChasingState : TungTungEState
     public override void Start(TungTungE tte)
     {
         speed = 0;
-        duckingDir = tte.FacingRight ? Vector2.right : Vector2.left;
     }
 
     public override void Update(TungTungE tte)
@@ -92,6 +91,7 @@ public class TTEChasingState : TungTungEState
         //    tte.ChangeState(tte.State["Attack"]);
         //{
         tte.SpriteControl();
+        duckingDir = tte.FacingRight ? Vector2.right : Vector2.left;
         if (tte.DistanceToPlayer() <= tte.Stat.attackDistance)
         {
             tte.ChangeState(tte.State["Attack"]);

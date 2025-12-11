@@ -840,12 +840,12 @@ public class Player : MonoBehaviour
             meleeAirAttackHitBox.gameObject.SetActive(false);
             yield break;
         }
-        rigid.linearVelocityY = 0;
-        rigid.AddForce(Vector2.up * 3, ForceMode2D.Impulse);
         yield return CoroutineCasher.Wait(0.1f);
-        if(meleeAirAttackHitBox.GetComponent<HitBox>().Trigger)
+        if(meleeAirAttackHitBox.Trigger)
         {
             GetOverFlowEnergy(10f);
+            rigid.linearVelocityY = 0;
+            rigid.AddForce(Vector2.up * 3, ForceMode2D.Impulse);
         }
 
         meleeAirAttackHitBox.gameObject.SetActive(false);

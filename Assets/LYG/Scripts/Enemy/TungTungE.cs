@@ -51,7 +51,6 @@ public class TungTungE : MonoBehaviour, IDamageable
 
     private void Update()
     {
-        
         currentState?.Update(this);
     }
 
