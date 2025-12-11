@@ -53,8 +53,8 @@ public class SkillManager : MonoBehaviour
 
     private void Awake()
     {
-        player = GetComponentInParent<Player>();
         knifePool = GetComponent<Magazine>();
+        player = GetComponentInParent<Player>();
         casting = false;
         openFire = false;
         phantomBladeUsable = true;

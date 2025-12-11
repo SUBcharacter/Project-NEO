@@ -2587,7 +2587,7 @@ Transform:
   m_GameObject: {fileID: 1038145544}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.66, y: 0.3399999, z: -10}
+  m_LocalPosition: {x: 9.222, y: 0.3399999, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3736,7 +3736,7 @@ Transform:
   m_GameObject: {fileID: 1651391986}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 9.66, y: 0.3399999, z: -10}
+  m_LocalPosition: {x: 9.222, y: 0.3399999, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4558,9 +4558,13 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: -0.45
       objectReference: {fileID: 0}
+    - target: {fileID: 2777112384088330522, guid: 279264dcb96387a489879d672b1c9ace, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2790391508819898091, guid: 279264dcb96387a489879d672b1c9ace, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 9.66
+      value: 9.222
       objectReference: {fileID: 0}
     - target: {fileID: 2790391508819898091, guid: 279264dcb96387a489879d672b1c9ace, type: 3}
       propertyPath: m_LocalPosition.y
@@ -4750,6 +4754,10 @@ PrefabInstance:
       propertyPath: m_Radius
       value: 0.38
       objectReference: {fileID: 0}
+    - target: {fileID: 9163343700506732471, guid: 279264dcb96387a489879d672b1c9ace, type: 3}
+      propertyPath: eyeGlow
+      value: 
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4766,6 +4774,10 @@ PrefabInstance:
     - target: {fileID: 1379644166568292859, guid: 48b95d6453f212648ae02dc54bd51863, type: 3}
       propertyPath: m_Name
       value: TungTungE
+      objectReference: {fileID: 0}
+    - target: {fileID: 1379644166568292859, guid: 48b95d6453f212648ae02dc54bd51863, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4658194876802470866, guid: 48b95d6453f212648ae02dc54bd51863, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4863,6 +4875,10 @@ PrefabInstance:
     - target: {fileID: 9204926796068948812, guid: 616dcd168a5a23549b56aff619fef7fc, type: 3}
       propertyPath: m_Name
       value: Bisili
+      objectReference: {fileID: 0}
+    - target: {fileID: 9204926796068948812, guid: 616dcd168a5a23549b56aff619fef7fc, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
