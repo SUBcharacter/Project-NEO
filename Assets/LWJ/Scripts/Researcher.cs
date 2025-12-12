@@ -12,7 +12,7 @@ public class Researcher : MonoBehaviour, IDamageable
     [SerializeField] public GameObject Bullet_prefab;
     [SerializeField] public GameObject D_prefab;
 
-    public ResearcherState[] R_States = new ResearcherState[6];
+    public ResearcherState[] R_States = new ResearcherState[7];
     public ResearcherState currentStates;
 
     public SightRange sightRange;
@@ -27,38 +27,50 @@ public class Researcher : MonoBehaviour, IDamageable
     public float R_Speed = 2f;
     public float Movedistance = 1f;
     public float WaitTimer = 3f;
-    public float statetime;
-    public float Idlewaittime;
-    private float currenthealth = 100f;
+    private float currenthealth = 50f;
     private float knockBackXForce = 0.5f;
     private float flashDuration = 0.1f;    
     private float invincibilityDuration = 0.5f;
-    private float wallCheckDistance = 0.8f;
-    private float groundCheckDistance = 0.8f;
+    private float wallCheckDistance = 1f;
+    private float groundCheckDistance = 1f;
     private float M_direction;
+    public float fireRate = 1f;
+    public float nextFireTime;
 
     private Coroutine flashCoroutine;
 
     public bool isDroneSummoned = false;
-    private bool isInvincible = false;
-    private bool ismove = false;
-    private bool isSummon = false;
-    private bool isDead = false;
-    private bool isAttack = false;
-    
+    public bool isarmlock = false;
     public Rigidbody2D rb;
 
     [SerializeField] private Color flashColor = Color.red;
 
-    private Animator animator;
-    private Animator Armanima;
+    [SerializeField] public Animator animator;
+    [SerializeField] private Animator Armanima;
     
 
     void Awake()
     {
-        Transform ch_Trans = transform.Find("Armposition");
-        Transform arm_trans = ch_Trans.Find("ArmSprite");
-        Armanima = arm_trans.GetComponent<Animator>();
+       Transform ch_Trans = transform.Find("Armposition");
+       
+       if (ch_Trans != null)
+       {
+           Transform arm_trans = ch_Trans.Find("ArmSprite");
+       
+           if (arm_trans != null)
+           {
+               Armanima = arm_trans.GetComponent<Animator>();
+           }
+           else
+           {
+               Debug.LogError("ArmSprite를 'Armposition' 자식에서 찾을 수 없습니다.");
+           }
+       }
+       else
+       {
+           Debug.LogError("Armposition 자식 오브젝트를 찾을 수 없습니다.");
+       }
+      
         sightRange = GetComponent<SightRange>();   
         aimRange = GetComponent<AimRange>();
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -69,12 +81,13 @@ public class Researcher : MonoBehaviour, IDamageable
         R_States[3] = new R_Attackstate();
         R_States[4] = new R_Hitstate();
         R_States[5] = new R_ChaseState();
+        R_States[6] = new R_Deadstate();
         ChangeState(R_States[0]);
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         arm = transform.Find("Armposition");
         Gunfire = transform.Find("GunTip");
-        Armanima = GetComponentInChildren<Animator>();
+      
     }
 
     void Update()
@@ -87,6 +100,7 @@ public class Researcher : MonoBehaviour, IDamageable
        currentStates?.Exit(this);
        currentStates = newState;
        currentStates?.Start(this);
+       
     }
     
     public void PatrolMove()
@@ -96,23 +110,7 @@ public class Researcher : MonoBehaviour, IDamageable
         rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y);    
     }
 
-    public void ShootBullet() 
-    {
-     
-        Vector3 startPosition = Gunfire != null ? Gunfire.position : arm.position;
 
-      
-        Vector2 dirToTarget = (Player_Trans.position - startPosition).normalized;
-
-        GameObject bulletObject = Instantiate(Bullet_prefab, startPosition, Quaternion.identity);
-        R_Bullet bulletComponent = bulletObject.GetComponent<R_Bullet>();
-
-        if (bulletComponent != null)
-        {
- 
-            bulletComponent.Init(dirToTarget, startPosition);
-        }
-    }
 
     public void MovetoPlayer()
     {
@@ -129,76 +127,24 @@ public class Researcher : MonoBehaviour, IDamageable
 
     }
 
-    #region 애니메이션 함수
-    public void PlayWalk()
-    {
-        ismove = true;
-        animator.SetBool("R_Move", ismove);
-    }
 
-    public void StopWalk()
+    #region 애니메이션 키 이벤트 함수
+    public void R_die()
     {
-        ismove = false;
-        animator.SetBool("R_Move", ismove);
-        
+        gameObject.SetActive(false);
     }
-
-    public void PlayDeath()
+    
+    public void summontoattack()
     {
-        isDead = true;
-        animator.SetBool("R_Death",isDead);
-    }
-
-    public void PlayAttack()
-    {
-        isAttack = true;
-        animator.SetBool("R_Attack", isAttack);
-    }
-    public void StopAttack()
-    {
-        isAttack = false;
-        animator.SetBool("R_Attack", isAttack);
-    }
-
-    public void PlaySummon()
-    {
-        isSummon = true;
-        animator.SetBool("R_Summon",isSummon);    
-    }
-
-    public void StopSummon()
-    {
-        isSummon = false;
-        animator.SetBool("R_Summon", isSummon);
-    }
-
-    public void PlayShot()
-    {
-         Armanima.Play("R_Shot");
-    }
-
-
-    public void Playtriggeranima()
-    {
-        animator.SetTrigger("R_attack");
-    }
-
-    public void PlayIdletoattack()
-    {
-        animator.SetTrigger("R_ItoA");
+        ChangeState(R_States[5]);
     }
     #endregion
-
-    public void Idletowalk()
-    {
-        ChangeState(R_States[1]);
-    }
-
 
     #region 벽과 낭떠러지 체크
     public bool CheckForObstacle(Researcher researcher)
     {
-        Vector2 checkDirection = (Movedistance > 0) ? Vector2.right : Vector2.left;
+        float direction = Mathf.Sign(researcher.transform.localScale.x);
+        Vector2 checkDirection = (direction > 0) ? Vector2.right : Vector2.left;
 
         RaycastHit2D hit = Physics2D.Raycast(researcher.transform.position, checkDirection, wallCheckDistance, researcher.wallLayer);
 
@@ -207,9 +153,9 @@ public class Researcher : MonoBehaviour, IDamageable
 
     public bool CheckForLedge(Researcher researcher)
     {
-
+        float direction = Mathf.Sign(researcher.transform.localScale.x);
         Vector3 footPosition = researcher.transform.position;
-        footPosition.x += Movedistance * 0.3f;
+        footPosition.x += direction * 0.3f;
 
         RaycastHit2D hit = Physics2D.Raycast(footPosition, Vector2.down, groundCheckDistance, researcher.groundLayer);
 
@@ -222,14 +168,42 @@ public class Researcher : MonoBehaviour, IDamageable
     public void Armsetactive(bool isactive)
     {
         arm.gameObject.SetActive(isactive);
+
+        if (isactive)
+        {
+            arm.rotation = Quaternion.Euler(0, 0, 0);
+
+            float currentDirection = transform.localScale.x;
+
+            Vector3 armLocalScale = arm.localScale;
+
+            if (currentDirection < 0) 
+            {
+                armLocalScale.x = -1;
+                armLocalScale.y = -1;
+            }
+            else 
+            {
+                armLocalScale.x = 1;
+                armLocalScale.y = 1;
+            }
+
+            arm.localScale = armLocalScale;
+
+            if (!isarmlock)
+            {
+                Aimatplayer();
+            }
+        }
     }
     public void Aimatplayer()
     {
+        if(isarmlock) return;
+
         Vector3 dir = Player_Trans.position - arm.position;
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         arm.rotation = Quaternion.Euler(0, 0, angle);
     }
-    #endregion
 
     public void FlipArm(float direction)
     {
@@ -249,17 +223,39 @@ public class Researcher : MonoBehaviour, IDamageable
 
             armLocalScale.x = 1;
             armLocalScale.y = 1;
-   
+
         }
 
         arm.localScale = armLocalScale;
-
-
     }
-    public void summontoattack()
+
+    public void ShootBullet()
     {
-       ChangeState(R_States[3]);
+
+        Vector3 startPosition =  Gunfire != null ? Gunfire.position : arm.position;
+        Vector2 dirToTarget = arm.right;
+
+        GameObject bulletObject = Instantiate(Bullet_prefab, startPosition, Quaternion.identity);
+        R_Bullet bulletComponent = bulletObject.GetComponent<R_Bullet>();
+
+        if (bulletComponent != null)
+        {
+            bulletComponent.Init(dirToTarget, startPosition);
+        }
+        Debug.Log("발사");
     }
+
+    public void PlayShot()
+    {
+        isarmlock = true;
+        Armanima.Play("R_Shot");
+    }
+
+    public void Armshotend()
+    {
+        isarmlock = false;
+    }
+    #endregion
 
     public Vector2 GetcurrentVect2()
     {
@@ -300,15 +296,27 @@ public class Researcher : MonoBehaviour, IDamageable
        
     public void TakeDamage(float damage)
     {
-        Debug.Log("Researcher " + damage);
-        currenthealth -= damage;
+      
 
-       
-        ChangeState(R_States[3]);
-        flashCoroutine = StartCoroutine(FlashCoroutin());
+        Debug.Log("Researcher " + damage);
+  
+        currenthealth -= damage;
+        Debug.Log("체력 : " + currenthealth);
+
+        if (flashCoroutine != null)
+        {
+            StopCoroutine(flashCoroutine);
+            spriteRenderer.color = Color.white;
+        }
+
         if (currenthealth <= 0)
         {
-            PlayDeath();
+            ChangeState(R_States[6]);
+        }
+        else
+        {
+            ChangeState(R_States[3]);
+            flashCoroutine = StartCoroutine(FlashCoroutin());
         }
     }
 
@@ -322,7 +330,7 @@ public class Researcher : MonoBehaviour, IDamageable
 
     private IEnumerator FlashCoroutin()
     {
-        isInvincible = true;
+
         Color originalColor = flashrender.color;
 
         float endTime = Time.time + invincibilityDuration;
@@ -339,7 +347,6 @@ public class Researcher : MonoBehaviour, IDamageable
 
 
         flashrender.color = originalColor;
-        isInvincible = false;
         flashCoroutine = null;
     }
 }

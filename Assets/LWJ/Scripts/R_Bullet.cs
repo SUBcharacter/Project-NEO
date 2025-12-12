@@ -26,11 +26,10 @@ public class R_Bullet : Bullet
     protected override void Triggered(Collider2D collision)
     {
 
-        if (((1 << collision.gameObject.layer) & stats.attackable) == 0) return; // 공격 가능한 레이어 체크 유지
+        if (((1 << collision.gameObject.layer) & stats.attackable) == 0) return; 
 
         if (collision.gameObject.layer == (int)Layers.player)
         {
-            // R_Bullet은 Player에게 데미지를 입혀야 하므로 여기서 처리
             Player player = collision.GetComponent<Player>();
             if (player != null)
             {

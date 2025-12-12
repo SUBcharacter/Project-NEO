@@ -15,9 +15,6 @@ public class R_IdleState : ResearcherState
     public override void Start(Researcher researcher)
     {
         Debug.Log("Researcher Idle State 시작");
-        researcher.statetime = Time.time + researcher.Idlewaittime;
-        Debug.Log($"Idlewaittime 값: {researcher.Idlewaittime}");
-        Debug.Log($"Idle 종료 예상 시각: {researcher.statetime}, 현재 Time.time: {Time.time}");
 
     }
     public override void Update(Researcher researcher)
@@ -36,18 +33,13 @@ public class R_IdleState : ResearcherState
         {
             if (researcher.sightRange != null && researcher.sightRange.IsPlayerInSight)
             {         
-                researcher.ChangeState(researcher.R_States[3]);
+                researcher.ChangeState(researcher.R_States[5]);
                 return;
             }
         }
 
        
         researcher.rb.linearVelocity = Vector2.zero;
-        if (Time.time >= researcher.statetime)
-        {
-            researcher.ChangeState(researcher.R_States[1]); 
-            return; 
-        }
     }
 
 
@@ -64,7 +56,7 @@ public class R_WalkState : ResearcherState
     public override void Start(Researcher researcher)
     {
         Debug.Log("Researcher Walk State 시작");
-        researcher.PlayWalk();
+        researcher.animator.Play("R_Move");
     }
     public override void Update(Researcher researcher)
     {
@@ -88,12 +80,9 @@ public class R_WalkState : ResearcherState
         }
 
         if (researcher.CheckForObstacle(researcher) || researcher.CheckForLedge(researcher))
-        {
-          
-          
+        {  
             researcher.Movedistance *= -1;
             researcher.FlipResearcher(researcher, researcher.Movedistance);
-            researcher.ChangeState(researcher.R_States[0]);
             return;
         }
         else
@@ -107,7 +96,7 @@ public class R_WalkState : ResearcherState
     public override void Exit(Researcher researcher)
     {
         Debug.Log("Researcher walk State 종료");
-        researcher.StopWalk();
+
         researcher.rb.linearVelocity = Vector2.zero;
     }
 
@@ -117,33 +106,19 @@ public class R_SummonDroneState : ResearcherState
 {
     public override void Start(Researcher researcher)
     {
-       Debug.Log("드론 소환");
-        researcher.PlaySummon();
-
+        Debug.Log("드론 소환");
         researcher.rb.linearVelocity = Vector2.zero;
-        researcher.statetime = Time.time + researcher.WaitTimer;
         researcher.SummonDrone();
-
+        researcher.animator.Play("R_Summon");
     }
     public override void Update(Researcher researcher)
     {
-        //if (researcher.sightRange != null && researcher.sightRange.IsPlayerInSight)
-        //{
-        //    researcher.PlayIdletoattack();
-        //    researcher.ChangeState(researcher.R_States[3]);
-        //    return;
-        //}
-        //else
-        //{
-        //    researcher.PlayIdletoattack();
-        //    researcher.ChangeState(researcher.R_States[5]);
-        //    return;
-        //}
+
     }
     public override void Exit(Researcher researcher)
     {
         Debug.Log("Summon Drone State 종료");
-        researcher.StopSummon();
+        
     }
 }
 
@@ -152,22 +127,21 @@ public class  R_ChaseState : ResearcherState
     public override void Start(Researcher researcher)
     {
         Debug.Log("추적");
-        researcher.PlayWalk();
+        researcher.animator.Play("R_Move");
     }
     public override void Update(Researcher researcher)
     {
 
         if (researcher.CheckForObstacle(researcher) || researcher.CheckForLedge(researcher))
         {
-            researcher.StopWalk();
-            researcher.ChangeState(researcher.R_States[0]);
+           
+            researcher.ChangeState(researcher.R_States[1]);
             return;
         }
         researcher.MovetoPlayer();
 
         if(researcher.aimRange != null && researcher.aimRange.IsPlayerInSight)
         {
-            researcher.Playtriggeranima();
             researcher.ChangeState(researcher.R_States[3]);
             return;
         }   
@@ -180,29 +154,34 @@ public class  R_ChaseState : ResearcherState
 }
 public class R_Attackstate : ResearcherState
 {
-    private float fireRate = 1f; 
-    private float nextFireTime;
     private bool active;
     public override void Start(Researcher researcher)
     {
         active = true;
         Debug.Log("연구원 공격!");
-        nextFireTime = fireRate;
-        researcher.Armsetactive(active);  
-        researcher.PlayAttack();  
+
+        researcher.Armsetactive(active);
+        researcher.animator.Play("R_attack");
         researcher.rb.linearVelocity = Vector2.zero;
     }
     public override void Update(Researcher researcher)
     {   
-        researcher.Aimatplayer(); 
 
         if (researcher.aimRange != null && researcher.aimRange.IsPlayerInSight)
         {
-            nextFireTime -= Time.deltaTime;
-            if (0 >= nextFireTime)
-            {
+          if(Time.time >= researcher.nextFireTime)
+          {
+
                 researcher.PlayShot();
-                nextFireTime = fireRate;
+                researcher.nextFireTime = Time.time + researcher.fireRate;
+          }
+          else
+          {
+                if (researcher.isarmlock == false)
+                {       
+                    researcher.Aimatplayer(); 
+                }
+  
             }
         }
         else
@@ -212,7 +191,7 @@ public class R_Attackstate : ResearcherState
                 
         }
 
-        
+  
 
     }
     public override void Exit(Researcher researcher)
@@ -220,7 +199,7 @@ public class R_Attackstate : ResearcherState
         active = false;
         Debug.Log("Researcher Attack State 종료");
         researcher.Armsetactive(active);
-        researcher.StopAttack();
+        researcher.isarmlock = false;
     }
 
  
@@ -266,3 +245,23 @@ public class R_Hitstate : ResearcherState
     }
 }
 
+public class R_Deadstate : ResearcherState
+{
+
+    public override void Start(Researcher researcher)
+    {
+
+        Debug.Log("Researcher Dead State 시작");
+        researcher.animator.Play("R_Death");
+
+        
+    }
+    public override void Update(Researcher researcher)
+    {
+
+    }
+    public override void Exit(Researcher researcher)
+    {
+        Debug.Log("Researcher Dead State 종료");
+    }
+}
