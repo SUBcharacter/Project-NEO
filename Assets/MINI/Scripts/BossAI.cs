@@ -4,89 +4,110 @@ using System.Threading;
 
 public class BossAI : MonoBehaviour, IDamageable
 {
-    [Header("컴포넌트 관련 변수")]
-    [SerializeField] private BossState currentState;        // 보스 상태
-    [SerializeField] private BossPhase currentPhase;        // 보스 현재 페이즈
+    [Header("참조 변수")]
+    [SerializeField] public Transform player;
     public Animator animator;
     public Rigidbody2D rb;
+    public GameObject tackleHitbox;
 
-    public BossPhase CurrentPhase => currentPhase;
-
-    [Header("실 사용 변수")]
-    [SerializeField] public Transform player;
-    [SerializeField] public float maxHp = 10000f; // 임시 체력
-    [SerializeField] public float currentHp;
-
-
+    [Header("State Info")]
+    [SerializeField] private BossPhase currentPhase;        // 보스 현재 페이즈
     [SerializeField] private List<BossPhase> allPhases = new();
 
+    [Header("Status")]
+    [SerializeField] private float maxHp = 10000f; // 임시 체력
+    [SerializeField] private float currentHp;
+    [SerializeField] private float currentPoise;  // 강인도
+    private bool isGroggy = false;
+
+    private BossState currentState;        // 보스 상태    
+    private CancellationTokenSource _cts;// 비동기 작업 취소용 토큰
+
+    public BossPhase CurrentPhase => currentPhase;
+    public CancellationToken DestroyCancellationToken => _cts != null ? _cts.Token : CancellationToken.None;
+    
     public List<BossPhase> AllPhase => allPhases;
 
     [HideInInspector] public List<GameObject> activeLightWaves = new();
 
-    // 비동기 작업 취소용 토큰
-    private CancellationTokenSource _cts;
-    public CancellationToken DestroyCancellationToken => _cts.Token;
 
     private void Awake()
     {
         _cts = new CancellationTokenSource();
-        animator = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody2D>();
+        if(!animator) animator = GetComponent<Animator>();
+        if(!rb) rb = GetComponent<Rigidbody2D>();
     }
 
     void Start()
     {
         currentHp = maxHp;
         if (allPhases.Count > 0) SetPhase(0);
-
-        currentState = new BossIdleState(this);
-        currentState.Start();
+        else Debug.LogError("BossAI: Phase미설정상태");
+        ChangeState(new BossIdleState(this));
+        //currentState.Start();
     }
-
-
     void Update()
     {
         currentState?.Update();
+        
         PhaseTestDamage();
     }
-    public void FaceTarget(Vector3 targetPos)
-    {
-        // 현재 스케일의 크기(절댓값)를 가져옵니다. (예: 2.0f)
-        float scaleX = Mathf.Abs(transform.localScale.x);
-        float scaleY = transform.localScale.y;
-        float scaleZ = transform.localScale.z;
+    public BossPattern SelectBestPattern() // 패턴 선택 알고리즘
+    {        
+        if (currentPhase == null) return null; 
 
-        if (targetPos.x > transform.position.x)
-        {
-            // 오른쪽을 봐야 함 (양수)
-            transform.localScale = new Vector3(scaleX, scaleY, scaleZ);
+        List<BossPattern> candidates = currentPhase.availablePatterns;  // 후보
+        float totalWeight = 0f;                                         // 가중치 변수
+
+        // 가중치 합산
+        foreach (var p in candidates)
+        {            
+            float score = p.EvaluateScore(this);
+            if (score > 0) totalWeight += score;
         }
-        else
+
+        // 계산 해도 없다? => null
+        if (totalWeight <= 0) return null;
+
+        // 룰렛 방식 가챠 패턴 가중치가 높을수록 확률 UP
+        float randomValue = Random.Range(0, totalWeight);
+        float currentSum = 0;
+
+        foreach (var p in candidates)
         {
-            // 왼쪽을 봐야 함 (음수)
-            transform.localScale = new Vector3(-scaleX, scaleY, scaleZ);
+            float score = p.EvaluateScore(this);
+            if (score > 0)
+            {
+                currentSum += score;
+                if (randomValue <= currentSum) return p;
+            }
         }
+
+        return null;
     }
     public void TakeDamage(float damage)
     {
-        currentHp -= damage;
+        if (isGroggy) damage *= 1.5f; // 그로기 때는 더 아프게
+
+        currentHp = Mathf.Max(0, currentHp - damage);
+
+        // 강인도 깎기 (데미지에 비례하거나 고정값) <- 어째해야할지 논의해야 함
+        if (!isGroggy)
+        {
+            currentPoise -= damage; // 여기다 변수하나 해서 넣어보기..정도? ex) 근접이면 1.5,원거리는 1.0? 이런느낌
+            if (currentPoise <= 0)
+            {
+                StartGroggy();
+            }
+        }
+    
         CheckPhaseTransition();
-
     }
-    void CheckPhaseTransition()     // 페이즈 체크 함수
+    void StartGroggy()
     {
-        if (allPhases.Count < 3) return;
-
-        float hpRatio = currentHp / maxHp;
-        if (hpRatio <= 0.1f && currentPhase != allPhases[2]) SetPhase(2);           //10퍼 이하 광폭
-        else if (hpRatio <= 0.6f && currentPhase != allPhases[1]) SetPhase(1);      //60퍼 이하 2페이즈
-    }
-    public void SetPhase(int index)
-    {
-        if (index >= allPhases.Count) return;
-        currentPhase = allPhases[index];
-        if (animator != null) animator.speed = currentPhase.speedMultiplier;
+        isGroggy = true;
+        // 그로기 상태로 전환 
+        ChangeState(new GroggyState(this, 3.0f));
     }
     public void ChangeState(BossState newState)
     {
@@ -94,38 +115,52 @@ public class BossAI : MonoBehaviour, IDamageable
         currentState = newState;
         currentState.Start();
     }
-    public void OnAnimationTrigger(string eventName)
+    public void RecoverPoise()
     {
-        currentState?.OnAnimationEvent(eventName);
+        isGroggy = false;
+        currentPoise = currentPhase.maxPoise;
     }
-    private void OnDestroy()
+    void CheckPhaseTransition()     // 페이즈 체크 함수
     {
-        if (_cts != null)
+        float ratio = currentHp / maxHp;
+        int nextPhaseIndex = -1;
+
+        if (ratio <= 0.2f && currentPhase != allPhases[2]) nextPhaseIndex = 2; 
+        else if (ratio <= 0.5f && currentPhase != allPhases[1]) nextPhaseIndex = 1;
+
+        if (nextPhaseIndex != -1) SetPhase(nextPhaseIndex);
+    }
+    public void SetPhase(int index)
+    {
+        if (index >= allPhases.Count) return;
+
+        currentPhase = allPhases[index];
+        animator.speed = currentPhase.speedMultiplier;
+        currentPoise = currentPhase.maxPoise; // 페이즈 바뀔 때 강인도 리셋
+        
+        Debug.Log($"Phase : {currentPhase.phaseName}");
+
+        // 페이즈 진입 패턴이 있다면 즉시 실행 (기믹 패턴)
+        if (currentPhase.entryPattern != null)
         {
-            _cts.Cancel();
-            _cts.Dispose();
-            _cts = null;
+            // 강제로 AttackingState로 전환하며 기믹 패턴 주입
+            ChangeState(new AttackingState(this, currentPhase.entryPattern));
         }
     }
+    public void OnAnimationTrigger(string eventName) => currentState?.OnAnimationEvent(eventName);
+    public void FaceTarget(Vector3 targetPos)
+    {
+        float scaleX = Mathf.Abs(transform.localScale.x);
+        if (targetPos.x > transform.position.x) transform.localScale = new Vector3(scaleX, transform.localScale.y, 1);
+        else transform.localScale = new Vector3(-scaleX, transform.localScale.y, 1);
+    }
+    private void OnDestroy() { _cts?.Cancel(); _cts?.Dispose(); }
     private void PhaseTestDamage()
     {
         if (Input.GetKeyDown(KeyCode.P))
         {
             TakeDamage(1000f);
-            Debug.Log($"Test Damage Taken. Current HP: {currentHp}");
+            Debug.Log($"Test Damage Current HP: {currentHp}");
         }
-    }
-    // 기획 변경 될 시 페이즈 별 패턴 조정을 위한 함수
-
-    [System.Serializable]
-    public class BossPhase
-    {
-        public string phaseName;                        // 에디터에서 확인 할 용도   
-        public float speedMultiplier = 1.0f;            // 패턴 속도 배율
-
-        public List<BossPattern> shortPattern = new();    // 근거리 패턴
-        public List<BossPattern> middlePattern = new();   // 중거리 패턴
-        public List<BossPattern> longPattern = new();     // 장거리 패턴
-
-    }
+    }   
 }

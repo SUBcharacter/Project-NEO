@@ -4839,39 +4839,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1af611feb6401e04c88e05f0b0ab11ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentPhase:
-    phaseName: 
-    speedMultiplier: 1
-    shortPattern: []
-    middlePattern: []
-    longPattern: []
+  player: {fileID: 1183272609}
   animator: {fileID: 2146609293}
   rb: {fileID: 2146609291}
-  player: {fileID: 1183272609}
+  tackleHitbox: {fileID: 1953128799}
+  currentPhase: {fileID: 0}
+  allPhases:
+  - {fileID: 11400000, guid: 4309b48f9e9cad146946d056ef9a2ef7, type: 2}
+  - {fileID: 11400000, guid: 93d31ca728e7b654587a40d423d790ad, type: 2}
+  - {fileID: 11400000, guid: 746301d5fe9f56d4cb4b87921d25122b, type: 2}
   maxHp: 10000
   currentHp: 0
-  allPhases:
-  - phaseName: Phase 1
-    speedMultiplier: 1
-    shortPattern:
-    - {fileID: 11400000, guid: e82f0435d4757ea449ff5e47d1fef265, type: 2}
-    middlePattern:
-    - {fileID: 11400000, guid: 38b030ad4fdde434cb27ad3033dd45dd, type: 2}
-    longPattern:
-    - {fileID: 11400000, guid: 181773eb8357dbe4f8041afa736829fe, type: 2}
-  - phaseName: Phase 2
-    speedMultiplier: 1
-    shortPattern:
-    - {fileID: 11400000, guid: 09df5b6e7688fcb43a715ddf0a05b07d, type: 2}
-    middlePattern:
-    - {fileID: 11400000, guid: 90a2c7ae9d7a2c044b6280cb3e373a98, type: 2}
-    longPattern: []
-  - phaseName: Berserk
-    speedMultiplier: 1.5
-    shortPattern: []
-    middlePattern:
-    - {fileID: 11400000, guid: 057e81a567a6f694583e2bf90519e581, type: 2}
-    longPattern: []
+  currentPoise: 0
   activeLightWaves: []
 --- !u!58 &2146609295
 CircleCollider2D:

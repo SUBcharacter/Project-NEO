@@ -19,7 +19,7 @@ public class SmashPattern : BossPattern
         pos.y += Mathf.Sin(t * Mathf.PI) * height;
         return pos;
     }
-    public override async void StartPattern()
+    protected override async Awaitable Execute()
     {
         if (boss == null)
         {
@@ -106,7 +106,7 @@ public class SmashPattern : BossPattern
         if (hit.collider != null)
         {
             result.y = hit.point.y;
-            Debug.Log($"Smash 바닥 감지 성공: {hit.collider.name} / Y: {result.y}");
+            //Debug.Log($"Smash 바닥 감지 성공: {hit.collider.name} / Y: {result.y}");
         }
         else
         {

@@ -14,7 +14,7 @@ public class ShoulderTacklePattern : BossPattern
     
     private GameObject tackleHitBox; // 보스한테 붙어있는 히트박스 캐싱용
 
-    public override async void StartPattern()
+    protected override async Awaitable Execute()
     {
         if (boss == null) return;
                

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56b72d073968cc24fa455eae24db13b4, type: 3}
+  m_Name: LazerShootPattern
+  m_EditorClassIdentifier: 
+  minRange: 0
+  maxRange: 20
+  cooldownTime: 2.5
+  priorityWeight: 1
+  comboPatterns:
+  - {fileID: 11400000, guid: 181773eb8357dbe4f8041afa736829fe, type: 2}
+  comboChance: 0.5
+  lazerPrefab: {fileID: 165814796086986629, guid: ed988140a1a9bcf468265299b5c603b1, type: 3}
+  maxDistance: 30
+  chargeTime: 1.5
+  laserDuration: 1
+  laserThickness: 1
+  muzzleOffset: {x: 0, y: 0.5}

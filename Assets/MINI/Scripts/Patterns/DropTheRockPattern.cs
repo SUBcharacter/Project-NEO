@@ -17,7 +17,7 @@ public class DropTheRockPattern : BossPattern
 
     private List<GameObject> activeRocks = new List<GameObject>();  // 프리팹 관리용 리스트
 
-    public override async void StartPattern()
+    protected override async Awaitable Execute()
     {
         if (boss == null) return;
         activeRocks.Clear();
