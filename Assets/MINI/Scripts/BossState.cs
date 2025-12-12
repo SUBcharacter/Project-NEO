@@ -96,7 +96,7 @@ public class BossCoolDownState : BossState
                 cooldownTime = 1.5f;
                 break;
             case "Berserk":
-                cooldownTime = 1.0f;
+                cooldownTime = 1.5f;
                 break;
             default:          
                 break;
