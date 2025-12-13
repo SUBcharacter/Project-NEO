@@ -15,7 +15,7 @@ public class LightWavePattern : BossPattern
 
 
     //[System.NonSerialized] private GameObject spawnCoreObject;
-    public override async void StartPattern()
+    protected override async Awaitable Execute()
     {
         if (boss == null)
         {
