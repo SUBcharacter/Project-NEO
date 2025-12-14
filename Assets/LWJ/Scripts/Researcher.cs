@@ -1,8 +1,9 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEditor.Searcher;
 using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
-public class Researcher : MonoBehaviour, IDamageable
+public class Researcher : Enemy
 {
     [SerializeField] public Transform[] dronespawnpoints;
     [SerializeField] public Transform Player_Trans;
@@ -21,37 +22,29 @@ public class Researcher : MonoBehaviour, IDamageable
     public LayerMask groundLayer;
     public LayerMask wallLayer;
 
-    private SpriteRenderer spriteRenderer;
     private SpriteRenderer flashrender;
 
-    public float R_Speed = 2f;
-    public float Movedistance = 1f;
-    public float WaitTimer = 3f;
-    private float currenthealth = 50f;
     private float knockBackXForce = 0.5f;
     private float flashDuration = 0.1f;    
     private float invincibilityDuration = 0.5f;
     private float wallCheckDistance = 1f;
     private float groundCheckDistance = 1f;
     private float M_direction;
-    public float fireRate = 1f;
     public float nextFireTime;
-
+    public float AimRotationSpeed = 5f;
     private Coroutine flashCoroutine;
 
     public bool isDroneSummoned = false;
     public bool isarmlock = false;
-    public Rigidbody2D rb;
 
     [SerializeField] private Color flashColor = Color.red;
-
     [SerializeField] public Animator animator;
     [SerializeField] private Animator Armanima;
-    
 
-    void Awake()
+    protected override void Awake()
     {
-       Transform ch_Trans = transform.Find("Armposition");
+        base.Awake();
+        Transform ch_Trans = transform.Find("Armposition");
        
        if (ch_Trans != null)
        {
@@ -73,7 +66,6 @@ public class Researcher : MonoBehaviour, IDamageable
       
         sightRange = GetComponent<SightRange>();   
         aimRange = GetComponent<AimRange>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
         flashrender = GetComponent<SpriteRenderer>();   
         R_States[0] = new R_IdleState();
         R_States[1] = new R_WalkState();
@@ -83,12 +75,12 @@ public class Researcher : MonoBehaviour, IDamageable
         R_States[5] = new R_ChaseState();
         R_States[6] = new R_Deadstate();
         ChangeState(R_States[0]);
-        rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         arm = transform.Find("Armposition");
         Gunfire = transform.Find("GunTip");
-      
-    }
+
+       
+    } 
 
     void Update()
     {
@@ -99,39 +91,35 @@ public class Researcher : MonoBehaviour, IDamageable
     {
        currentStates?.Exit(this);
        currentStates = newState;
-       currentStates?.Start(this);
-       
+       currentStates?.Start(this); 
     }
     
-    public void PatrolMove()
+    public override void Move()
     {
         M_direction = Mathf.Sign(transform.localScale.x);
-        float velocityX = M_direction * R_Speed;
-        rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y);    
+        float velocityX = M_direction * enemyData.moveSpeed;
+        rigid.linearVelocity = new Vector2(velocityX, rigid.linearVelocity.y);
     }
 
-
-
-    public void MovetoPlayer()
+    public override void Chase()
     {
         float directionToPlayer = Player_Trans.position.x - transform.position.x;
 
         float M_direction = Mathf.Sign(directionToPlayer);
 
-        float velocityX = M_direction * R_Speed;
+        float velocityX = M_direction * enemyData.moveSpeed;
 
-        rb.linearVelocity = new Vector2(velocityX, rb.linearVelocity.y);
+        rigid.linearVelocity = new Vector2(velocityX, rigid.linearVelocity.y);
 
         FlipResearcher(this, directionToPlayer);
         FlipArm(directionToPlayer); 
 
     }
 
-
     #region 애니메이션 키 이벤트 함수
     public void R_die()
     {
-        gameObject.SetActive(false);
+      Die();
     }
     
     public void summontoattack()
@@ -164,7 +152,6 @@ public class Researcher : MonoBehaviour, IDamageable
     #endregion
 
     #region 팔 관련 함수
-
     public void Armsetactive(bool isactive)
     {
         arm.gameObject.SetActive(isactive);
@@ -192,17 +179,27 @@ public class Researcher : MonoBehaviour, IDamageable
 
             if (!isarmlock)
             {
-                Aimatplayer();
+                Aimatplayer(true); 
             }
+
         }
     }
-    public void Aimatplayer()
+    public void Aimatplayer(bool active = false)
     {
-        if(isarmlock) return;
+        if (isarmlock) return;
 
         Vector3 dir = Player_Trans.position - arm.position;
-        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        arm.rotation = Quaternion.Euler(0, 0, angle);
+        float targetAngle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        Quaternion targetRotation = Quaternion.Euler(0, 0, targetAngle);
+
+        if (active) 
+        {
+            arm.rotation = targetRotation;
+        }
+        else 
+        {
+            arm.rotation = Quaternion.Slerp(arm.rotation,targetRotation,Time.deltaTime * AimRotationSpeed);
+        }
     }
 
     public void FlipArm(float direction)
@@ -210,7 +207,6 @@ public class Researcher : MonoBehaviour, IDamageable
 
         Vector3 armLocalScale = arm.localScale;
 
-        // 1. 방향에 따른 Y 스케일 및 X 위치 설정
         if (direction < 0) // 왼쪽을 바라볼 때
         {
 
@@ -231,8 +227,7 @@ public class Researcher : MonoBehaviour, IDamageable
 
     public void ShootBullet()
     {
-
-        Vector3 startPosition =  Gunfire != null ? Gunfire.position : arm.position;
+        Vector3 startPosition = Gunfire != null ? Gunfire.position : arm.position;
         Vector2 dirToTarget = arm.right;
 
         GameObject bulletObject = Instantiate(Bullet_prefab, startPosition, Quaternion.identity);
@@ -243,6 +238,25 @@ public class Researcher : MonoBehaviour, IDamageable
             bulletComponent.Init(dirToTarget, startPosition);
         }
         Debug.Log("발사");
+    }
+    public override void Attack()
+    {
+
+        if (aimRange != null && aimRange.IsPlayerInSight)
+        {
+            Aimatplayer();
+            if (Time.time >= nextFireTime)
+            {
+
+                PlayShot();
+                nextFireTime = Time.time + enemyData.fireCooldown;
+            }
+        }
+        else
+        {
+            Debug.Log("사격 범위 이탈, 시야 유지. 추적으로 전환.");
+            ChangeState(R_States[5]);
+        }
     }
 
     public void PlayShot()
@@ -257,16 +271,24 @@ public class Researcher : MonoBehaviour, IDamageable
     }
     #endregion
 
-    public Vector2 GetcurrentVect2()
+    public void WallorLedgeFlip(Researcher researcher)
     {
-        float directonx = Mathf.Sign(transform.localScale.x);
-        return new Vector2(directonx, 0);
+        if (CheckForObstacle(researcher) || CheckForLedge(researcher))
+        {
+            enemyData.moveDistance *= -1;
+            researcher.FlipResearcher(researcher, enemyData.moveDistance);
+            return;
+        }
+        else
+        {
+            Move();
+        }
     }
     public void FlipResearcher(Researcher researcher, float direction)
     {
+        if (isarmlock) return;
 
         Vector3 currentScale = researcher.transform.localScale;
-
 
         if (direction > 0 && currentScale.x < 0)
         {
@@ -277,9 +299,7 @@ public class Researcher : MonoBehaviour, IDamageable
         {
             researcher.transform.localScale = new Vector3(-Mathf.Abs(currentScale.x), currentScale.y, currentScale.z);
         }
-
     }
-
 
     public void SummonDrone()
     {
@@ -294,14 +314,10 @@ public class Researcher : MonoBehaviour, IDamageable
         }
     }
        
-    public void TakeDamage(float damage)
+    public override void TakeDamage(float damage)
     {
-      
-
-        Debug.Log("Researcher " + damage);
-  
-        currenthealth -= damage;
-        Debug.Log("체력 : " + currenthealth);
+        currnetHealth -= damage;
+        Debug.Log("체력 : " + currnetHealth);
 
         if (flashCoroutine != null)
         {
@@ -309,13 +325,13 @@ public class Researcher : MonoBehaviour, IDamageable
             spriteRenderer.color = Color.white;
         }
 
-        if (currenthealth <= 0)
+        if (currnetHealth <= 0)
         {
             ChangeState(R_States[6]);
         }
         else
         {
-            ChangeState(R_States[3]);
+            ChangeState(R_States[4]);
             flashCoroutine = StartCoroutine(FlashCoroutin());
         }
     }
@@ -324,8 +340,8 @@ public class Researcher : MonoBehaviour, IDamageable
     {
         Vector2 knockbackDirection = (Vector2)transform.position - (Vector2)Player_Trans.position;
         float xDirection = Mathf.Sign(knockbackDirection.x);
-        Vector2 knockbackForce = new Vector2(xDirection * knockBackXForce, 0f); 
-        rb.AddForce(knockbackForce, ForceMode2D.Impulse);
+        Vector2 knockbackForce = new Vector2(xDirection * knockBackXForce, 0f);
+        rigid.AddForce(knockbackForce, ForceMode2D.Impulse);
     }
 
     private IEnumerator FlashCoroutin()

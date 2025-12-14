@@ -3,7 +3,7 @@ using UnityEngine;
 public class EnemyBullet : Bullet
 {
     [SerializeField] private BulletStat enemyBulletStat;
-    [SerializeField] private LongDiEnemy shooter;
+    //[SerializeField] private LongDiEnemy shooter;
     private LayerMask layer;
 
     public void Fire(Vector3 startPos, Vector3 targetPos)
@@ -29,14 +29,14 @@ public class EnemyBullet : Bullet
         }
 
         // 공격 가능한 대상 체크
-        if ((layerMask & stats.attackable) > 0)
-        {
-            if (shooter != null)
-                shooter.HitEnemy();
-
-            transform.SetParent(parent);
-            gameObject.SetActive(false);
-            return;
-        }
+        //if ((layerMask & stats.attackable) > 0)
+        //{
+        //    if (shooter != null)
+        //        shooter.HitEnemy();
+        //
+        //    transform.SetParent(parent);
+        //    gameObject.SetActive(false);
+        //    return;
+        //}
     }
 }
