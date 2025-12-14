@@ -1,8 +1,15 @@
 using System.Collections;
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor.Searcher;
 using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
+using static UnityEditor.VersionControl.Asset;
+
+public enum ResearcherStateType
+{
+    Idle, Walk, Chase, Summon, Attack, Hit, Dead
+}
 public class Researcher : Enemy
 {
     [SerializeField] public Transform[] dronespawnpoints;
@@ -13,7 +20,10 @@ public class Researcher : Enemy
     [SerializeField] public GameObject Bullet_prefab;
     [SerializeField] public GameObject D_prefab;
 
-    public ResearcherState[] R_States = new ResearcherState[7];
+    [SerializeField] Dictionary<ResearcherStateType, ResearcherState> R_States = new();
+
+    [SerializeField] public Animator animator;
+    [SerializeField] private Animator Armanima;
     public ResearcherState currentStates;
 
     public SightRange sightRange;
@@ -34,54 +44,64 @@ public class Researcher : Enemy
     public float AimRotationSpeed = 5f;
     private Coroutine flashCoroutine;
 
-    public bool isDroneSummoned = false;
-    public bool isarmlock = false;
+    public bool isDroneSummoned;
+    public bool isarmlock;
+    public Dictionary<ResearcherStateType, ResearcherState> r_states => R_States;
 
-    [SerializeField] private Color flashColor = Color.red;
-    [SerializeField] public Animator animator;
-    [SerializeField] private Animator Armanima;
-
+    public ResearcherState previousState;
     protected override void Awake()
     {
-        base.Awake();
-        Transform ch_Trans = transform.Find("Armposition");
-       
-       if (ch_Trans != null)
-       {
-           Transform arm_trans = ch_Trans.Find("ArmSprite");
-       
-           if (arm_trans != null)
-           {
-               Armanima = arm_trans.GetComponent<Animator>();
-           }
-           else
-           {
-               Debug.LogError("ArmSprite를 'Armposition' 자식에서 찾을 수 없습니다.");
-           }
-       }
-       else
-       {
-           Debug.LogError("Armposition 자식 오브젝트를 찾을 수 없습니다.");
-       }
-      
+
+        startPos = transform.position;
         sightRange = GetComponent<SightRange>();   
         aimRange = GetComponent<AimRange>();
-        flashrender = GetComponent<SpriteRenderer>();   
-        R_States[0] = new R_IdleState();
-        R_States[1] = new R_WalkState();
-        R_States[2] = new R_SummonDroneState();
-        R_States[3] = new R_Attackstate();
-        R_States[4] = new R_Hitstate();
-        R_States[5] = new R_ChaseState();
-        R_States[6] = new R_Deadstate();
-        ChangeState(R_States[0]);
-        animator = GetComponent<Animator>();
+        flashrender = GetComponentInChildren<SpriteRenderer>();
+        animator = GetComponentInChildren<Animator>();
+        Ren = GetComponentInChildren<SpriteRenderer>();
+        Rigid = GetComponent<Rigidbody2D>();    
+        R_State();
+        InitArm();
+
+    }
+    private void OnEnable()
+    {
+        Init();
+    }
+    public override void Init()
+    {
+        currnetHealth = Stat.MaxHp;
+        isDroneSummoned = false;
+        isarmlock = false;
+        flashrender.color = Color.white;
+        ChangeState(r_states[ResearcherStateType.Idle]);
+    }
+
+    void InitArm()
+    {
         arm = transform.Find("Armposition");
+
+        if (arm != null)
+        {
+            Transform arm_trans = arm.Find("ArmSprite");
+       
+            Armanima = arm_trans.GetComponent<Animator>();
+   
+        }
+
         Gunfire = transform.Find("GunTip");
 
-       
-    } 
-
+        arm.gameObject.SetActive(false);
+    }
+    void R_State()
+    {
+        r_states[ResearcherStateType.Idle] = new R_IdleState();
+        r_states[ResearcherStateType.Walk] = new R_WalkState();
+        r_states[ResearcherStateType.Summon] = new R_SummonDroneState();
+        r_states[ResearcherStateType.Attack] = new R_Attackstate();
+        r_states[ResearcherStateType.Hit] = new R_Hitstate();
+        r_states[ResearcherStateType.Chase] = new R_ChaseState();
+        r_states[ResearcherStateType.Dead] = new R_Deadstate();
+    }
     void Update()
     {
         currentStates?.Update(this);
@@ -89,31 +109,42 @@ public class Researcher : Enemy
 
     public void ChangeState(ResearcherState newState)
     {
-       currentStates?.Exit(this);
-       currentStates = newState;
-       currentStates?.Start(this); 
+        if (currentStates == newState) return;
+
+        previousState = currentStates;
+
+        currentStates?.Exit(this);
+        currentStates = newState;
+        currentStates?.Start(this); 
     }
     
-    public override void Move()
+    public void Move()
     {
         M_direction = Mathf.Sign(transform.localScale.x);
-        float velocityX = M_direction * enemyData.moveSpeed;
+        float velocityX = M_direction * Stat.moveSpeed;
         rigid.linearVelocity = new Vector2(velocityX, rigid.linearVelocity.y);
     }
 
-    public override void Chase()
+    public  void Chase()
     {
         float directionToPlayer = Player_Trans.position.x - transform.position.x;
 
         float M_direction = Mathf.Sign(directionToPlayer);
 
-        float velocityX = M_direction * enemyData.moveSpeed;
+        float velocityX = M_direction * Stat.moveSpeed;
 
         rigid.linearVelocity = new Vector2(velocityX, rigid.linearVelocity.y);
 
         FlipResearcher(this, directionToPlayer);
         FlipArm(directionToPlayer); 
 
+    }
+
+    protected override void Die()
+    {
+        rigid.linearVelocity = Vector2.zero;
+        gameObject.SetActive(false);
+        Debug.Log("Researcher 사망");
     }
 
     #region 애니메이션 키 이벤트 함수
@@ -124,28 +155,28 @@ public class Researcher : Enemy
     
     public void summontoattack()
     {
-        ChangeState(R_States[5]);
+        ChangeState(R_States[ResearcherStateType.Attack]);
     }
     #endregion
 
     #region 벽과 낭떠러지 체크
-    public bool CheckForObstacle(Researcher researcher)
+    public bool CheckForObstacle()
     {
-        float direction = Mathf.Sign(researcher.transform.localScale.x);
+        float direction = Mathf.Sign(transform.localScale.x);
         Vector2 checkDirection = (direction > 0) ? Vector2.right : Vector2.left;
 
-        RaycastHit2D hit = Physics2D.Raycast(researcher.transform.position, checkDirection, wallCheckDistance, researcher.wallLayer);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, checkDirection, wallCheckDistance, wallLayer);
 
         return hit.collider != null;
     }
 
-    public bool CheckForLedge(Researcher researcher)
+    public bool CheckForLedge( )
     {
-        float direction = Mathf.Sign(researcher.transform.localScale.x);
-        Vector3 footPosition = researcher.transform.position;
+        float direction = Mathf.Sign(transform.localScale.x);
+        Vector3 footPosition = transform.position;
         footPosition.x += direction * 0.3f;
 
-        RaycastHit2D hit = Physics2D.Raycast(footPosition, Vector2.down, groundCheckDistance, researcher.groundLayer);
+        RaycastHit2D hit = Physics2D.Raycast(footPosition, Vector2.down, groundCheckDistance, groundLayer);
 
         return hit.collider == null;
     }
@@ -249,13 +280,13 @@ public class Researcher : Enemy
             {
 
                 PlayShot();
-                nextFireTime = Time.time + enemyData.fireCooldown;
+                nextFireTime = Time.time + Stat.fireCooldown;
             }
         }
         else
         {
             Debug.Log("사격 범위 이탈, 시야 유지. 추적으로 전환.");
-            ChangeState(R_States[5]);
+            ChangeState(r_states[ResearcherStateType.Chase]);
         }
     }
 
@@ -271,18 +302,18 @@ public class Researcher : Enemy
     }
     #endregion
 
+    #region 방향 전환
     public void WallorLedgeFlip(Researcher researcher)
     {
-        if (CheckForObstacle(researcher) || CheckForLedge(researcher))
+        if (CheckForObstacle() || CheckForLedge())
         {
-            enemyData.moveDistance *= -1;
-            researcher.FlipResearcher(researcher, enemyData.moveDistance);
+            Stat.moveDistance *= -1;
+            researcher.FlipResearcher(researcher, Stat.moveDistance);
             return;
         }
-        else
-        {
-            Move();
-        }
+       
+        Move();
+        
     }
     public void FlipResearcher(Researcher researcher, float direction)
     {
@@ -301,13 +332,14 @@ public class Researcher : Enemy
         }
     }
 
+#endregion
     public void SummonDrone()
     {
         int rand = Random.Range(0, dronespawnpoints.Length);
         Transform spawnPos = dronespawnpoints[rand];
         isDroneSummoned = true;
         GameObject droneObject = Instantiate(D_prefab, spawnPos.position, Quaternion.identity);
-        Drone droneComponent = droneObject.GetComponent<Drone>();
+        SummonDrone droneComponent = droneObject.GetComponent<SummonDrone>();
         if (droneComponent != null)
         {
             droneComponent.SummonInit(this.transform, Player_Trans);
@@ -322,16 +354,16 @@ public class Researcher : Enemy
         if (flashCoroutine != null)
         {
             StopCoroutine(flashCoroutine);
-            spriteRenderer.color = Color.white;
+            Ren.color = Color.white;
         }
 
         if (currnetHealth <= 0)
         {
-            ChangeState(R_States[6]);
+            ChangeState(r_states[ResearcherStateType.Dead]);
         }
         else
         {
-            ChangeState(R_States[4]);
+            ChangeState(r_states[ResearcherStateType.Hit]);
             flashCoroutine = StartCoroutine(FlashCoroutin());
         }
     }
@@ -353,11 +385,11 @@ public class Researcher : Enemy
 
         while (Time.time < endTime)
         {
-    
-            spriteRenderer.color = flashColor;
+
+            Ren.color = Color.red;
             yield return new WaitForSeconds(flashDuration);
 
-            spriteRenderer.color = originalColor;
+            Ren.color = originalColor;
             yield return new WaitForSeconds(flashDuration);
         }
 

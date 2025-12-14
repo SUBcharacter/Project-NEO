@@ -51,7 +51,6 @@ public class D_Summonstate : DroneState
     public override void Start(Drone drone)
     {
         Debug.Log("Summon State Ω√¿€");
-
  
     }
     public override void Update(Drone drone)
