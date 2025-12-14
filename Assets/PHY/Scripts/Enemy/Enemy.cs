@@ -3,41 +3,35 @@ using UnityEngine;
 public abstract class Enemy : MonoBehaviour, IResetable, IDamageable
 {
     [Header("Enemy 데이터")]
-    [SerializeField] protected EnemyData enemyData;
-    protected float currnetHealth;
+    [SerializeField] protected EnemyData stat;
+    [SerializeField] protected float currnetHealth;
     // 런타임 상태값
 
+    [SerializeField] protected Vector3 startPos;
+    [SerializeField] protected bool facingRight;
+
     // 컴포넌트
-    public Rigidbody2D rigid;
-    protected SpriteRenderer spriteRenderer;
+    [SerializeField] protected Rigidbody2D rigid;
+    [SerializeField] protected SpriteRenderer ren;
+
+    public EnemyData Stat => stat;
+    public Rigidbody2D Rigid { get => rigid; set => rigid = value; }
+    public SpriteRenderer Ren { get => ren; set => ren = value; }
+
+    public bool FacingRight => facingRight;
 
     // 기본 Awake
-    protected virtual void Awake()
-    {
-        rigid = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+    protected abstract void Awake();
 
-        Init(); // 체력
-    }
 
     // 초기화 (원하면 override 가능)
-    public virtual void Init()
-    {
-        currnetHealth = enemyData.MaxHp;
-    }
-    
+    public abstract void Init();
+
     // 알아서 수정할 것
-    public virtual void TakeDamage(float damage){ }
+    public abstract void TakeDamage(float damage);
 
     // 공통 사망 처리
-    public virtual void Die()
-    {
-        gameObject.SetActive(false);
-        Debug.Log("뒤짐"); // ㅋㅋㅋ
-    }
-
-    // 적마다 구현하는 행동
-    public abstract void Move();
+    protected abstract void Die();
+    
     public abstract void Attack();
-    public abstract void Chase();
 }
