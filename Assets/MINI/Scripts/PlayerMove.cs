@@ -19,7 +19,7 @@ public class PlayerMove : MonoBehaviour ,IDamageable
     public void TakeDamage(float damage)
     {
         currentHp -= damage;
-        Debug.Log($"Player Hit! HP: {currentHp}");
+        Debug.Log($"detectedPlayer Hit! HP: {currentHp}");
         // 피격 애니메이션이나 무적 시간 로직 추가
     }
 

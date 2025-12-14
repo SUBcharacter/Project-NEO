@@ -254,6 +254,8 @@ public class PlayerHitState : PlayerState
 
     public override void Start(Player player)
     {
+
+        Debug.Log("피격 상태 진입");
         // 제어 불능 타이머 초기화
         timer = 0;
         // Hit 스위치

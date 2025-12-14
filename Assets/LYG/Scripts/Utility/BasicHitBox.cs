@@ -1,3 +1,4 @@
+using UnityEditor.Searcher;
 using UnityEngine;
 
 public class BasicHitBox : HitBox
@@ -21,9 +22,10 @@ public class BasicHitBox : HitBox
     {
         if (((1 << collision.gameObject.layer) & stats.attackable) == 0)
             return;
-        // enhance 여부로 데미지 결정 할 것
+
         float enhancing = enhance ? 2 : 1;
         float damage = stats.damage * enhancing;
+
         switch (collision.gameObject.layer)
         {
             case (int)Layers.terrain:

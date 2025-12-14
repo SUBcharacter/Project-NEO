@@ -282,9 +282,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2eaaeedf5b42104b959881e60758098, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rigid: {fileID: 0}
-  attackMask:
-    serializedVersion: 2
-    m_Bits: 840
-  speed: 10
-  damage: 0
+  parent: {fileID: 0}
+  rigid: {fileID: 583711069513675842}
+  stats: {fileID: 0}
+  enemyBulletStat: {fileID: 11400000, guid: c6dfe69b263100b4fa5e9c214f16e140, type: 2}

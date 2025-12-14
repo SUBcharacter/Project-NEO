@@ -282,9 +282,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 665a0bcfd1901dd489e0c159d7fec013, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  parent: {fileID: 0}
   rigid: {fileID: 0}
+  stats: {fileID: 11400000, guid: bb1d491878179034cb2e9ec86807fc9d, type: 2}
   attackMask:
     serializedVersion: 2
     m_Bits: 328
-  speed: 200
-  damage: 0
