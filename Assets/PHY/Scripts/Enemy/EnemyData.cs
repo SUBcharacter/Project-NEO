@@ -4,17 +4,16 @@ using UnityEngine;
 public class EnemyData : ScriptableObject
 {
     [Header("이동 관련")]
-    public float moveSpeed = 1.5f;
-    public float moveDistance = 2.5f;
+    public float moveSpeed;
+    public float moveDistance;
 
     [Header("체력 관련")]
-    public int maxHits = 4;
+    public float MaxHp;
 
     [Header("총알 관련")]
-    public int bulletCount = 4;
-    public float bulletInterval = 0.15f;
+    public int bulletcount;
 
     [Header("공격 관련")]
-    public float fireCooldown = 1f;
-    public float readyToFireTime = 0.5f;
+    public float fireCooldown;
+    public float Damage;
 }

@@ -4,14 +4,11 @@ public abstract class Enemy : MonoBehaviour, IResetable, IDamageable
 {
     [Header("Enemy 데이터")]
     [SerializeField] protected EnemyData enemyData;
-
+    protected float currnetHealth;
     // 런타임 상태값
-    protected bool isMovingRight = true;
-    protected Vector3 startPos;
-    protected int currentHits = 0;
 
     // 컴포넌트
-    protected Rigidbody2D rigid;
+    public Rigidbody2D rigid;
     protected SpriteRenderer spriteRenderer;
 
     // 기본 Awake
@@ -20,25 +17,17 @@ public abstract class Enemy : MonoBehaviour, IResetable, IDamageable
         rigid = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
-        Init(); // 체력, 위치 등 초기화
+        Init(); // 체력
     }
 
     // 초기화 (원하면 override 가능)
     public virtual void Init()
     {
-        currentHits = 0;
-        isMovingRight = true;
-        startPos = transform.position;
+        currnetHealth = enemyData.MaxHp;
     }
-
-    public virtual void TakeDamage(float damage)
-    {
-        currentHits++;
-        Debug.Log($"맞은 횟수 : " + currentHits);
-
-        if (currentHits >= enemyData.maxHits)
-            Die();
-    }
+    
+    // 알아서 수정할 것
+    public virtual void TakeDamage(float damage){ }
 
     // 공통 사망 처리
     public virtual void Die()
@@ -48,7 +37,7 @@ public abstract class Enemy : MonoBehaviour, IResetable, IDamageable
     }
 
     // 적마다 구현하는 행동
-    protected abstract void Move();
-    protected abstract void Attack();
-    protected abstract void Chase();
+    public abstract void Move();
+    public abstract void Attack();
+    public abstract void Chase();
 }

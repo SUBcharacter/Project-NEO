@@ -6,15 +6,14 @@ public class SightRange : MonoBehaviour
     [Header("FOV Settings")]
     [SerializeField] private float viewRadius = 5f; 
     [Range(0, 360)] 
-    [SerializeField] private float viewAngle = 90f; 
-
+    [SerializeField] private float viewAngle = 90f;
+    [SerializeField] public bool IsPlayerInSight { get; private set; } = false;
+    [SerializeField] public Transform PlayerInSight { get; private set; }
     [SerializeField] private LayerMask targetLayer; 
     [SerializeField] private LayerMask obstacleLayer;  
 
     
-    public bool IsPlayerInSight { get; private set; } = false;
 
-    public Transform PlayerInSight { get; private set; }
 
     void Update()
     {
