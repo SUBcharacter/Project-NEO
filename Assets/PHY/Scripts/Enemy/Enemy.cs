@@ -35,3 +35,4 @@ public abstract class Enemy : MonoBehaviour, IResetable, IDamageable
 
     public abstract void Attack();
 }
+
