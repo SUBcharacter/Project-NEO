@@ -18,6 +18,7 @@ public class EMIdleState : EnhancableMeleeState
     {
         timer = 0;
         melee.Rigid.linearVelocity = Vector2.zero;
+        melee.AniCon.Play("EnhancableMelee_Idle");
     }
 
     public override void Update(EnhancableMelee melee)
@@ -63,6 +64,7 @@ public class EMPatrolState : EnhancableMeleeState
         melee.SpriteControl(dirDecision);
         float dir = melee.FacingRight ? 1 : -1;
         melee.Rigid.linearVelocityX = dir * melee.Stat.moveSpeed;
+        melee.AniCon.Play("EnhancableMelee_Walk");
     }
 
     public override void Update(EnhancableMelee melee)
@@ -107,6 +109,7 @@ public class EMChasingState : EnhancableMeleeState
 
     public override void Start(EnhancableMelee melee)
     {
+        melee.AniCon.Play("EnhancableMelee_Walk");
         melee.SpriteControl();
     }
 
@@ -236,6 +239,7 @@ public class EMHitState : EnhancableMeleeState
         timer = 0;
         melee.StopAttack();
         melee.Rigid.linearVelocity = Vector2.zero;
+        melee.AniCon.Play("EnhancableMelee_Idle");
     }
 
     public override void Update(EnhancableMelee melee)

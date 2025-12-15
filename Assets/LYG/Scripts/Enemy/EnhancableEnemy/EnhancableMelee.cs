@@ -8,13 +8,14 @@ using UnityEngine.Rendering;
 
 public class EnhancableMelee : Enemy
 {
+    [SerializeField] Animator animator;
     [SerializeField] Transform target;
     [SerializeField] CapsuleCollider2D col;
-    [SerializeField] Detector detector;
+    [SerializeField] Material hitFlash;
     [SerializeField] HitBox impact;
+    [SerializeField] Detector detector;
     [SerializeField] EnhancableMeleeState currentState;
     [SerializeField] Dictionary<string, EnhancableMeleeState> state = new();
-    [SerializeField] Material mat;
     CancellationTokenSource _cts;
 
     [SerializeField] LayerMask groundMask;
@@ -22,10 +23,12 @@ public class EnhancableMelee : Enemy
 
     [SerializeField] bool attacking;
     [SerializeField] bool enhanced;
+    [SerializeField] bool hitted;
 
     public Transform Target => target;
     public EnhancableMeleeState CrSt => currentState;
     public Dictionary<string, EnhancableMeleeState> State => state;
+    public Animator AniCon { get => animator; set => animator = value; }
     public CapsuleCollider2D Col { get => col; set => col = value; }
 
     public bool Attacking => attacking;
@@ -37,8 +40,9 @@ public class EnhancableMelee : Enemy
         col = GetComponent<CapsuleCollider2D>();
         detector = GetComponent<Detector>();
         ren = GetComponentInChildren<SpriteRenderer>();
+        animator = GetComponentInChildren<Animator>();
+        hitted = false;
         currnetHealth = stat.MaxHp;
-        mat = ren.material;
         StateInit();
     }
 
@@ -180,6 +184,7 @@ public class EnhancableMelee : Enemy
         StopAttack();
         _cts = new CancellationTokenSource();
         _ = InitiateAttack(_cts.Token);
+        animator.Play("EnhancableMelee_Attack");
     }
 
     public void StopAttack()
@@ -194,10 +199,15 @@ public class EnhancableMelee : Enemy
 
     IEnumerator HitFlash()
     {
-        mat.EnableKeyword("_EMISSION");
-        mat.SetColor("_EmissionColor", Color.white * 2f);
-        yield return CoroutineCasher.Wait(0.05f);
-        mat.SetColor("_EmissionColor", Color.black);
+        if(hitted == false)
+        {
+            hitted = true;
+            Material origin = ren.material;
+            ren.material = hitFlash;
+            yield return CoroutineCasher.Wait(0.1f);
+            ren.material = origin;
+            hitted = false;
+        }
     }
 
     IEnumerator Enhancing()
@@ -225,7 +235,7 @@ public class EnhancableMelee : Enemy
         try
         {
             attacking = true;
-            impact.Init();
+            impact.Init(enhanced);
             await Awaitable.WaitForSecondsAsync(0.1f);
             impact.gameObject.SetActive(false);
         }

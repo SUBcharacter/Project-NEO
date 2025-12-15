@@ -313,7 +313,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -443,12 +443,14 @@ MonoBehaviour:
   rigid: {fileID: 0}
   col: {fileID: 0}
   ren: {fileID: 0}
+  hitFlash: {fileID: 2100000, guid: 6193ff678a87941489e60c7a713ac097, type: 2}
   detector: {fileID: 0}
   stat: {fileID: 11400000, guid: 27319f8b7a181304cb7f30a5a7e87225, type: 2}
   baseColor: {r: 0, g: 0, b: 0, a: 0}
   health: 0
   attacking: 0
   facingRight: 0
+  hitted: 0
 --- !u!114 &8806154868292063889
 MonoBehaviour:
   m_ObjectHideFlags: 0

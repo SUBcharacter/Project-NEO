@@ -12,6 +12,7 @@ public class TungTungE : MonoBehaviour, IDamageable
     [SerializeField] Rigidbody2D rigid;
     [SerializeField] CapsuleCollider2D col;
     [SerializeField] SpriteRenderer ren;
+    [SerializeField] Material hitFlash;
     [SerializeField] TungTungEStat stat;
     [SerializeField] Detector detector;
     [SerializeField] TungTungEState currentState;
@@ -25,6 +26,7 @@ public class TungTungE : MonoBehaviour, IDamageable
 
     [SerializeField] bool facingRight;
     [SerializeField] bool attacking;
+    [SerializeField] bool hitted;
 
     public TungTungEStat Stat => stat;
     public Transform Target => target;
@@ -44,6 +46,7 @@ public class TungTungE : MonoBehaviour, IDamageable
         detector = GetComponent<Detector>();
         ren = GetComponentInChildren<SpriteRenderer>();
         health = stat.maxHealth;
+        hitted = false;
         StateInit();
         target = detector.Detect();
         
@@ -139,9 +142,15 @@ public class TungTungE : MonoBehaviour, IDamageable
 
     IEnumerator Hit()
     {
-        ren.color = Color.red;
-        yield return CoroutineCasher.Wait(0.05f);
-        ren.color = Color.black;
+        if (hitted == false)
+        {
+            hitted = true;
+            Material origin = ren.material;
+            ren.material = hitFlash;
+            yield return CoroutineCasher.Wait(0.1f);
+            ren.material = origin;
+            hitted = false;
+        }
     }
 
     //IEnumerator LeftRight()

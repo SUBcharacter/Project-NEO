@@ -1,4 +1,4 @@
-using NUnit.Framework.Constraints;
+    using NUnit.Framework.Constraints;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -11,6 +11,7 @@ public class Bisili : MonoBehaviour, IDamageable
     [SerializeField] Rigidbody2D rigid;
     [SerializeField] CapsuleCollider2D col;
     [SerializeField] SpriteRenderer ren;
+    [SerializeField] Material hitFlash;
     [SerializeField] Detector detector;
     [SerializeField] BisiliStat stat;
     [SerializeField] BisiliState currentState;
@@ -23,6 +24,7 @@ public class Bisili : MonoBehaviour, IDamageable
 
     [SerializeField] bool attacking;
     [SerializeField] bool facingRight;
+    [SerializeField] bool hitted;
 
     public Transform Target => target;
     public BisiliState CrSt => currentState;
@@ -43,6 +45,7 @@ public class Bisili : MonoBehaviour, IDamageable
         target = detector.Detect();
         health = stat.maxHealth;
         baseColor = ren.color;
+        hitted = false;
         StateInit();
         ChangeState(states["BattleIdle"]);
     }
@@ -129,11 +132,15 @@ public class Bisili : MonoBehaviour, IDamageable
     }
     IEnumerator Hit()
     {
-        ren.color = Color.red;
-
-        yield return CoroutineCasher.Wait(0.05f);
-
-        ren.color = baseColor;
+        if (hitted == false)
+        {
+            hitted = true;
+            Material origin = ren.material;
+            ren.material = hitFlash;
+            yield return CoroutineCasher.Wait(0.1f);
+            ren.material = origin;
+            hitted = false;
+        }
     }
     
     async Awaitable Swing(CancellationToken token)
