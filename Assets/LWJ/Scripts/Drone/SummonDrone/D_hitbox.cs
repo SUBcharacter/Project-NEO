@@ -2,9 +2,11 @@ using UnityEngine;
 
 public class D_hitbox : HitBox
 {
+    SummonDrone summondrone;
     protected override void Awake()
     {
         col = GetComponent<Collider2D>();
+        summondrone = GetComponent<SummonDrone>();
     }
 
     public override void Init(bool enhanced = false)
@@ -19,6 +21,8 @@ public class D_hitbox : HitBox
 
     protected override void Triggered(Collider2D collision)
     {
+        if(summondrone.currentStates is SD_Attackstate == false) return;
+
         if (((1 << collision.gameObject.layer) & stats.attackable) == 0) return;
 
 

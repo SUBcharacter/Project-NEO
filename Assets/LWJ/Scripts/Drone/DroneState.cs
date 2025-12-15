@@ -67,34 +67,33 @@ public class D_Summonstate : DroneState
 
     public override void Exit(Drone drone) { }
 }
-    public class D_Attackstate : DroneState
+public class D_Attackstate : DroneState
+{
+public override void Start(Drone drone) 
+{
+    drone.SetDroneActive(true);
+    drone.isattack = true;
+    drone.StartExplosionTimer();
+    Debug.Log("Attack State 시작");
+}
+public override void Update(Drone drone) 
+{
+    drone.transform.position = Vector3.MoveTowards(drone.transform.position, drone.Player_trans.position , drone.D_speed * Time.deltaTime);
+    float directionX = drone.Player_trans.position.x - drone.transform.position.x;
+   
+    if (directionX > 0)
     {
-    public override void Start(Drone drone) 
-    {
-        drone.SetDroneActive(true);
-        drone.isattack = true;
-        drone.StartExplosionTimer();
-        Debug.Log("Attack State 시작");
+        drone.horizontalDirection = 1f;
     }
-    public override void Update(Drone drone) 
+    else if (directionX < 0)
     {
-        drone.transform.position = Vector3.MoveTowards(drone.transform.position, drone.Player_trans.position , drone.D_speed * Time.deltaTime);
-        float directionX = drone.Player_trans.position.x - drone.transform.position.x;
-
-       
-        if (directionX > 0)
-        {
-            drone.horizontalDirection = 1f;
-        }
-        else if (directionX < 0)
-        {
-            drone.horizontalDirection = -1f;
-        }
-     
-            
-        drone.FlipDrone(drone, drone.horizontalDirection);
+        drone.horizontalDirection = -1f;
+    }
+ 
         
-    }
-    public override void Exit(Drone drone) { }
-    }
+    drone.FlipDrone(drone, drone.horizontalDirection);
+    
+}
+public override void Exit(Drone drone) { }
+}
 

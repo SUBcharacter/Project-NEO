@@ -151,6 +151,7 @@ public class R_Attackstate : ResearcherState
     }
     public override void Update(Researcher researcher)
     {
+        researcher.FlipToTargetX(researcher.Player_Trans.position.x);
         researcher.Attack();
     }
     public override void Exit(Researcher researcher)

@@ -10,7 +10,7 @@ public class Drone : MonoBehaviour,IDamageable
   
     bool isWait = false;
     public bool isattack = false;
-    public Vector2 offset = new Vector2(0f, 1.5f);
+    public Vector2 offset = new Vector2(0f, 1.0f);
 
     [SerializeField] LayerMask playerLayer;
     [SerializeField] float explosionRadius = 1.5f;

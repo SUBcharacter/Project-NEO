@@ -29,6 +29,9 @@ public class Researcher : Enemy
 
     [SerializeField] public Animator animator;
     [SerializeField] private Animator Armanima;
+
+    [SerializeField] Material hitFlash;
+    [SerializeField] bool hitted;
     public ResearcherState currentStates;
 
     public SightRange sightRange;
@@ -37,11 +40,7 @@ public class Researcher : Enemy
     public LayerMask groundLayer;
     public LayerMask wallLayer;
 
-    private SpriteRenderer flashrender;
-
     private float knockBackXForce = 0.5f;
-    private float flashDuration = 0.1f;    
-    private float invincibilityDuration = 0.5f;
     private float wallCheckDistance = 1f;
     private float groundCheckDistance = 1f;
     private float M_direction;
@@ -60,10 +59,10 @@ public class Researcher : Enemy
         startPos = transform.position;
         sightRange = GetComponent<SightRange>();   
         aimRange = GetComponent<AimRange>();
-        flashrender = GetComponentInChildren<SpriteRenderer>();
         animator = GetComponentInChildren<Animator>();
         Ren = GetComponentInChildren<SpriteRenderer>();
-        Rigid = GetComponent<Rigidbody2D>();    
+        Rigid = GetComponent<Rigidbody2D>();
+        hitted = false;
         R_State();
         InitArm();
 
@@ -77,7 +76,6 @@ public class Researcher : Enemy
         currnetHealth = Stat.MaxHp;
         isDroneSummoned = false;
         isarmlock = false;
-        flashrender.color = Color.white;
         ChangeState(r_states[ResearcherStateType.Idle]);
     }
 
@@ -127,7 +125,7 @@ public class Researcher : Enemy
     {
         M_direction = Mathf.Sign(transform.localScale.x);
         float velocityX = M_direction * Stat.moveSpeed;
-        rigid.linearVelocity = new Vector2(velocityX, rigid.linearVelocity.y);
+        Rigid.linearVelocity = new Vector2(velocityX, Rigid.linearVelocity.y);
     }
 
     public  void Chase()
@@ -138,7 +136,7 @@ public class Researcher : Enemy
 
         float velocityX = M_direction * Stat.moveSpeed;
 
-        rigid.linearVelocity = new Vector2(velocityX, rigid.linearVelocity.y);
+        Rigid.linearVelocity = new Vector2(velocityX, Rigid.linearVelocity.y);
 
         FlipResearcher(this, directionToPlayer);
         FlipArm(directionToPlayer); 
@@ -147,7 +145,7 @@ public class Researcher : Enemy
 
     protected override void Die()
     {
-        rigid.linearVelocity = Vector2.zero;
+        Rigid.linearVelocity = Vector2.zero;
         gameObject.SetActive(false);
         Debug.Log("Researcher 사망");
     }
@@ -260,7 +258,18 @@ public class Researcher : Enemy
 
         arm.localScale = armLocalScale;
     }
+    public void FlipToTargetX(float targetX)
+    {
+        if (isarmlock) return;
 
+        float dir = targetX - transform.position.x;
+        if (Mathf.Abs(dir) < 0.01f) return;
+
+        Vector3 scale = transform.localScale;
+        scale.x = Mathf.Sign(dir) * Mathf.Abs(scale.x);
+        transform.localScale = scale;
+        FlipArm(dir);
+    }
     public void ShootBullet()
     {
         Vector3 startPosition = Gunfire != null ? Gunfire.position : arm.position;
@@ -356,21 +365,16 @@ public class Researcher : Enemy
         currnetHealth -= damage;
         Debug.Log("체력 : " + currnetHealth);
 
-        if (flashCoroutine != null)
-        {
-            StopCoroutine(flashCoroutine);
-            Ren.color = Color.white;
-        }
+        StartCoroutine(HitFlash());
 
         if (currnetHealth <= 0)
         {
             ChangeState(r_states[ResearcherStateType.Dead]);
+            return;
         }
-        else
-        {
-            ChangeState(r_states[ResearcherStateType.Hit]);
-            flashCoroutine = StartCoroutine(FlashCoroutin());
-        }
+      
+        ChangeState(r_states[ResearcherStateType.Hit]);
+   
     }
 
     public void Knockback()
@@ -381,25 +385,16 @@ public class Researcher : Enemy
         rigid.AddForce(knockbackForce, ForceMode2D.Impulse);
     }
 
-    private IEnumerator FlashCoroutin()
+    IEnumerator HitFlash()
     {
-
-        Color originalColor = flashrender.color;
-
-        float endTime = Time.time + invincibilityDuration;
-
-        while (Time.time < endTime)
+        if (hitted == false)
         {
-
-            Ren.color = Color.red;
-            yield return new WaitForSeconds(flashDuration);
-
-            Ren.color = originalColor;
-            yield return new WaitForSeconds(flashDuration);
+            hitted = true;
+            Material origin = ren.material;
+            ren.material = hitFlash;
+            yield return CoroutineCasher.Wait(0.1f);
+            ren.material = origin;
+            hitted = false;
         }
-
-
-        flashrender.color = originalColor;
-        flashCoroutine = null;
     }
 }
