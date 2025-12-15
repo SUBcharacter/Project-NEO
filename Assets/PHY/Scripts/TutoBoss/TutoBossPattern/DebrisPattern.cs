@@ -9,13 +9,11 @@ public class DebrisPattern : BossPattern
 {
     [Header("더미 오브젝트")]
     [SerializeField] private GameObject DebrisPrefab;
-    [SerializeField] private float forwardPower = 6f;  // 앞 방향 힘
-    [SerializeField] private float upwardPower = 10f;  // 위 방향 힘
 
-    [Header("거리 기반 힘 보정값")]
-    [SerializeField] private float distancePower = 5f;        // 거리값 조절
-    [SerializeField] private float minPower = 0.8f;
-    [SerializeField] private float maxPower = 1.8f;
+    // 밑에 변수들 SO로 빼도 될 거같은데..
+    [SerializeField] private float throwSpeed = 10f;    // 던지는 속도
+    [SerializeField] private float throwX = 6f;        // 보스 기준 얼마나 떨어진 곳으로 던질지
+    [SerializeField] private float throwY = 0.5f;      // 던지는 높이 (플레이어 몸통쪽으로)
 
     private bool isThrow = false;
 
@@ -72,38 +70,53 @@ public class DebrisPattern : BossPattern
 
     private void SpawnDebris()
     {
-        float playerPos = boss.player.position.x - boss.transform.position.x;
-        int throwDir = playerPos >= 0 ? 1 : -1;
+        // 플레이어까지의 방향 (초기 계산)
+        Vector2 direction = (boss.player.position - boss.transform.position).normalized;
 
-        float bossWidth = boss.GetComponent<Collider2D>().bounds.extents.x;
+        // 완전 직선으로 만들기 (y축 제거)
+        direction.y = 0f;
+        direction.Normalize();
 
-        Vector3 throwPos = boss.transform.position + new Vector3(throwDir * (bossWidth + 0.3f), 1.2f, 0f);
+        // 보스 기준 좌/우 방향
+        float xDir = direction.x >= 0 ? 1f : -1f;
 
-        GameObject debrisObj = Instantiate(DebrisPrefab, throwPos, Quaternion.identity);
-        DebrisProjectile debrisProjectile = debrisObj.GetComponent<DebrisProjectile>();
+        // 보스 몸 바깥으로 스폰 위치 설정
+        Vector3 spawnPos = boss.transform.position + new Vector3(xDir * throwX, throwY, 0f);
 
-        Physics2D.IgnoreCollision(
-            debrisProjectile.GetComponent<Collider2D>(),
-            boss.GetComponent<Collider2D>()
-        );
+        GameObject obj = Instantiate(DebrisPrefab, spawnPos, Quaternion.identity);
+        DebrisProjectile projectile = obj.GetComponent<DebrisProjectile>();
 
-        Vector2 dir = (boss.player.position - throwPos).normalized;
+        // 보스와 충돌 무시
+        Physics2D.IgnoreCollision(projectile.col, boss.GetComponent<Collider2D>());
 
-        // y 조금 아래로 눌러서 퍼올리는 느낌 유지
-        dir.y = -0.3f;
+        // 직선으로 던지기
+        projectile.Launch(direction, throwSpeed);
+    }
+
+#if UNITY_EDITOR
+    public void DrawGizmos(BossAI boss)
+    {
+        if (boss == null || boss.player == null)
+            return;
+
+        // 방향 계산
+        Vector2 dir = (boss.player.position - boss.transform.position);
+        dir.y = 0f;
         dir.Normalize();
 
-        float distance = Mathf.Abs(boss.player.position.x - boss.transform.position.x);
-        float distanceFactor = Mathf.Clamp(distance / distancePower, minPower, maxPower);
+        float xDir = dir.x >= 0 ? 1 : -1;
 
-        float finalForward = forwardPower * distanceFactor;
-        float finalUpward = upwardPower * (distanceFactor * 0.5f); 
+        // 스폰 포지션 계산
+        Vector3 spawnPos = boss.transform.position + new Vector3(xDir * throwX, throwY, 0);
 
-        debrisProjectile.Launch(dir, finalForward, finalUpward);
+        // --- 기즈모 그리기 ---
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawSphere(spawnPos, 0.25f);  // 스폰 위치
 
-
-        debrisProjectile.Launch(dir, finalForward, finalUpward);
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(spawnPos, spawnPos + (Vector3)(dir * 3f)); // 발사 방향
     }
+#endif
 
 
 

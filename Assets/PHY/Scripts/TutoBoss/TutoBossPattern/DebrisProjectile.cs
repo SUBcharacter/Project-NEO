@@ -6,10 +6,9 @@ public class DebrisProjectile : MonoBehaviour
     [Header("잔해 오브젝트 Setting")]
     [SerializeField] private LayerMask checkLayer;
     public float lifetime = 5f;     
-    private float gravity = 3f;     // 포물선으로 던질 때의 중력 값
 
-    private Rigidbody2D rb;
-    private Collider2D col;
+    public Rigidbody2D rb;
+    public Collider2D col;
 
     private void Awake()
     {
@@ -35,18 +34,13 @@ public class DebrisProjectile : MonoBehaviour
 
 
 
-    public void Launch(Vector2 direction, float forwardPower, float arcPower)
+    public void Launch(Vector2 direction, float speed)
     {
-        rb.gravityScale = gravity;
+        rb.gravityScale = 0f;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
-        // 기본 진행 방향
-        Vector2 forward = direction * forwardPower;
+        rb.linearVelocity = direction * speed;
 
-        // 위로 들어올리는 힘
-        Vector2 lift = Vector2.up * arcPower;
-
-        rb.linearVelocity = forward + lift;
 
         col.enabled = true;
         Destroy(gameObject, lifetime);
