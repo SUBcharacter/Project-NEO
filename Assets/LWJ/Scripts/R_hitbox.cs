@@ -29,7 +29,7 @@ public class R_hitbox : HitBox
         if (player != null)
         {
             Debug.Log("플레이어에게 데미지 입힘");
-            player.Hit((int)stats.damage);
+            player.TakeDamage(stats.damage);
 
         }
         else

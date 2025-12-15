@@ -45,7 +45,7 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 61
@@ -113,10 +113,10 @@ TextureImporter:
       name: Ch_4_Death_23_0
       rect:
         serializedVersion: 2
-        x: 35
-        y: 1
-        width: 75
-        height: 49
+        x: 0
+        y: 0
+        width: 158
+        height: 101
       alignment: 7
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -127,28 +127,6 @@ TextureImporter:
       bones: []
       spriteID: 072d9d57b64f58344813b05556cccf12
       internalID: -481749830
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Ch_4_Death_23_1
-      rect:
-        serializedVersion: 2
-        x: 110
-        y: 3
-        width: 4
-        height: 4
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f048759b539982f40919f27c374fc3ed
-      internalID: 1517556709
       vertices: []
       indices: 
       edges: []

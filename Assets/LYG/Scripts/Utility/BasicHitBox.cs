@@ -41,6 +41,8 @@ public class BasicHitBox : HitBox
                 triggered = true;
                 break;
             case (int)Layers.player:
+                Debug.Log("플레이어 충돌");
+                collision.GetComponent<IDamageable>().TakeDamage(damage);
                 triggered = true;
                 break;
             case (int)Layers.border:
@@ -75,6 +77,8 @@ public class BasicHitBox : HitBox
                 triggered = true;
                 break;
             case (int)Layers.player:
+                Debug.Log("플레이어 충돌");
+                collision.gameObject.GetComponent<IDamageable>().TakeDamage(damage);
                 triggered = true;
                 break;
             case (int)Layers.border:

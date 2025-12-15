@@ -56,14 +56,17 @@ public class EMPatrolState : EnhancableMeleeState
 {
     float timer;
     float moveTimer;
+    float enhancing;
+
     public override void Start(EnhancableMelee melee)
     {
         timer = 0;
+        enhancing = melee.Enhanced ? 2 : 1;
         moveTimer = Random.Range(0f, 2f);
         bool dirDecision = Random.Range(0, 2) == 1;
         melee.SpriteControl(dirDecision);
         float dir = melee.FacingRight ? 1 : -1;
-        melee.Rigid.linearVelocityX = dir * melee.Stat.moveSpeed;
+        melee.Rigid.linearVelocityX = dir * melee.Stat.moveSpeed * enhancing;
         melee.AniCon.Play("EnhancableMelee_Walk");
     }
 
@@ -99,7 +102,7 @@ public class EMPatrolState : EnhancableMeleeState
 
     public override void Exit(EnhancableMelee melee)
     {
-
+        
     }
 }
 
@@ -107,9 +110,12 @@ public class EMChasingState : EnhancableMeleeState
 {
     Vector2 moveDir;
 
+    float enhancing;
+
     public override void Start(EnhancableMelee melee)
     {
         melee.AniCon.Play("EnhancableMelee_Walk");
+        enhancing = melee.Enhanced ? 2 : 1;
         melee.SpriteControl();
     }
 
@@ -131,7 +137,7 @@ public class EMChasingState : EnhancableMeleeState
                 }
                 else
                 {
-                    melee.Rigid.linearVelocityX = moveDir.x * melee.Stat.moveSpeed;
+                    melee.Rigid.linearVelocityX = moveDir.x * melee.Stat.moveSpeed * enhancing;
                 }
             } 
         }
@@ -151,14 +157,16 @@ public class EMChasingState : EnhancableMeleeState
 public class EMAttackState : EnhancableMeleeState
 {
     float timer;
+    float enhancing;
 
     public override void Start(EnhancableMelee melee)
     {
         Debug.Log("АјАн");
         timer = 0;
+        enhancing = melee.Enhanced ? 2 : 1;
         melee.Rigid.linearVelocity = Vector2.zero;
         melee.SpriteControl();
-        melee.Attack();
+        melee.AniCon.Play("EnhancableMelee_Attack");
     }
 
     public override void Update(EnhancableMelee melee)
@@ -167,7 +175,7 @@ public class EMAttackState : EnhancableMeleeState
         {
             timer += Time.deltaTime;
 
-            if (timer >= melee.Stat.fireCooldown)
+            if (timer >= melee.Stat.fireCooldown/enhancing)
             {
                 if (melee.Target != null)
                 {
@@ -190,16 +198,21 @@ public class EMAttackState : EnhancableMeleeState
 
     public override void Exit(EnhancableMelee melee)
     {
-        melee.StopAttack();
+        melee.AniCon.Play("EnhancableMelee_Idle");
     }
 }
 
 public class EMEnhanceState : EnhancableMeleeState
 {
+    LayerMask origin;
 
     public override void Start(EnhancableMelee melee)
     {
         melee.StopAttack();
+        melee.Rigid.linearVelocity = Vector2.zero;
+        origin = melee.gameObject.layer;
+        melee.gameObject.layer = LayerMask.NameToLayer("Invincible");
+        melee.AniCon.Play("EnhancableMelee_Enhancing");
     }
 
     public override void Update(EnhancableMelee melee)
@@ -226,7 +239,7 @@ public class EMEnhanceState : EnhancableMeleeState
 
     public override void Exit(EnhancableMelee melee)
     {
-
+        melee.gameObject.layer = origin;
     }
 }
 
@@ -274,17 +287,34 @@ public class EMHitState : EnhancableMeleeState
 public class EMDestroyState : EnhancableMeleeState
 {
     LayerMask origin;
+
+    float timer;
+    float disableTime = 3f;
     public override void Start(EnhancableMelee melee)
     {
         melee.StopAttack();
         melee.Rigid.linearVelocity = Vector2.zero;
         origin = melee.gameObject.layer;
         melee.gameObject.layer = LayerMask.NameToLayer("Invincible");
+        melee.AniCon.Play("EnhancableMelee_Death");
     }
 
     public override void Update(EnhancableMelee melee)
     {
+        if(melee.IsDead)
+        {
+            timer += Time.deltaTime;
 
+            float t = timer / disableTime;
+
+            Color c = melee.Ren.color;
+            c.a = Mathf.Lerp(1f, 0f, t);
+            melee.Ren.color = c;
+            if(timer >= disableTime)
+            {
+                melee.gameObject.SetActive(false);
+            }
+        }
     }
 
     public override void Exit(EnhancableMelee melee)

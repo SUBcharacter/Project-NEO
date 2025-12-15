@@ -24,15 +24,18 @@ public class EnhancableMelee : Enemy
     [SerializeField] bool attacking;
     [SerializeField] bool enhanced;
     [SerializeField] bool hitted;
+    [SerializeField] bool isDead;
 
     public Transform Target => target;
     public EnhancableMeleeState CrSt => currentState;
+    public HitBox Impact => impact;
     public Dictionary<string, EnhancableMeleeState> State => state;
     public Animator AniCon { get => animator; set => animator = value; }
     public CapsuleCollider2D Col { get => col; set => col = value; }
 
-    public bool Attacking => attacking;
-    public bool Enhanced => enhanced;
+    public bool Enhanced { get => enhanced; set => enhanced = value; }
+    public bool Attacking { get => attacking; set => attacking = value; }
+    public bool IsDead { get => isDead; set => isDead = value; }
 
     protected override void Awake()
     {
@@ -48,12 +51,12 @@ public class EnhancableMelee : Enemy
 
     private void OnEnable()
     {
-        
+        EventManager.Subscribe(Event.Enemy_Enhance, Enhance);
     }
 
     private void OnDisable()
     {
-        
+        EventManager.Subscribe(Event.Enemy_Enhance, Enhance);
     }
 
     private void Update()
@@ -74,6 +77,14 @@ public class EnhancableMelee : Enemy
         state["Death"] = new EMDestroyState();
 
         ChangeState(state["Idle"]);
+    }
+
+    void Enhance()
+    {
+        if (isDead || currentState is EMDestroyState)
+            return;
+        ChangeState(state["Enhance"]);
+        StartCoroutine(Enhancing());
     }
 
     public bool CheckWall()
@@ -151,6 +162,7 @@ public class EnhancableMelee : Enemy
 
     protected override void Die()
     {
+        StartCoroutine(Weaked());
         ChangeState(state["Death"]);
     }
 
@@ -184,7 +196,6 @@ public class EnhancableMelee : Enemy
         StopAttack();
         _cts = new CancellationTokenSource();
         _ = InitiateAttack(_cts.Token);
-        animator.Play("EnhancableMelee_Attack");
     }
 
     public void StopAttack()
@@ -225,8 +236,23 @@ public class EnhancableMelee : Enemy
 
             yield return null;
         }
+    }
 
-        enhanced = true;
+    IEnumerator Weaked()
+    {
+        float t = 0;
+        Color origin = ren.color;
+        Color target = Color.white;
+
+        while(t < 1f)
+        {
+            t += Time.deltaTime;
+            float progress = t / 1.5f;
+
+            ren.color = Color.Lerp(origin, target, progress);
+
+            yield return null;
+        }
     }
 
 

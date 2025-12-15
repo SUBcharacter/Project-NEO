@@ -3054,7 +3054,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!70 &3752959701644447273
 CapsuleCollider2D:
@@ -3340,9 +3340,9 @@ MonoBehaviour:
   currentVelocity: {x: 0, y: 0}
   mousePos: {x: 0, y: 0}
   currentWeapon: 0
+  health: 0
   stamina: 0
   overFlowEnergy: 0
-  health: 0
   meleeAttackIndex: 0
   bulletCount: 0
   facingRight: 0
@@ -3521,7 +3521,7 @@ MonoBehaviour:
   ghostPrefab: {fileID: 2439063567540992291, guid: 5ae300bd8752cb74aa75a7ce58771ff9, type: 3}
   pool: []
   timer: 0
-  duration: 0.05
+  duration: 0.01
   index: 0
   size: 50
 --- !u!1 &8010644313460846982

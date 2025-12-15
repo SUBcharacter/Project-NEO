@@ -34,7 +34,7 @@ public class R_Bullet : Bullet
             if (player != null)
             {
                 // Player 데미지 처리
-                player.Hit((int)stats.damage); // 단순 데미지 적용
+                player.TakeDamage(stats.damage); // 단순 데미지 적용
 
                 transform.SetParent(parent);
                 gameObject.SetActive(false);

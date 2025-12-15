@@ -19,7 +19,7 @@ public enum ShotMode
     Minigun
 }
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IDamageable
 {
     [SerializeField] Rigidbody2D rigid;
     [SerializeField] CapsuleCollider2D col;
@@ -102,6 +102,7 @@ public class Player : MonoBehaviour
         skillManager = GetComponentInChildren<SkillManager>();
         ghostTrail = GetComponentInChildren<GhostTrail>();
         rigid.sharedMaterial = stats.noFriction;
+        rigid.sleepMode = RigidbodySleepMode2D.NeverSleep;
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = false;
         StateInit();
@@ -448,8 +449,9 @@ public class Player : MonoBehaviour
         arm.transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 
-    public void Hit(int damage)
+    public void TakeDamage(float damage)
     {
+        Debug.Log("피격 됨!");
         // 피격 함수 
         health -= damage;
 
