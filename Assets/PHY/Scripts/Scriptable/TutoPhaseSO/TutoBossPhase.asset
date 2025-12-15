@@ -17,4 +17,5 @@ MonoBehaviour:
   restTime: 1
   maxPoise: 100
   entryPattern: {fileID: 0}
-  availablePatterns: []
+  availablePatterns:
+  - {fileID: 11400000, guid: a19c11291e321434f98dee7b9f686324, type: 2}

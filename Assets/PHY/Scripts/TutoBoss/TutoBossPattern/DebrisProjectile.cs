@@ -11,8 +11,6 @@ public class DebrisProjectile : MonoBehaviour
     private Rigidbody2D rb;
     private Collider2D col;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -22,23 +20,39 @@ public class DebrisProjectile : MonoBehaviour
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        Debug.Log($"충돌 감지됨: {collision.collider.name}");
+
         int objLayer = collision.collider.gameObject.layer;
 
-        if (((1 << objLayer) & checkLayer) == 0) return;
+        if (((1 << objLayer) & checkLayer) == 0)
+        {
+            Debug.Log("충돌했지만 checkLayer에 포함 안됨");
+            return;
+        }
 
+        Destroy(gameObject);
     }
 
-    public void Launch(Vector2 dir, float targetPower, float arcPower)
+
+
+    public void Launch(Vector2 direction, float forwardPower, float arcPower)
     {
         rb.gravityScale = gravity;
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
-        float vx = dir.x * targetPower;
+        // 기본 진행 방향
+        Vector2 forward = direction * forwardPower;
 
-        float vy = arcPower;
+        // 위로 들어올리는 힘
+        Vector2 lift = Vector2.up * arcPower;
 
-        Vector2 targetPos = dir - (Vector2)transform.position;
+        rb.linearVelocity = forward + lift;
 
-        rb.linearVelocity = new Vector2(vx, vy);
-
+        col.enabled = true;
+        Destroy(gameObject, lifetime);
     }
+
+
+
+
 }
