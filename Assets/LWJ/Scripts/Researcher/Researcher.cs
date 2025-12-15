@@ -10,6 +10,11 @@ public enum ResearcherStateType
 {
     Idle, Walk, Chase, Summon, Attack, Hit, Dead
 }
+
+// hitFlash 머티리얼을 인자로 받기
+// bool hitted 선언
+// HitFlash코루틴은 비실이, 퉁퉁이, EnhancableMelee 스크립트 참고 할 것.
+
 public class Researcher : Enemy
 {
     [SerializeField] public Transform[] dronespawnpoints;
