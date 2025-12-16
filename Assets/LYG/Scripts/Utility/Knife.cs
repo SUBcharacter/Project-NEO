@@ -55,6 +55,8 @@ public class Knife : Bullet
         // 각 레이어에 맞게 작용하게끔 작성할 것
         if (((1 << collision.gameObject.layer) & stats.attackable) == 0)
             return;
+        float enhancing = enhance ? 2 : 1;
+
         switch (collision.gameObject.layer)
         {
             case (int)Layers.terrain:
@@ -64,6 +66,9 @@ public class Knife : Bullet
             case (int)Layers.enviroment:
                 break;
             case (int)Layers.enemy:
+                collision.GetComponent<IDamageable>().TakeDamage(stats.damage * enhancing);
+                transform.SetParent(parent);
+                gameObject.SetActive(false);
                 break;
             case (int)Layers.player:
                 break;

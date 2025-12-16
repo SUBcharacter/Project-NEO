@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2456571718308311195}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: KnifeSpawnPoint (4)
   m_TagString: Untagged
   m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
@@ -340,7 +340,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1793268535788927833}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: KnifeSpawnPoint (10)
   m_TagString: Untagged
   m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
@@ -1489,7 +1489,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7759451649606304904}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: KnifeSpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
@@ -1520,7 +1520,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6699433493701565015}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: KnifeSpawnPoint (1)
   m_TagString: Untagged
   m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
@@ -1737,7 +1737,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6233077361056213485}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: ArmPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2113,7 +2113,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4440586814276485225}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: KnifeSpawnPoint (5)
   m_TagString: Untagged
   m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
@@ -2144,7 +2144,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7034229939906784530}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: KnifeSpawnPoint (3)
   m_TagString: Untagged
   m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
@@ -2250,7 +2250,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1931058077749442931}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: KnifeSpawnPoint (7)
   m_TagString: Untagged
   m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
@@ -2413,7 +2413,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5133430350450157935}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: KnifeSpawnPoint (9)
   m_TagString: Untagged
   m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
@@ -2444,7 +2444,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2276482651364050685}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: KnifeSpawnPoint (13)
   m_TagString: Untagged
   m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
@@ -2579,7 +2579,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 918375341250069957}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: KnifeSpawnPoint (14)
   m_TagString: Untagged
   m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
@@ -2686,7 +2686,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2863396697793974178}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: KnifeSpawnPoint (2)
   m_TagString: Untagged
   m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
@@ -2717,7 +2717,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3355374771401095123}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: KnifeSpawnPoint (8)
   m_TagString: Untagged
   m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
@@ -2748,7 +2748,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6484097700488723128}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: MeleeAttackHitBoxes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2785,7 +2785,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7642932202994194610}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: KnifeSpawnPoint (15)
   m_TagString: Untagged
   m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
@@ -3450,7 +3450,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 257295869282863621}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: KnifeSpawnPoint (12)
   m_TagString: Untagged
   m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
@@ -3533,7 +3533,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1907872747777744770}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: KnifeSpawnPoint (11)
   m_TagString: Untagged
   m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
@@ -3566,7 +3566,7 @@ GameObject:
   - component: {fileID: 1200490358900694148}
   - component: {fileID: 9108054832447115383}
   - component: {fileID: 2465450391777802110}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: ChargeAttackHitBox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3648,7 +3648,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2472903419440672805}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: KnifeSpawnPoint (6)
   m_TagString: Untagged
   m_Icon: {fileID: 4422084297763085224, guid: 0000000000000000d000000000000000, type: 0}
@@ -3679,7 +3679,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4534461943795013925}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: SpawnPoints
   m_TagString: Untagged
   m_Icon: {fileID: 0}

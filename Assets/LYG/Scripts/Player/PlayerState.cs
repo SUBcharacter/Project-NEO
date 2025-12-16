@@ -131,13 +131,11 @@ public class PlayerDodgeState : PlayerState
     // 회피 상태
     float currentVel;
     float gravityScale;
-    LayerMask maskOrigin;
 
     public override void Start(Player player)
     {
         // 중력 계수 저장 및 제거 
         // Y축 속도 제거
-        maskOrigin = player.gameObject.layer;
         player.gameObject.layer = LayerMask.NameToLayer("Invincible");
         gravityScale = player.Rigid.gravityScale;
         player.Dodging = true;
@@ -168,7 +166,7 @@ public class PlayerDodgeState : PlayerState
     {
         // 회피 상태 해제
         // 중력 계수 복귀
-        player.gameObject.layer = maskOrigin;
+        player.gameObject.layer = player.OriginMask;
         player.Dodging = false;
         player.Rigid.gravityScale = gravityScale;
         player.GhTr.gameObject.SetActive(false);
@@ -293,13 +291,11 @@ public class PlayerHitState : PlayerState
     IEnumerator InvincibleTime(Player player)
     {
         // 레이어 마스크 일시 교체
-        LayerMask originMask = player.gameObject.layer;
-
         player.gameObject.layer = LayerMask.NameToLayer("Invincible");
 
         yield return CoroutineCasher.Wait(player.Stats.invincibleTime);
 
-        player.gameObject.layer = originMask;
+        player.gameObject.layer = player.OriginMask;
     }
 }
 

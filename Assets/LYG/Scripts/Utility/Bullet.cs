@@ -11,7 +11,7 @@ public class Bullet : MonoBehaviour
     
     protected float timer;
 
-    private bool enhance;
+    protected bool enhance;
 
     protected virtual void Awake()
     {

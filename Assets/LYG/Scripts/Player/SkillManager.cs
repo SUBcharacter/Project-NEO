@@ -407,14 +407,12 @@ public class SkillManager : MonoBehaviour
                 case (int)Layers.enemy:
                     Debug.Log("HeadShot");
                     player.BulletCount--;
-                    // t.GetComponent<Enemy>().TakeDamage(autoTargeting.damage * enhancing);
-                    t.gameObject.SetActive(false);
+                    t.GetComponent<Enemy>().TakeDamage(autoTargeting.damage * enhancing);
                     break;
                 case (int)Layers.boss:
                     Debug.Log("HeadShot");
                     player.BulletCount--;
-                    // t.GetComponent<Boss>().TakeDamage(autoTargeting.damage * enhancing);
-                    t.gameObject.SetActive(false);
+                    //t.GetComponent<Boss>().TakeDamage(autoTargeting.damage * enhancing);
                     break;
             }
         }
@@ -422,6 +420,7 @@ public class SkillManager : MonoBehaviour
         {
             c.gameObject.SetActive(false);
         }
+        Time.timeScale = 1f;
         openFire = false;
         casting = false;
     }
@@ -430,6 +429,7 @@ public class SkillManager : MonoBehaviour
     {
         if(player.BulletCount >= autoTargeting.bulletCost)
         {
+            Time.timeScale = 0.3f;
             float timer = 0;
             Collider2D[] targets;
             while (true)
@@ -450,6 +450,7 @@ public class SkillManager : MonoBehaviour
                 if (timer >= autoTargeting.scanTime)
                 {
                     casting = false;
+                    Time.timeScale = 1f;
                     foreach (var c in player.UI.targetCrossHair)
                     {
                         c.gameObject.SetActive(false);
@@ -465,6 +466,7 @@ public class SkillManager : MonoBehaviour
         else
         {
             Debug.Log("최소 코스트 부족");
+            Time.timeScale = 1f;
             casting = false;
         }
         

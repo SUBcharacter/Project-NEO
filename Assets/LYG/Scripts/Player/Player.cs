@@ -44,6 +44,7 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] Vector2 currentVelocity;
     [SerializeField] Vector2 mousePos;
     [SerializeField] WeaponState currentWeapon;
+    LayerMask originMask;
 
     [SerializeField] float health;
     [SerializeField] float stamina;
@@ -73,7 +74,7 @@ public class Player : MonoBehaviour, IDamageable
     public CapsuleCollider2D Col { get => col; set => col = value; }
     public TerrainCheck Check { get => check; set => check = value; }
 
-
+    public LayerMask OriginMask => originMask;
     public WeaponState CrWp => currentWeapon;
 
     public float Stamina { get => stamina; set => stamina = value; }
@@ -157,6 +158,7 @@ public class Player : MonoBehaviour, IDamageable
         stamina = stats.maxStamina;
         overFlowEnergy = 0;
         isDead = false;
+        originMask = gameObject.layer;
         currentWeapon = WeaponState.Melee;
         ChangeState(states["Idle"]);
     }
