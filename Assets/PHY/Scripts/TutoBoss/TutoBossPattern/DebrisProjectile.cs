@@ -32,8 +32,6 @@ public class DebrisProjectile : MonoBehaviour
         Destroy(gameObject);
     }
 
-
-
     public void Launch(Vector2 direction, float speed)
     {
         rb.gravityScale = 0f;
@@ -45,8 +43,6 @@ public class DebrisProjectile : MonoBehaviour
         col.enabled = true;
         Destroy(gameObject, lifetime);
     }
-
-
 
 
 }

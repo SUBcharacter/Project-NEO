@@ -60,7 +60,7 @@ public class DebrisPattern : BossPattern
 
     public override void UpdatePattern()
     {
-       
+
     }
     public override void ExitPattern()
     {
@@ -70,54 +70,64 @@ public class DebrisPattern : BossPattern
 
     private void SpawnDebris()
     {
-        // 플레이어까지의 방향 (초기 계산)
-        Vector2 direction = (boss.player.position - boss.transform.position).normalized;
 
-        // 완전 직선으로 만들기 (y축 제거)
-        direction.y = 0f;
-        direction.Normalize();
+        Vector3 bossPos = boss.transform.position;
+        Vector3 playerPos = boss.player.position;
 
-        // 보스 기준 좌/우 방향
-        float xDir = direction.x >= 0 ? 1f : -1f;
+        float distance = Vector2.Distance(playerPos, bossPos);
 
-        // 보스 몸 바깥으로 스폰 위치 설정
-        Vector3 spawnPos = boss.transform.position + new Vector3(xDir * throwX, throwY, 0f);
+        float xDir = Mathf.Abs(playerPos.x - bossPos.x);
+        float yDir = Mathf.Abs(playerPos.y - bossPos.y);
 
-        GameObject obj = Instantiate(DebrisPrefab, spawnPos, Quaternion.identity);
-        DebrisProjectile projectile = obj.GetComponent<DebrisProjectile>();
+        bool isGround = xDir >= 6f;
 
-        // 보스와 충돌 무시
-        Physics2D.IgnoreCollision(projectile.col, boss.GetComponent<Collider2D>());
+        bool isAir = yDir > 1f;
 
-        // 직선으로 던지기
-        projectile.Launch(direction, throwSpeed);
+        // 플레이어 공중에 있을 때 x,y 계산해서 던지기 
+        if (isAir && isGround)
+        {
+            AirDebris(bossPos, playerPos);
+            return;
+        }
+
+        GroundDebris(bossPos, playerPos);
+
     }
 
-#if UNITY_EDITOR
-    public void DrawGizmos(BossAI boss)
-    {
-        if (boss == null || boss.player == null)
-            return;
+    // 기존에 지면에서 던지기 
 
-        // 방향 계산
-        Vector2 dir = (boss.player.position - boss.transform.position);
+    public void GroundDebris(Vector3 bossPos, Vector3 playerPos)
+    {
+        Vector2 dir = (playerPos - bossPos);
+
+        // 완전 직선으로 만들기 (y축 제거)
         dir.y = 0f;
         dir.Normalize();
 
-        float xDir = dir.x >= 0 ? 1 : -1;
+        float xDir = Mathf.Sign(dir.x);
 
-        // 스폰 포지션 계산
-        Vector3 spawnPos = boss.transform.position + new Vector3(xDir * throwX, throwY, 0);
+        Vector3 spawnPos = bossPos + new Vector3(xDir * throwX, throwY, 0f);
+        LaunchDebris(dir, spawnPos);
 
-        // --- 기즈모 그리기 ---
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawSphere(spawnPos, 0.25f);  // 스폰 위치
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(spawnPos, spawnPos + (Vector3)(dir * 3f)); // 발사 방향
     }
-#endif
 
+    public void AirDebris(Vector3 bossPos, Vector3 playerPos)
+    {
+        Vector2 dir = (playerPos - bossPos).normalized;
 
+        float xDir = Mathf.Sign(dir.x);
 
+        // 보스 몸 바깥으로 스폰 위치 설정
+        Vector3 spawnPos = bossPos + new Vector3(xDir * throwX, throwY, 0f);
+        LaunchDebris(dir, spawnPos);
+    }
+
+    public void LaunchDebris(Vector2 dir, Vector3 spawnPos)
+    {
+        GameObject Obj = Instantiate(DebrisPrefab, spawnPos, Quaternion.identity);
+        DebrisProjectile debrisProjectile = Obj.GetComponent<DebrisProjectile>();
+
+        Physics2D.IgnoreCollision(debrisProjectile.col, boss.GetComponent<Collider2D>());
+        debrisProjectile.Launch(dir, throwSpeed);
+    }
 }
