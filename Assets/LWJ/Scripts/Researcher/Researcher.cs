@@ -50,6 +50,7 @@ public class Researcher : Enemy
 
     public bool isDroneSummoned;
     public bool isarmlock;
+    public bool isbodylock;
     public Dictionary<ResearcherStateType, ResearcherState> r_states => R_States;
 
     public ResearcherState previousState;
@@ -76,6 +77,7 @@ public class Researcher : Enemy
         currnetHealth = Stat.MaxHp;
         isDroneSummoned = false;
         isarmlock = false;
+        isbodylock = false;
         ChangeState(r_states[ResearcherStateType.Idle]);
     }
 
@@ -138,8 +140,8 @@ public class Researcher : Enemy
 
         Rigid.linearVelocity = new Vector2(velocityX, Rigid.linearVelocity.y);
 
-        FlipResearcher(this, directionToPlayer);
-        FlipArm(directionToPlayer); 
+        FlipResearcher(directionToPlayer);
+       
 
     }
 
@@ -200,13 +202,11 @@ public class Researcher : Enemy
 
             if (currentDirection < 0) 
             {
-                armLocalScale.x = -1;
-                armLocalScale.y = -1;
+                armLocalScale.x = -1;           
             }
-            else 
+            else if(currentDirection > 0)
             {
-                armLocalScale.x = 1;
-                armLocalScale.y = 1;
+                armLocalScale.x = 1;             
             }
 
             arm.localScale = armLocalScale;
@@ -258,9 +258,11 @@ public class Researcher : Enemy
 
         arm.localScale = armLocalScale;
     }
+    #endregion
+
     public void FlipToTargetX(float targetX)
     {
-        if (isarmlock) return;
+        if (isarmlock || isbodylock) return;
 
         float dir = targetX - transform.position.x;
         if (Mathf.Abs(dir) < 0.01f) return;
@@ -286,13 +288,11 @@ public class Researcher : Enemy
     }
     public override void Attack()
     {
-
         if (aimRange != null && aimRange.IsPlayerInSight)
         {
             Aimatplayer();
             if (Time.time >= nextFireTime)
             {
-
                 PlayShot();
                 nextFireTime = Time.time + Stat.fireCooldown;
             }
@@ -307,46 +307,47 @@ public class Researcher : Enemy
     public void PlayShot()
     {
         isarmlock = true;
+        isbodylock = true;
         Armanima.Play("R_Shot");
     }
 
-    public void Armshotend()
+    public void Armandbodyshotend()
     {
         isarmlock = false;
+        isbodylock = false;
     }
-    #endregion
 
     #region 방향 전환
-    public void WallorLedgeFlip(Researcher researcher)
+    public void WallorLedgeFlip()
     {
         if (CheckForObstacle() || CheckForLedge())
         {
             Stat.moveDistance *= -1;
-            researcher.FlipResearcher(researcher, Stat.moveDistance);
+            FlipResearcher(Stat.moveDistance);
             return;
         }
        
         Move();
         
     }
-    public void FlipResearcher(Researcher researcher, float direction)
+    public void FlipResearcher(float direction)
     {
-        if (isarmlock) return;
+        if (isarmlock || isbodylock) return;
 
-        Vector3 currentScale = researcher.transform.localScale;
+        Vector3 currentScale = transform.localScale;
 
         if (direction > 0 && currentScale.x < 0)
         {
-            researcher.transform.localScale = new Vector3(Mathf.Abs(currentScale.x), currentScale.y, currentScale.z);
+            transform.localScale = new Vector3(Mathf.Abs(currentScale.x), currentScale.y, currentScale.z);
         }
 
         else if (direction < 0 && currentScale.x > 0)
         {
-            researcher.transform.localScale = new Vector3(-Mathf.Abs(currentScale.x), currentScale.y, currentScale.z);
+            transform.localScale = new Vector3(-Mathf.Abs(currentScale.x), currentScale.y, currentScale.z);
         }
     }
+    #endregion
 
-#endregion
     public void SummonDrone()
     {
         int rand = Random.Range(0, dronespawnpoints.Length);
@@ -382,7 +383,7 @@ public class Researcher : Enemy
         Vector2 knockbackDirection = (Vector2)transform.position - (Vector2)Player_Trans.position;
         float xDirection = Mathf.Sign(knockbackDirection.x);
         Vector2 knockbackForce = new Vector2(xDirection * knockBackXForce, 0f);
-        rigid.AddForce(knockbackForce, ForceMode2D.Impulse);
+        Rigid.AddForce(knockbackForce, ForceMode2D.Impulse);
     }
 
     IEnumerator HitFlash()

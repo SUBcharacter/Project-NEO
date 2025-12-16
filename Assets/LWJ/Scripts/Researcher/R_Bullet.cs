@@ -3,12 +3,10 @@ using UnityEngine.EventSystems;
 
 public class R_Bullet : Bullet
 {
-    [SerializeField] LayerMask attackMask;
 
     protected override void Awake()
     {
         base.Awake();
-        stats.attackable = attackMask;
 
     }
 

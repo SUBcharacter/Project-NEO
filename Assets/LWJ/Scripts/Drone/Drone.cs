@@ -1,7 +1,12 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-public class Drone : MonoBehaviour,IDamageable
+enum DroneStateType
+{
+    Idle, Attack, Dead, Hit, Walk, Chase, Enhance
+}
+public class Drone : Enemy
 {
     public DroneState[] droneStates = new DroneState[3];
     DroneState currentstates;
@@ -13,29 +18,32 @@ public class Drone : MonoBehaviour,IDamageable
     public Vector2 offset = new Vector2(0f, 1.0f);
 
     [SerializeField] LayerMask playerLayer;
-    [SerializeField] float explosionRadius = 1.5f;
-    [SerializeField] LayerMask damagelayer;
-    [SerializeField] public float D_speed = 3f;
+
+    private Dictionary<DroneStateType, DroneState> Dronestate = new(); 
+    Dictionary<DroneStateType, DroneState> droneState => Dronestate;
+
     SpriteRenderer spriteRenderer;
     public LayerMask groundLayer;
     public LayerMask wallLayer;
-    public float Movedistance = 1f;
-    public float D_Speed = 2f;
+    public float Movedistance;
+    public float D_Speed;
     public float horizontalDirection = 1f;
     public float wallCheckDistance = 0.5f; // 전방 벽 감지 거리
-    float CurrentHealth = 10f;
-    public SightRange sightRange;
 
+    private SightRange sightRange;
+    public SightRange sightrange;
 
+    public Animator animator;
 
-    void Awake()
+    [SerializeField] bool hitted;
+
+    protected override void Awake()
     {
-        droneStates[0] = new D_Idlestate();
-        droneStates[1] = new D_Attackstate();
-        droneStates[2] = new D_Summonstate();
-        ChangeState(droneStates[0]);
-        sightRange = GetComponent<SightRange>();    
-        spriteRenderer = GetComponent<SpriteRenderer>();    
+       
+        sightrange = GetComponent<SightRange>();    
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        animator = GetComponentInChildren<Animator>();
+        Statinit();
     }
 
     void Start()
@@ -43,13 +51,34 @@ public class Drone : MonoBehaviour,IDamageable
         
     }
 
+    private void OnEnable()
+    {
+        Init();
+    }
 
+    private void Statinit()
+    {
+        droneState[DroneStateType.Idle] = new D_Idlestate();
+        droneState[DroneStateType.Attack] = new D_Attackstate();
+        droneState[DroneStateType.Dead] = new D_Deadstate();
+        droneState[DroneStateType.Hit] = new D_Hitstate();
+        droneState[DroneStateType.Chase] = new D_Chasestate();
+        droneState[DroneStateType.Walk] = new D_Walkstate();
+        droneState[DroneStateType.Enhance] = new D_EnhancedDroneState();
+
+    }
     void Update()
     {
         currentstates?.Update(this);
-
     }
 
+    public override void Init() 
+    {
+        //currnetHealth = Stat.MaxHp;
+        //D_Speed = Stat.moveSpeed;
+        ChangeState(droneStates[0]);
+        hitted = false;
+    }
     public void ChangeState(DroneState drone)
     {
         currentstates?.Exit(this);
@@ -57,97 +86,21 @@ public class Drone : MonoBehaviour,IDamageable
         currentstates?.Start(this);  
     }
 
-    public void SummonInit(Transform researcher, Transform player)
-    {
-        Resear_trans = researcher;
-        Player_trans = player;
-        ChangeState(droneStates[2]);  
-    }
-
-   
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (!isattack) return;
-
-        if (((1 << collision.gameObject.layer) & playerLayer) != 0)
-        {
-            Debug.Log("드론이 플레이어와 충돌했습니다.");
-            Destroy(this.gameObject);
-        }
-
-    }
-    public void TakeDamage(float damage)
+    public override void TakeDamage(float damage)
     {
         Debug.Log("드론이 데미지를 입었습니다.");
-        
-        CurrentHealth -= damage;
-        if(CurrentHealth <= 0)
+
+        currnetHealth -= damage;
+        if(currnetHealth <= 0)
         {
             Debug.Log("드론 파괴");
            gameObject.SetActive(false);
         }   
     }
-
-    #region 드론 공격 대기 코루틴
-    public void WaitDroneandattackstate()
-    {
-        if (isWait) return;
-
-        isWait = true;
-        StartCoroutine(Waitone());
-    }
-    IEnumerator Waitone()
-    {
-        yield return CoroutineCasher.Wait(1f);
-
-        ChangeState(droneStates[1]);
-  
-        isWait = false;
-        
-    }
-
-    #endregion
-
-    #region 드론 자폭
-    public void StartExplosionTimer()
-    {
-        StartCoroutine(Explosion_timer());
-    }
-    IEnumerator Explosion_timer()
-    {
-        yield return CoroutineCasher.Wait(3f);
-        Debug.Log("드론 폭발");
-        PerformExplosion();
-        Destroy(this.gameObject);
-    }
-    void PerformExplosion()
-    {
-        if (!isattack) return;
-
-       //Collider2D[] objectsInRange = Physics2D.OverlapCircleAll(transform.position, explosionRadius, damagelayer);
-       //
-       //foreach (Collider2D col in objectsInRange)
-       //{
-       //    Debug.Log($"{col.gameObject.name} 폭발 데미지 받음.");
-       //    Player player = col.GetComponent<Player>();
-       //
-       //    if (player != null)
-       //    {
-       //        player.Hit(1); 
-       //    }   
-       //}
-
-    }
-
-    #endregion
+ 
     public void SetDroneActive(bool isActive)
     {
         gameObject.SetActive(isActive);
-    }
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, explosionRadius);
     }
 
     public void FlipDrone(Drone drone, float direction)
@@ -165,5 +118,12 @@ public class Drone : MonoBehaviour,IDamageable
         {
             drone.transform.localScale = new Vector3(-Mathf.Abs(currentScale.x), currentScale.y, currentScale.z);
         }
+    }
+
+    protected override void Die() { }
+
+    public override void Attack()
+    {
+
     }
 }

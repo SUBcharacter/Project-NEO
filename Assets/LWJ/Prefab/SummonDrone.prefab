@@ -139,12 +139,20 @@ MonoBehaviour:
   facingRight: 0
   rigid: {fileID: 0}
   ren: {fileID: 0}
-  Offset: {x: 0, y: 1}
+  Resear_trans: {fileID: 0}
+  Player_trans: {fileID: 0}
+  offset: {x: 0, y: 1}
+  sightRange: {fileID: 0}
+  animator: {fileID: 0}
   hitFlash: {fileID: 2100000, guid: 6193ff678a87941489e60c7a713ac097, type: 2}
   damagelayer:
     serializedVersion: 2
     m_Bits: 256
+  hitted: 0
   explosionRadius: 1.5
+  SD_Speed: 0
+  Arriveposition: 0.1
+  SD_direction: 0
 --- !u!114 &2273616202449752246
 MonoBehaviour:
   m_ObjectHideFlags: 0

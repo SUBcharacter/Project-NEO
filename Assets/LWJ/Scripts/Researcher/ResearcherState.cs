@@ -51,6 +51,8 @@ public class R_WalkState : ResearcherState
     public override void Start(Researcher researcher)
     {
         Debug.Log("Researcher Walk State 시작");
+        researcher.isarmlock = false;
+        researcher.isbodylock = false;
         researcher.animator.Play("R_Move");
     }
     public override void Update(Researcher researcher)
@@ -73,7 +75,7 @@ public class R_WalkState : ResearcherState
             return;
         }
 
-        researcher.WallorLedgeFlip(researcher);
+        researcher.WallorLedgeFlip();
 
     }
 
@@ -112,6 +114,8 @@ public class  R_ChaseState : ResearcherState
     public override void Start(Researcher researcher)
     {
         Debug.Log("추적");
+        researcher.isarmlock = false;
+        researcher.isbodylock = false;
         researcher.animator.Play("R_Move");
     }
     public override void Update(Researcher researcher)
@@ -133,8 +137,7 @@ public class  R_ChaseState : ResearcherState
     }
     public override void Exit(Researcher researcher)
     {
-        Debug.Log("추적 상태 종료");
-       
+        Debug.Log("추적 상태 종료");      
     }
 }
 public class R_Attackstate : ResearcherState
@@ -144,14 +147,16 @@ public class R_Attackstate : ResearcherState
     {
         active = true;
         Debug.Log("연구원 공격!");
-
+        if (!researcher.isbodylock)
+        {
+            researcher.FlipToTargetX(researcher.Player_Trans.position.x);
+        }
         researcher.Armsetactive(active);
         researcher.animator.Play("R_attack");
         researcher.Rigid.linearVelocity = Vector2.zero;
     }
     public override void Update(Researcher researcher)
     {
-        researcher.FlipToTargetX(researcher.Player_Trans.position.x);
         researcher.Attack();
     }
     public override void Exit(Researcher researcher)
@@ -166,7 +171,7 @@ public class R_Attackstate : ResearcherState
 
 public class R_Hitstate : ResearcherState
 {
-    private float hitDuration = 0.1f; // 넉백 지속 시간
+    private float hitDuration = 0.1f; 
     private float exitTime;
     float directionToPlayer;
     public override void Start(Researcher researcher)

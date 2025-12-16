@@ -13,8 +13,8 @@ public class ArmEvent : MonoBehaviour
         researcher.ShootBullet();
     }
 
-    public void R_ArmlockOff()
+    public void R_ArmandbodylockOff()
     {
-        researcher.Armshotend();
+        researcher.Armandbodyshotend();
     }   
 }

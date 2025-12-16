@@ -16,7 +16,7 @@ public class D_Idlestate : DroneState
     }
     public override void Update(Drone drone)
     {
-        if(drone.sightRange != null && drone.sightRange.IsPlayerInSight)
+        if(drone.sightrange != null && drone.sightrange.IsPlayerInSight)
         {
             drone.ChangeState(drone.droneStates[1]);
             return;
@@ -46,7 +46,7 @@ public class D_Idlestate : DroneState
 
 }
 
-public class D_Summonstate : DroneState
+public class D_Walkstate : DroneState
 {
     public override void Start(Drone drone)
     {
@@ -56,11 +56,11 @@ public class D_Summonstate : DroneState
     public override void Update(Drone drone)
     {
         Vector3 target = drone.Resear_trans.position + (Vector3)drone.offset;
-        drone.transform.position = Vector3.MoveTowards(drone.transform.position, target, drone.D_speed * Time.deltaTime);
+        //drone.transform.position = Vector3.MoveTowards(drone.transform.position, target, drone.D_speed * Time.deltaTime);
 
         if (Vector3.Distance(drone.transform.position, target) < 0.1f)
         {
-            drone.WaitDroneandattackstate();
+       
         }
 
     }
@@ -73,12 +73,12 @@ public override void Start(Drone drone)
 {
     drone.SetDroneActive(true);
     drone.isattack = true;
-    drone.StartExplosionTimer();
+
     Debug.Log("Attack State 시작");
 }
 public override void Update(Drone drone) 
 {
-    drone.transform.position = Vector3.MoveTowards(drone.transform.position, drone.Player_trans.position , drone.D_speed * Time.deltaTime);
+    //drone.transform.position = Vector3.MoveTowards(drone.transform.position, drone.Player_trans.position , drone.D_speed * Time.deltaTime);
     float directionX = drone.Player_trans.position.x - drone.transform.position.x;
    
     if (directionX > 0)
@@ -97,3 +97,108 @@ public override void Update(Drone drone)
 public override void Exit(Drone drone) { }
 }
 
+public class D_Chasestate : DroneState
+{
+    public override void Start(Drone drone)
+    {
+        drone.SetDroneActive(true);
+        drone.isattack = true;
+
+        Debug.Log("Attack State 시작");
+    }
+    public override void Update(Drone drone)
+    {
+        //drone.transform.position = Vector3.MoveTowards(drone.transform.position, drone.Player_trans.position , drone.D_speed * Time.deltaTime);
+        float directionX = drone.Player_trans.position.x - drone.transform.position.x;
+
+        if (directionX > 0)
+        {
+            drone.horizontalDirection = 1f;
+        }
+        else if (directionX < 0)
+        {
+            drone.horizontalDirection = -1f;
+        }
+
+
+        drone.FlipDrone(drone, drone.horizontalDirection);
+
+    }
+    public override void Exit(Drone drone) { }
+}
+
+public class D_Hitstate : DroneState
+{
+    public override void Start(Drone drone)
+    {
+        drone.SetDroneActive(true);
+        drone.isattack = true;
+
+        Debug.Log("Attack State 시작");
+    }
+    public override void Update(Drone drone)
+    {
+        //drone.transform.position = Vector3.MoveTowards(drone.transform.position, drone.Player_trans.position , drone.D_speed * Time.deltaTime);
+        float directionX = drone.Player_trans.position.x - drone.transform.position.x;
+
+        if (directionX > 0)
+        {
+            drone.horizontalDirection = 1f;
+        }
+        else if (directionX < 0)
+        {
+            drone.horizontalDirection = -1f;
+        }
+
+
+        drone.FlipDrone(drone, drone.horizontalDirection);
+
+    }
+    public override void Exit(Drone drone) { }
+}
+
+public class D_Deadstate : DroneState
+{
+    public override void Start(Drone drone)
+    {
+        drone.SetDroneActive(true);
+        drone.isattack = true;
+
+        Debug.Log("Attack State 시작");
+    }
+    public override void Update(Drone drone)
+    {
+        //drone.transform.position = Vector3.MoveTowards(drone.transform.position, drone.Player_trans.position , drone.D_speed * Time.deltaTime);
+        float directionX = drone.Player_trans.position.x - drone.transform.position.x;
+
+        if (directionX > 0)
+        {
+            drone.horizontalDirection = 1f;
+        }
+        else if (directionX < 0)
+        {
+            drone.horizontalDirection = -1f;
+        }
+
+
+        drone.FlipDrone(drone, drone.horizontalDirection);
+
+    }
+    public override void Exit(Drone drone) { }
+}
+
+public class D_EnhancedDroneState : DroneState
+{
+    public override void Start(Drone drone)
+    {
+        Debug.Log("Enhanced Drone State 시작");
+    }
+    public override void Update(Drone drone)
+    {
+        // 여기에 강화된 드론의 행동 로직을 추가하세요.
+    }
+    public override void Exit(Drone drone)
+    {
+        Debug.Log("Enhanced Drone State 종료");
+    }
+}   

@@ -76,7 +76,6 @@ public class SummonDrone : Enemy
         currentStates?.Start(this);
 
     }
-
     public void SummonInit(Transform researcher, Transform player)
     {
         Resear_trans = researcher;
@@ -131,9 +130,13 @@ public class SummonDrone : Enemy
     }
     public void Chase()
     {
-        Vector2 dir = (Player_trans.position - transform.position).normalized;
-        Rigid.linearVelocity = dir * SD_Speed;
-        Flip(this, dir.x);
+        Vector3 targetPosition = Player_trans.position;
+
+
+        transform.position = Vector3.MoveTowards(transform.position,targetPosition,SD_Speed * Time.deltaTime);
+
+        Vector2 directionToPlayer = Player_trans.position - transform.position;
+        Flip(this, directionToPlayer.x);
     }
     public void Flip(SummonDrone drone,float direction)
     {
