@@ -2963,20 +2963,22 @@ MonoBehaviour:
   m_GameObject: {fileID: 1754630442}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1af611feb6401e04c88e05f0b0ab11ee, type: 3}
+  m_Script: {fileID: 11500000, guid: fbce8e99f16ecf848ab32ea1aabc0d4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1586359642}
   animator: {fileID: 1754630445}
   rb: {fileID: 1754630443}
   tackleHitbox: {fileID: 0}
-  currentPhase: {fileID: 11400000, guid: b47641e868e132747b682fcbb3fbaf8f, type: 2}
-  allPhases:
-  - {fileID: 11400000, guid: b47641e868e132747b682fcbb3fbaf8f, type: 2}
+  currentPhase: {fileID: 0}
+  allPhases: []
   maxHp: 3000
   currentHp: 0
   currentPoise: 0
   activeLightWaves: []
+  tutorialSequence: []
+  randomPatterns: []
+  tutorialIndex: 0
 --- !u!1001 &1825320112
 PrefabInstance:
   m_ObjectHideFlags: 0
