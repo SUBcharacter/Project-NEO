@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using UnityEngine;
 /// <summary>
 /// 전기충격파 패턴
@@ -5,35 +6,64 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "ElecShockPattern", menuName = "TutoBoss/TutoBossPattern/ElecShock")]
 public class ElecShockPattern : BossPattern
 {
-    public override void ExitPattern()
+    [Header("충격파 프리팹")]
+    [SerializeField] private GameObject ShockWavePrefab;
+
+    [SerializeField] private float shockSpawnY = -0.5f;
+    [SerializeField] private float delay = 0.5f;
+
+    private bool isShockTriggerd = false;
+
+    public override async Task StartPattern()
     {
-        throw new System.NotImplementedException();
+        isShockTriggerd = false;
+        await Execute();        // 얘는 또 쓰는군
+    }
+
+    protected override async Awaitable Execute()
+    {
+        boss.FaceTarget(boss.player.position);
+
+        animator.SetTrigger("ElecShock");
+        Debug.Log("전기충격 패턴 실행됨");
+
+        while (!isShockTriggerd)
+            await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
+
+        await Awaitable.WaitForSecondsAsync(delay, boss.DestroyCancellationToken);
+
+        ExitPattern();
     }
 
     public override void OnAnimationEvent(string eventName)
     {
-        throw new System.NotImplementedException();
+        if (eventName == "ShockEvent")
+        {
+            Debug.Log("전기충격 애니메이션 실행됨");
+            ShockWave();
+            isShockTriggerd = true;
+        }
     }
 
     public override void UpdatePattern()
     {
-        throw new System.NotImplementedException();
+
     }
 
-    protected override Awaitable Execute()
+    public override void ExitPattern()
     {
-        throw new System.NotImplementedException();
+        isShockTriggerd = false;
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void ShockWave()
     {
-        
+        Vector3 pos = boss.transform.position + new Vector3(0, shockSpawnY, 0);
+
+        GameObject obj = Instantiate(ShockWavePrefab, pos, Quaternion.identity);
+
+        var hitbox = obj.GetComponent<ElecHitBox>();
+        if (hitbox != null)
+            hitbox.Init();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

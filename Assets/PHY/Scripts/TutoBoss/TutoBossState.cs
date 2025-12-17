@@ -1,4 +1,6 @@
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using UnityEditor.Tilemaps;
 using UnityEngine;
 
 public class TutoBossState : BossState
@@ -13,17 +15,17 @@ public class TutoBossState : BossState
 
     public override void Exit()
     {
-        throw new System.NotImplementedException();
+
     }
 
     public override void Start()
     {
-        throw new System.NotImplementedException();
+
     }
 
     public override void Update()
     {
-        throw new System.NotImplementedException();
+
     }
 
 
@@ -49,42 +51,71 @@ public class TutoIdleState : TutoBossState
 
     private async Task PatrolRoutine()
     {
+        Vector3 leftPos = boss.transform.position + Vector3.left * 2f;
+        Vector3 rightPos = boss.transform.position + Vector3.right * 3f;
+
         while (isPatrolling)
         {
-            float timer = 0;
-            boss.FaceTarget(boss.transform.position + Vector3.left);
-
-            while (timer < 1f && isPatrolling)
-            {
-                timer += Time.deltaTime;
-                boss.transform.position += bossSpeed * Time.deltaTime * Vector3.left;
-                await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
-            }
-
-            if (!isPatrolling) break;
+            // 왼쪽 패트롤
+            boss.FaceTarget(leftPos);
+            await MoveTo(leftPos);
+            if (!isPatrolling) return;
             await Awaitable.WaitForSecondsAsync(1f, boss.DestroyCancellationToken);
 
-            // 오른쪽
-            timer = 0;
-            boss.FaceTarget(boss.transform.position + Vector3.right);
-
-            while (timer < 1f && isPatrolling)
-            {
-                timer += Time.deltaTime;
-                boss.transform.position += bossSpeed * Time.deltaTime * Vector3.right;
-                await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
-            }
-
-            if (!isPatrolling) break;
+            // 오른쪽 패트롤
+            boss.FaceTarget(rightPos);
+            await MoveTo(rightPos);
+            if (!isPatrolling) return;
             await Awaitable.WaitForSecondsAsync(1f, boss.DestroyCancellationToken);
+
+            //float timer = 0;
+            //boss.FaceTarget(boss.transform.position + Vector3.left);
+
+            //while (timer < 1f && isPatrolling)
+            //{
+            //    timer += Time.deltaTime;
+            //    boss.transform.position += tutoBossSpeed * Time.deltaTime * Vector3.left;
+            //    await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
+            //}
+
+            //if (!isPatrolling) break;
+            //await Awaitable.WaitForSecondsAsync(1f, boss.DestroyCancellationToken);
+
+            //// 오른쪽
+            //timer = 0;
+            //boss.FaceTarget(boss.transform.position + Vector3.right);
+
+            //while (timer < 1f && isPatrolling)
+            //{
+            //    timer += Time.deltaTime;
+            //    boss.transform.position += tutoBossSpeed * Time.deltaTime * Vector3.right;
+            //    await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
+            //}
+
+            //if (!isPatrolling) break;
+            //await Awaitable.WaitForSecondsAsync(1f, boss.DestroyCancellationToken);
         }
     }
+
+    private async Task MoveTo(Vector3 targetPos)
+    {
+        while (isPatrolling && Vector2.Distance(boss.transform.position, targetPos) > 0.05f)
+        {
+            boss.transform.position = Vector3.MoveTowards
+                (boss.transform.position, targetPos,
+                tutoBossSpeed * Time.deltaTime);
+
+            await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
+        }
+    }
+
+
 
     public override void Update()
     {
         if (boss.player == null) return;
 
-        float dist = Vector2.Distance(boss.transform.position, boss.player.position);
+        float dist = Mathf.Abs(boss.player.position.x - boss.transform.position.x);
 
         // Chase 전환 조건
         if (dist < detectRange)
@@ -105,7 +136,7 @@ public class TutoIdleState : TutoBossState
 public class TutoChaseState : TutoBossState
 {
     private float chaseSpeed = 2.5f;
-    private float attackRange = 5f;
+
 
     public TutoChaseState(BossAI boss) : base(boss) { }
 
@@ -119,14 +150,19 @@ public class TutoChaseState : TutoBossState
     {
         if (boss.player == null) return;
 
-        Vector3 dir = (boss.player.position - boss.transform.position).normalized;
+        float targetX = boss.player.position.x;
+        float bossY = boss.transform.position.y;
+
+        Vector2 targetPos = new Vector3(targetX, bossY, boss.transform.position.z);
+
         boss.FaceTarget(boss.player.position);
 
-        boss.transform.position += dir * chaseSpeed * Time.deltaTime;
+        boss.transform.position = Vector3.MoveTowards
+            (boss.transform.position, targetPos, chaseSpeed * Time.deltaTime);
 
-        float dist = Vector2.Distance(boss.transform.position, boss.player.position);
+        float dist = Mathf.Abs(boss.player.position.x - boss.transform.position.x);
 
-        if (dist < attackRange)
+        if (dist > 6f)
         {
             boss.ChangeState(new TutoAttackingState(boss));
         }
@@ -140,11 +176,11 @@ public class TutoAttackingState : TutoBossState
     private BossPattern currentPattern;
     private TutoBossAI tuto;
 
-    public TutoAttackingState(BossAI boss) : base(boss) 
+    public TutoAttackingState(BossAI boss) : base(boss)
     {
         tuto = tutoAI;
     }
-  
+
 
     public override void Start()
     {

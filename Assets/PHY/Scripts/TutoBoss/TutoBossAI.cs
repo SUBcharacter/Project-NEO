@@ -16,5 +16,7 @@ public class TutoBossAI : BossAI
     {
         // 튜토보스는 Phase 없음 → Idle 상태로 바로 시작
         ChangeState(new TutoIdleState(this));
+
+        
     }
 }
