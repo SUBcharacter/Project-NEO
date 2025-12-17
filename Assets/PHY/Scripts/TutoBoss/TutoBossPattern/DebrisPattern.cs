@@ -65,6 +65,7 @@ public class DebrisPattern : BossPattern
     public override void ExitPattern()
     {
         isThrow = false;
+        //boss.animator.SetTrigger("Walk");
     }
 
 

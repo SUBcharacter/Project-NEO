@@ -14,6 +14,7 @@ public class TutoBossAI : BossAI
 
     private void Start()
     {
+        Debug.Log("Idle 진입 시도");
         // 튜토보스는 Phase 없음 → Idle 상태로 바로 시작
         ChangeState(new TutoIdleState(this));
 

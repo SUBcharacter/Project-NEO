@@ -10,7 +10,7 @@ public class ElecShockPattern : BossPattern
     [SerializeField] private GameObject ShockWavePrefab;
 
     [SerializeField] private float shockSpawnY = -0.5f;
-    [SerializeField] private float delay = 0.5f;
+    [SerializeField] private float delay = 3.5f;
 
     private bool isShockTriggerd = false;
 
@@ -30,6 +30,7 @@ public class ElecShockPattern : BossPattern
         while (!isShockTriggerd)
             await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
 
+        // 전기충격 후 3-4초 유지
         await Awaitable.WaitForSecondsAsync(delay, boss.DestroyCancellationToken);
 
         ExitPattern();
@@ -53,8 +54,9 @@ public class ElecShockPattern : BossPattern
     public override void ExitPattern()
     {
         isShockTriggerd = false;
+        Debug.Log("전기충격 패턴 종료 -> 추적으로 돌아감");
+       
     }
-
     private void ShockWave()
     {
         Vector3 pos = boss.transform.position + new Vector3(0, shockSpawnY, 0);

@@ -2810,6 +2810,7 @@ MonoBehaviour:
   activeLightWaves: []
   tutorialSequence:
   - {fileID: 11400000, guid: a19c11291e321434f98dee7b9f686324, type: 2}
+  - {fileID: 11400000, guid: d51a4e0586bec024b83c4117f5c9211d, type: 2}
   randomPatterns: []
   tutorialIndex: 0
 --- !u!1001 &1825320112
