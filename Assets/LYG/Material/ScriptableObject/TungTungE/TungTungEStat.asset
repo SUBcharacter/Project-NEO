@@ -16,5 +16,5 @@ MonoBehaviour:
   speed: 7
   waitTime: 1
   attackDuration: 1
-  hitDuration: 0.5
+  hitDuration: 0.1
   attackDistance: 1

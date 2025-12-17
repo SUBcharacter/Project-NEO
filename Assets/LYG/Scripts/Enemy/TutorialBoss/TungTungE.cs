@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class TungTungE : MonoBehaviour, IDamageable
 {
+    [SerializeField] Animator animator;
     [SerializeField] HitBox[] punches;
     [SerializeField] Transform target;
     [SerializeField] Rigidbody2D rigid;
@@ -28,6 +29,8 @@ public class TungTungE : MonoBehaviour, IDamageable
     [SerializeField] bool attacking;
     [SerializeField] bool hitted;
 
+    public Animator AniCon => animator;
+    public HitBox[] Punches => punches;
     public TungTungEStat Stat => stat;
     public Transform Target => target;
     public TungTungEState CrSt => currentState;
@@ -37,7 +40,7 @@ public class TungTungE : MonoBehaviour, IDamageable
     public CapsuleCollider2D Col { get => col; set => col = value; }
 
     public bool FacingRight => facingRight;
-    public bool Attacking => attacking;
+    public bool Attacking { get => attacking; set => attacking = value; }
 
     private void Awake()
     {
@@ -45,6 +48,7 @@ public class TungTungE : MonoBehaviour, IDamageable
         col = GetComponent<CapsuleCollider2D>();
         detector = GetComponent<Detector>();
         ren = GetComponentInChildren<SpriteRenderer>();
+        animator = GetComponentInChildren<Animator>();
         health = stat.maxHealth;
         hitted = false;
         StateInit();
@@ -98,26 +102,22 @@ public class TungTungE : MonoBehaviour, IDamageable
         }
     }
 
-    public void StartAttack()
-    {
-        attacking = true;
-
-        StopAttack();
-
-        _cts = new CancellationTokenSource();
-
-        _ = LeftRight(_cts.Token);
-    }
+    //public void StartAttack()
+    //{
+    //    attacking = true;
+    //
+    //    StopAttack();
+    //
+    //    _cts = new CancellationTokenSource();
+    //
+    //    _ = LeftRight(_cts.Token);
+    //}
 
     public void StopAttack()
     {
-        if(_cts != null)
-        {
-            Debug.LogWarning("StopAttack() 호출됨! 공격 취소 시도.");
-            _cts?.Cancel();
-            _cts?.Dispose();
-            _cts = null;
-        }
+        punches[0].gameObject.SetActive(false);
+        punches[1].gameObject.SetActive(false);
+        attacking = false;
     }
 
     public float DistanceToPlayer()
@@ -153,45 +153,30 @@ public class TungTungE : MonoBehaviour, IDamageable
         }
     }
 
-    //IEnumerator LeftRight()
+    //async Awaitable LeftRight(CancellationToken token)
     //{
-    //    punches[0].Init();
-    //
-    //    yield return CoroutineCasher.Wait(0.05f);
-    //    punches[0].gameObject.SetActive(false);
-    //
-    //    yield return CoroutineCasher.Wait(0.1f);
-    //    punches[1].Init();
-    //    yield return CoroutineCasher.Wait(0.05f);
-    //    punches[1].gameObject.SetActive(false);
-    //
-    //    attack = null;
+    //    Debug.Log($"LeftRight 시작. Token IsCancellationRequested: {token.IsCancellationRequested}");
+    //    try
+    //    {
+    //        Debug.Log("공격");
+    //        attacking = true;
+    //        Debug.Log("뭐가 문젠데요");
+    //        punches[0].Init();
+    //        Debug.Log("1타");
+    //        await Awaitable.WaitForSecondsAsync(0.05f, token);
+    //        punches[0].gameObject.SetActive(false);
+    //        await Awaitable.WaitForSecondsAsync(0.1f, token);
+    //        punches[1].Init();
+    //        Debug.Log("2타");
+    //        await Awaitable.WaitForSecondsAsync(0.05f, token);
+    //        punches[1].gameObject.SetActive(false);
+    //    }
+    //    finally
+    //    {
+    //        Debug.Log("공격 종료");
+    //        punches[0].gameObject.SetActive(false);
+    //        punches[1].gameObject.SetActive(false);
+    //        attacking = false;
+    //    }
     //}
-
-    async Awaitable LeftRight(CancellationToken token)
-    {
-        Debug.Log($"LeftRight 시작. Token IsCancellationRequested: {token.IsCancellationRequested}");
-        try
-        {
-            Debug.Log("공격");
-            attacking = true;
-            Debug.Log("뭐가 문젠데요");
-            punches[0].Init();
-            Debug.Log("1타");
-            await Awaitable.WaitForSecondsAsync(0.05f, token);
-            punches[0].gameObject.SetActive(false);
-            await Awaitable.WaitForSecondsAsync(0.1f, token);
-            punches[1].Init();
-            Debug.Log("2타");
-            await Awaitable.WaitForSecondsAsync(0.05f, token);
-            punches[1].gameObject.SetActive(false);
-        }
-        finally
-        {
-            Debug.Log("공격 종료");
-            punches[0].gameObject.SetActive(false);
-            punches[1].gameObject.SetActive(false);
-            attacking = false;
-        }
-    }
 }

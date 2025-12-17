@@ -33,7 +33,7 @@ public class Shotgun : Weapon
 
     public override void Launch(Vector2 dir)
     {
-        CameraShake.instance.Shake(5, 0.2f);
+        CameraManager.instance.Shake(5, 0.2f);
         for (int i = 0; i < pellet; i++)
         {
             Vector2 originDir = dir;

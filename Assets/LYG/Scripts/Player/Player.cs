@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design.Serialization;
 using Unity.VisualScripting;
+using UnityEditor.Rendering.Universal;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
@@ -42,7 +43,7 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] Coroutine fire;
 
     [SerializeField] Vector2 currentVelocity;
-    [SerializeField] Vector2 mousePos;
+    [SerializeField] Vector3 mousePos;
     [SerializeField] WeaponState currentWeapon;
     LayerMask originMask;
 
@@ -120,7 +121,7 @@ public class Player : MonoBehaviour, IDamageable
         }
         currentState?.Update(this);
         StaminaTimer();
-
+        MouseConvert();
         if (hit)
             return;
         SpriteControl();
@@ -128,11 +129,9 @@ public class Player : MonoBehaviour, IDamageable
 
     private void FixedUpdate()
     {
-        if (isDead)
+        if (isDead || hit)
             return;
-        MouseConvert();
-        if (hit)
-            return;
+
         Move();
     }
 
@@ -187,7 +186,7 @@ public class Player : MonoBehaviour, IDamageable
         if(aiming || attacking)
         {
             // 사격 상태 혹은 근접 공격 상태
-            Vector2 dir = (mousePos - (Vector2)transform.position).normalized;
+            Vector2 dir = ((Vector2)mousePos - (Vector2)transform.position).normalized;
 
             if(dir.x <0)
             {
@@ -282,6 +281,7 @@ public class Player : MonoBehaviour, IDamageable
     void MouseConvert()
     {
         // 마우스 위치 변환 및 크로스헤어 위치 트래킹
+        
         mousePos = Camera.main.ScreenToWorldPoint(input.MouseInputVec);
         ui.playerCrossHair.rectTransform.position = input.MouseInputVec;
     }
@@ -300,7 +300,7 @@ public class Player : MonoBehaviour, IDamageable
         }
 
         // 공격 방향 결정
-        Vector2 dir = (mousePos - (Vector2)transform.position).normalized;
+        Vector2 dir = ((Vector2)mousePos - (Vector2)transform.position).normalized;
 
         if(check.IsGround)
         {
@@ -340,7 +340,7 @@ public class Player : MonoBehaviour, IDamageable
         // 사격 함수
         // 마우스 위치를 받아 방향 계산
         RotateArm();
-        Vector2 dir = (mousePos - (Vector2)transform.position).normalized;
+        Vector2 dir = ((Vector2)mousePos - (Vector2)transform.position).normalized;
 
         arm.Launch(dir);
         bulletCount--;
@@ -374,7 +374,7 @@ public class Player : MonoBehaviour, IDamageable
             return;
 
         // 초기 방향 결정
-        Vector2 dir = (mousePos - (Vector2)transform.position).normalized;
+        Vector2 dir = ((Vector2)mousePos - (Vector2)transform.position).normalized;
 
         if (check.IsGround)
         {
@@ -397,7 +397,7 @@ public class Player : MonoBehaviour, IDamageable
         Debug.Log("차지어택");
 
         // 방향 결정 및 실행
-        Vector2 dir = (mousePos - (Vector2)transform.position).normalized;
+        Vector2 dir = ((Vector2)mousePos - (Vector2)transform.position).normalized;
         skillManager.InitiatingChargeAttack(dir);
     }
 
@@ -444,7 +444,7 @@ public class Player : MonoBehaviour, IDamageable
         if (!aiming)
             return;
 
-        Vector2 dir = (mousePos - (Vector2)arm.transform.position).normalized;
+        Vector2 dir = ((Vector2)mousePos - (Vector2)arm.transform.position).normalized;
 
         float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
 

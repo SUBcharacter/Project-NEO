@@ -17,6 +17,7 @@ public class TTEBattleIdleState : TungTungEState
     {
         Debug.Log("전투 대기");
         timer = 0;
+        tte.AniCon.Play("TTE_ReadyToBattle");
     }
 
     public override void Update(TungTungE tte)
@@ -34,8 +35,6 @@ public class TTEBattleIdleState : TungTungEState
                 tte.ChangeState(tte.State["Chase"]);
             }
         }
-
-
     }
 
     public override void Exit(TungTungE tte)
@@ -50,7 +49,7 @@ public class TTEAttackState : TungTungEState
     float timer;
     public override void Start(TungTungE tte)
     {
-        tte.StartAttack();
+        tte.AniCon.Play("TTE_Attack");
     }
 
     public override void Update(TungTungE tte)
@@ -79,6 +78,7 @@ public class TTEChasingState : TungTungEState
     public override void Start(TungTungE tte)
     {
         speed = 0;
+        tte.AniCon.Play("TTE_Walk");
     }
 
     public override void Update(TungTungE tte)
@@ -138,6 +138,7 @@ public class TTEHitState : TungTungEState
     {
         timer = 0;
         tte.StopAttack();
+        tte.AniCon.speed = 0f;
     }
 
     public override void Update(TungTungE tte)
@@ -158,7 +159,7 @@ public class TTEHitState : TungTungEState
 
     public override void Exit(TungTungE tte)
     {
-
+        tte.AniCon.speed = 1f;
     }
 }
 
@@ -169,6 +170,7 @@ public class TTEDeathState : TungTungEState
     {
         tte.gameObject.layer = LayerMask.NameToLayer("Invincible");
         tte.Rigid.linearVelocity = Vector2.zero;
+        tte.AniCon.Play("TTE_Death");
     }
 
     public override void Update(TungTungE tte)
@@ -178,7 +180,7 @@ public class TTEDeathState : TungTungEState
 
     public override void Exit(TungTungE tte)
     {
-
+        tte.gameObject.layer = LayerMask.NameToLayer("Enemy");
     }
 }
 

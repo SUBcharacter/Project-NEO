@@ -45,6 +45,9 @@ public class PlayerInput : MonoBehaviour
 
     public void OnMouse(InputAction.CallbackContext context)
     {
+        if (!context.performed)
+            return;
+
         mouseInputVec = context.ReadValue<Vector2>();
     }
 

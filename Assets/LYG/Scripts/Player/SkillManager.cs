@@ -276,7 +276,7 @@ public class SkillManager : MonoBehaviour
                     {
                         knockDir = -dir;
                     }
-                    CameraShake.instance.Shake(4, 0.2f);
+                    CameraManager.instance.Shake(4, 0.2f);
                     player.Rigid.linearVelocity = knockDir * chargeAttack.knockBackForce;
                     Debug.Log("ºÎµúÇôÀÕ");
                     break;
@@ -395,7 +395,7 @@ public class SkillManager : MonoBehaviour
             return;
         }
 
-        CameraShake.instance.Shake(4, 0.2f);
+        CameraManager.instance.Shake(4, 0.2f);
         autoTargetingUsable = false;
         int enhancing = enhanced ? 2 : 1;
         foreach(var t in targets)
@@ -550,7 +550,7 @@ public class SkillManager : MonoBehaviour
         if (player.Stamina >= flashAttack.staminaCost)
         {
             player.Stamina -= flashAttack.staminaCost;
-            CameraShake.instance.Shake(4, 0.2f);
+            CameraManager.instance.Shake(4, 0.2f);
             Vector2 dir = facingRight ? Vector2.right : Vector2.left;
             float distance = CalculateDistance(facingRight, dir);
 
