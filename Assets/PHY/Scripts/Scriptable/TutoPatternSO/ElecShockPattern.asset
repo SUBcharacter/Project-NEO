@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 286ef9d4bc9aa20418970daa637cec9f, type: 3}
   m_Name: ElecShockPattern
   m_EditorClassIdentifier: 
-  minRange: 0
+  minRange: 3
   maxRange: 999
   cooldownTime: 3
   priorityWeight: 1
   comboPatterns: []
   comboChance: 0.5
   ShockWavePrefab: {fileID: 7777895436838574327, guid: ffb93343f0537524fa34fdfd67fca43a, type: 3}
-  shockSpawnY: -0.5
+  shockSpawnY: 0.1
   delay: 0.5
