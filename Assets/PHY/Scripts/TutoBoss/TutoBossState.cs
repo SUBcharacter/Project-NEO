@@ -137,9 +137,31 @@ public class TutoChaseState : TutoBossState
         if (boss.player == null) return;
 
         // 1) 플레이어 추적
+        // TrackPlayer();
+
+        //// 2) 일정 텀마다 패턴들 점수 평가
+        //patternCheckTimer += Time.deltaTime;
+
+        //if (patternCheckTimer >= patternCheckInterval)
+        //{
+        //    patternCheckTimer = 0f;
+
+        //    if (HasExecutablePattern())
+        //    {
+        //        Debug.Log("[Chase → Attack] 실행 가능한 패턴 발견, Attack 진입");
+        //        RequestChange(new TutoAttackingState(boss));
+        //    }
+        //}
+
+        // 최소 공격 간격 체크 (연속 패턴 방지 핵심)
+        if (Time.time < tuto.lastAttackTime + tuto.minAttackInterval)
+        {
+            TrackPlayer();
+            return;         // 공격 평가 자체를 막음
+        }
+
         TrackPlayer();
 
-        // 2) 일정 텀마다 패턴들 점수 평가
         patternCheckTimer += Time.deltaTime;
 
         if (patternCheckTimer >= patternCheckInterval)
@@ -283,6 +305,7 @@ public class TutoAttackingState : TutoBossState
 
         if (eventName == "AttackEnd")
         {
+            tuto.lastAttackTime = Time.time; // 마지막 공격 시간 기록
             Debug.Log("[Attack] AttackEnd 수신 → CoolDown 진입");
             currentPattern?.ExitPattern();
             RequestChange(new TutoCoolDownState(boss, 1f));
@@ -317,7 +340,7 @@ public class TutoCoolDownState : TutoBossState
     public override void Update()
     {
         timer -= Time.deltaTime;
-        //Debug.Log($"[CoolDown] Update — 남은 시간: {timer}");
+       
 
         if (timer <= 0)
         {

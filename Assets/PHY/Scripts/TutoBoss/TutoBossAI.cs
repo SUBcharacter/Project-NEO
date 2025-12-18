@@ -9,6 +9,10 @@ public class TutoBossAI : BossAI
 
     private TutoBossState currentState;        // 보스 상태    
 
+    [Header("튜토보스 공격 간격")]
+    public float lastAttackTime = -999f;
+    public float minAttackInterval = 2f;
+
     [HideInInspector]
     public int tutorialIndex = 0;                        // 현재 튜토 패턴 단계
 
