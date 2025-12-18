@@ -7,28 +7,28 @@ using UnityEngine;
 public class TutoBossState : BossState
 {
     protected TutoBossAI tutoAI;
-    protected float tutoBossRadius = 4f;
+    protected bool isRequestChange = false;
     protected float tutoBossSpeed = 3f;
     public TutoBossState(BossAI boss) : base(boss)
     {
         tutoAI = boss as TutoBossAI;
     }
 
+    public override void Start() { }
+
+    public override void Update() { }
+
+    public void RequestChange(TutoBossState tutoBossNext)
+    {
+        if (isRequestChange) return;
+        isRequestChange = true;
+        boss.ChangeState(tutoBossNext);
+
+    }
     public override void Exit()
     {
-
+        isRequestChange = false;
     }
-
-    public override void Start()
-    {
-
-    }
-
-    public override void Update()
-    {
-
-    }
-
 
 }
 
@@ -68,33 +68,6 @@ public class TutoIdleState : TutoBossState
             await MoveTo(rightPos);
             if (!isPatrolling) return;
             await Awaitable.WaitForSecondsAsync(1f, boss.DestroyCancellationToken);
-
-            //float timer = 0;
-            //boss.FaceTarget(boss.transform.position + Vector3.left);
-
-            //while (timer < 1f && isPatrolling)
-            //{
-            //    timer += Time.deltaTime;
-            //    boss.transform.position += tutoBossSpeed * Time.deltaTime * Vector3.left;
-            //    await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
-            //}
-
-            //if (!isPatrolling) break;
-            //await Awaitable.WaitForSecondsAsync(1f, boss.DestroyCancellationToken);
-
-            //// 오른쪽
-            //timer = 0;
-            //boss.FaceTarget(boss.transform.position + Vector3.right);
-
-            //while (timer < 1f && isPatrolling)
-            //{
-            //    timer += Time.deltaTime;
-            //    boss.transform.position += tutoBossSpeed * Time.deltaTime * Vector3.right;
-            //    await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
-            //}
-
-            //if (!isPatrolling) break;
-            //await Awaitable.WaitForSecondsAsync(1f, boss.DestroyCancellationToken);
         }
     }
 
@@ -124,7 +97,7 @@ public class TutoIdleState : TutoBossState
         {
             Debug.Log("[Idle → Chase] 플레이어 접근함, 상태 전환");
             isPatrolling = false;   // 패트롤 즉시 종료
-            boss.ChangeState(new TutoChaseState(boss));
+            RequestChange(new TutoChaseState(boss));
         }
     }
 
@@ -132,53 +105,11 @@ public class TutoIdleState : TutoBossState
     {
         // 상태 변경시 반드시 패트롤 종료
         isPatrolling = false;
+        base.Exit();
     }
 }
 
 
-//public class TutoChaseState : TutoBossState
-//{
-//    private float chaseSpeed = 2.5f;
-//    private float attackRange = 2f;
-
-//    public TutoChaseState(BossAI boss) : base(boss) { }
-
-
-//    public override void Start()
-//    {
-//        Debug.Log("Idle -> Walk로 넘어감");
-//        boss.animator.SetTrigger("Walk");
-//    }
-
-//    public override void Update()
-//    {
-//        if (boss.player == null) return;
-
-//        float targetX = boss.player.position.x;
-//        float bossY = boss.transform.position.y;
-
-//        Vector2 targetPos = new Vector3(targetX, bossY, boss.transform.position.z);
-
-//        boss.FaceTarget(boss.player.position);
-
-//        boss.transform.position = Vector3.MoveTowards
-//            (boss.transform.position, targetPos, chaseSpeed * Time.deltaTime);
-
-//        float dist = Mathf.Abs(boss.player.position.x - boss.transform.position.x);
-//        //Debug.Log($"[Chase] Update — DistToPlayer: {dist}");
-
-
-//            boss.ChangeState(new TutoAttackingState(boss));
-//        //if (dist < attackRange)
-//        //{
-//        //    Debug.Log("[Chase → Attack] 공격범위 도달, Attack 전환");
-
-//        //}
-//    }
-
-
-//    public override void Exit() { }
-//}
 
 public class TutoChaseState : TutoBossState
 {
@@ -218,7 +149,7 @@ public class TutoChaseState : TutoBossState
             if (HasExecutablePattern())
             {
                 Debug.Log("[Chase → Attack] 실행 가능한 패턴 발견, Attack 진입");
-                boss.ChangeState(new TutoAttackingState(boss));
+                RequestChange(new TutoAttackingState(boss));
             }
         }
     }
@@ -282,7 +213,7 @@ public class TutoAttackingState : TutoBossState
         if (currentPattern == null)
         {
             Debug.Log("[Attack] 패턴 없음 → CoolDown으로 전환");
-            boss.ChangeState(new TutoCoolDownState(boss, 1f));
+            RequestChange(new TutoCoolDownState(boss, 1f));
             return;
         }
 
@@ -291,23 +222,6 @@ public class TutoAttackingState : TutoBossState
         currentPattern.StartPattern();
     }
 
-    //private BossPattern SelectPattern()
-    //{
-    //    // 1) 튜토 순서대로
-    //    if (tuto.tutorialIndex < tuto.tutorialSequence.Count)
-    //    {
-    //        return tuto.tutorialSequence[tuto.tutorialIndex++];
-    //    }
-
-    //    // 2) 이후 랜덤
-    //    if (tuto.randomPatterns.Count > 0)
-    //    {
-    //        int idx = Random.Range(0, tuto.randomPatterns.Count);
-    //        return tuto.randomPatterns[idx];
-    //    }
-
-    //    return null;
-    //}
 
     private BossPattern SelectPattern()
     {
@@ -371,7 +285,7 @@ public class TutoAttackingState : TutoBossState
         {
             Debug.Log("[Attack] AttackEnd 수신 → CoolDown 진입");
             currentPattern?.ExitPattern();
-            boss.ChangeState(new TutoCoolDownState(boss, 1f));
+            RequestChange(new TutoCoolDownState(boss, 1f));
         }
         else
         {
@@ -408,7 +322,7 @@ public class TutoCoolDownState : TutoBossState
         if (timer <= 0)
         {
             Debug.Log("[CoolDown → Chase] 쿨타임 종료, 추적 재개");
-            boss.ChangeState(new TutoChaseState(boss));
+            RequestChange(new TutoChaseState(boss));
         }
     }
 
