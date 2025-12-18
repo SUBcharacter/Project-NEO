@@ -8,6 +8,7 @@ public class CameraManager : MonoBehaviour
     public static CameraManager instance;
 
     [SerializeField] CinemachineCamera cm;
+    [SerializeField] CinemachinePositionComposer cmp;
     [SerializeField] CinemachineBasicMultiChannelPerlin perlin;
     Coroutine shake;
     Coroutine zoom;
@@ -30,6 +31,11 @@ public class CameraManager : MonoBehaviour
             StopCoroutine(shake);
 
         shake = StartCoroutine(CameraShake(intensity, time));
+    }
+
+    public void DeadZoneControl(Vector2 size)
+    {
+        cmp.Composition.DeadZone.Size = size;
     }
 
     public void ZoomControl(float amount, float duration)
