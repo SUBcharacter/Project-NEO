@@ -51,8 +51,6 @@ public class R_WalkState : ResearcherState
     public override void Start(Researcher researcher)
     {
         Debug.Log("Researcher Walk State 시작");
-        researcher.isarmlock = false;
-        researcher.isbodylock = false;
         researcher.animator.Play("R_Move");
     }
     public override void Update(Researcher researcher)
@@ -114,8 +112,7 @@ public class  R_ChaseState : ResearcherState
     public override void Start(Researcher researcher)
     {
         Debug.Log("추적");
-        researcher.isarmlock = false;
-        researcher.isbodylock = false;
+        researcher.Armandbodyshotend();
         researcher.animator.Play("R_Move");
     }
     public override void Update(Researcher researcher)
@@ -143,6 +140,7 @@ public class  R_ChaseState : ResearcherState
 public class R_Attackstate : ResearcherState
 {
     private bool active;
+
     public override void Start(Researcher researcher)
     {
         active = true;
@@ -164,7 +162,7 @@ public class R_Attackstate : ResearcherState
         active = false;
         Debug.Log("Researcher Attack State 종료");
         researcher.Armsetactive(active);
-        researcher.isarmlock = false;
+        researcher.Armandbodyshotend();
     }
  
 }
@@ -173,13 +171,11 @@ public class R_Hitstate : ResearcherState
 {
     private float hitDuration = 0.1f; 
     private float exitTime;
-    float directionToPlayer;
     public override void Start(Researcher researcher)
     {
 
         Debug.Log("Researcher Hit State 시작");
         exitTime = Time.time + hitDuration;
-        directionToPlayer = researcher.Player_Trans.position.x - researcher.transform.position.x;
         researcher.Knockback();
     }
     public override void Update(Researcher researcher)
@@ -189,14 +185,12 @@ public class R_Hitstate : ResearcherState
             researcher.Rigid.linearVelocity = Vector2.zero;
 
             // 이전 상태가 공격/추적이면 거기로 복귀
-            if (researcher.previousState is R_Attackstate ||
-                researcher.previousState is R_ChaseState)
+            if (researcher.previousState is R_Attackstate || researcher.previousState is R_ChaseState)
             {
                 researcher.ChangeState(researcher.previousState);
                 return;
             }
 
-            // fallback
             researcher.ChangeState(researcher.r_states[ResearcherStateType.Chase]);
         }
     }

@@ -61,6 +61,7 @@ public class SD_Summonstate : SD_State
     {
         Vector3 target = summondrone.Resear_trans.position + (Vector3)summondrone.offset;
 
+        // 드론이 타겟 위치를 향해 이동
         if (target.x > summondrone.transform.position.x)
         {
 
@@ -76,7 +77,8 @@ public class SD_Summonstate : SD_State
 
         float distanceToTarget = Vector3.Distance(summondrone.transform.position, target);
 
-        if (distanceToTarget < summondrone.Arriveposition) 
+        // 타겟 위치에 도착했는지 확인
+        if (distanceToTarget < summondrone.arriveDistance) 
         {
             Debug.Log("소환 드론 목표 위치 도착. Idle 상태로 전환.");
 

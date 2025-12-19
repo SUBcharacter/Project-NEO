@@ -18,24 +18,28 @@ public enum ResearcherStateType
 public class Researcher : Enemy
 {
     [SerializeField] public Transform[] dronespawnpoints;
-    [SerializeField] public Transform Player_Trans;
-    [SerializeField] public Transform arm;
-    [SerializeField] public Transform Gunfire;
+     public Transform[] D_SpawnPoints => dronespawnpoints;
+    [SerializeField] private Transform playerTransform;
+    public Transform Player_Trans => playerTransform;
 
-    [SerializeField] public GameObject Bullet_prefab;
+    [SerializeField] public Transform arm { get; private set; }
+    [SerializeField] public Transform Gunfire { get; private set; }
+
     [SerializeField] public GameObject D_prefab;
+    [SerializeField] Magazine bulletpool;
+    [SerializeField] Material hitFlash;
 
     [SerializeField] Dictionary<ResearcherStateType, ResearcherState> R_States = new();
+    public Dictionary<ResearcherStateType, ResearcherState> r_states => R_States;
 
-    [SerializeField] public Animator animator;
-    [SerializeField] private Animator Armanima;
+    [SerializeField] public Animator animator { get; private set; }
+    [SerializeField] public Animator Armanima { get; private set; }
 
-    [SerializeField] Material hitFlash;
-    [SerializeField] bool hitted;
-    public ResearcherState currentStates;
+    public ResearcherState currentStates { get; private set; }
+    public ResearcherState previousState { get; private set; }
 
-    public SightRange sightRange;
-    public AimRange aimRange;
+    public SightRange sightRange { get; private set; }
+    public AimRange aimRange { get; private set; }
 
     public LayerMask groundLayer;
     public LayerMask wallLayer;
@@ -44,16 +48,15 @@ public class Researcher : Enemy
     private float wallCheckDistance = 1f;
     private float groundCheckDistance = 1f;
     private float M_direction;
-    public float nextFireTime;
     public float AimRotationSpeed = 5f;
-    private Coroutine flashCoroutine;
 
-    public bool isDroneSummoned;
-    public bool isarmlock;
-    public bool isbodylock;
-    public Dictionary<ResearcherStateType, ResearcherState> r_states => R_States;
+    [SerializeField] bool hitted;
+    public bool isDroneSummoned { get; private set; }
+    public bool isarmlock { get; private set; }
+    public bool isbodylock { get; private set; }
+    public float nextFireTime { get; private set; }
 
-    public ResearcherState previousState;
+
     protected override void Awake()
     {
 
@@ -130,24 +133,31 @@ public class Researcher : Enemy
         Rigid.linearVelocity = new Vector2(velocityX, Rigid.linearVelocity.y);
     }
 
-    public  void Chase()
+    public void Chase()
     {
-        float directionToPlayer = Player_Trans.position.x - transform.position.x;
+        float xDirection = Player_Trans.position.x - transform.position.x;
+        float directionSign = Mathf.Sign(xDirection);
 
-        float M_direction = Mathf.Sign(directionToPlayer);
+        // 2. 거리 체크
+        float distance = Mathf.Abs(xDirection); // X축 거리만 체크하거나 Vector2.Distance 사용
 
-        float velocityX = M_direction * Stat.moveSpeed;
+        if (distance > 1.0f) // 일정 거리 이상일 때만 이동
+        {
+            FlipResearcher(directionSign);
+            // Y축은 기존 물리(중력)를 유지하고 X축만 이동
+            Rigid.linearVelocity = new Vector2(directionSign * Stat.moveSpeed, Rigid.linearVelocity.y);
+        }
+        else
+        {
+            // 사거리 안으로 들어오면 정지
+            Rigid.linearVelocity = new Vector2(0, Rigid.linearVelocity.y);
+        }
 
-        Rigid.linearVelocity = new Vector2(velocityX, Rigid.linearVelocity.y);
-
-        FlipResearcher(directionToPlayer);
-       
 
     }
 
     protected override void Die()
     {
-        Rigid.linearVelocity = Vector2.zero;
         gameObject.SetActive(false);
         Debug.Log("Researcher 사망");
     }
@@ -161,6 +171,18 @@ public class Researcher : Enemy
     public void summontoattack()
     {
         ChangeState(R_States[ResearcherStateType.Attack]);
+    }
+    public void PlayShot()
+    {
+        isarmlock = true;
+        isbodylock = true;
+        Armanima.Play("R_Shot");
+    }
+
+    public void Armandbodyshotend()
+    {
+        isarmlock = false;
+        isbodylock = false;
     }
     #endregion
 
@@ -277,13 +299,8 @@ public class Researcher : Enemy
         Vector3 startPosition = Gunfire != null ? Gunfire.position : arm.position;
         Vector2 dirToTarget = arm.right;
 
-        GameObject bulletObject = Instantiate(Bullet_prefab, startPosition, Quaternion.identity);
-        R_Bullet bulletComponent = bulletObject.GetComponent<R_Bullet>();
+        bulletpool.Fire(dirToTarget, startPosition,false);
 
-        if (bulletComponent != null)
-        {
-            bulletComponent.Init(dirToTarget, startPosition);
-        }
         Debug.Log("발사");
     }
     public override void Attack()
@@ -304,18 +321,7 @@ public class Researcher : Enemy
         }
     }
 
-    public void PlayShot()
-    {
-        isarmlock = true;
-        isbodylock = true;
-        Armanima.Play("R_Shot");
-    }
 
-    public void Armandbodyshotend()
-    {
-        isarmlock = false;
-        isbodylock = false;
-    }
 
     #region 방향 전환
     public void WallorLedgeFlip()

@@ -12,25 +12,31 @@ public class SummonDrone : Enemy
 {
     Dictionary<SummonDroneStateType, SD_State> Summonstates = new();
     public Dictionary<SummonDroneStateType, SD_State> SD_states => Summonstates;
+    public SD_State currentStates { get; private set; }
 
-    public Transform Resear_trans;
-    public Transform Player_trans;
+    public Transform Resear_trans { get; private set; }
+    public Transform Player_trans { get; private set; }
 
-    public SD_State currentStates;
+    [SerializeField] private Vector2 Offset = new Vector2(0f, 1.5f);
+    public Vector2 offset => Offset;
 
-    public Vector2 offset = new Vector2(0f, 1.0f);
+    [SerializeField] private float ExplosionRadius = 1.5f;
+    public float explosionRadius => ExplosionRadius;
 
-    [SerializeField] public SightRange sightRange;
-    [SerializeField] public Animator animator;
+    [SerializeField] private float ArriveDistance = 0.1f;
+    public float arriveDistance => ArriveDistance;
+    [SerializeField] public SightRange sightRange { get; private set; }
+    [SerializeField] public Animator animator { get; private set; }
+
     [SerializeField] public Material hitFlash;
     [SerializeField] LayerMask damagelayer;
-    [SerializeField] bool hitted = false;
-    bool isExploding = false;
 
-    [SerializeField] float explosionRadius = 1.5f;
-    public float SD_Speed;
-    public float Arriveposition = 0.1f;
-    public float SD_direction;
+    public bool isExploding { get; private set; }
+    [SerializeField] bool hitted = false;
+
+    public float SD_Speed => Stat.moveSpeed;
+
+
     protected override void Awake()
     {
         startPos = transform.position;
@@ -62,7 +68,6 @@ public class SummonDrone : Enemy
     public override void Init()
     {
         currnetHealth = Stat.MaxHp;
-        SD_Speed = Stat.moveSpeed;
         isExploding = false;
         hitted = false;
     }
@@ -130,13 +135,10 @@ public class SummonDrone : Enemy
     }
     public void Chase()
     {
-        Vector3 targetPosition = Player_trans.position;
+        Vector2 targetPosition = (Player_trans.position - transform.position).normalized;
+        Flip(this, targetPosition.x);
+        Rigid.linearVelocity = targetPosition * Stat.moveSpeed;
 
-
-        transform.position = Vector3.MoveTowards(transform.position,targetPosition,SD_Speed * Time.deltaTime);
-
-        Vector2 directionToPlayer = Player_trans.position - transform.position;
-        Flip(this, directionToPlayer.x);
     }
     public void Flip(SummonDrone drone,float direction)
     {

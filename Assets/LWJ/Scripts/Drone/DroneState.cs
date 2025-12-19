@@ -10,39 +10,30 @@ public abstract class DroneState
 
 public class D_Idlestate : DroneState
 {
+    float idleDuration = 0f;
+    float waitTime = 1f;
     public override void Start(Drone drone) 
     {
-
+        Debug.Log("Idle State 시작");
+        drone.Rigid.linearVelocity = Vector2.zero;
+        drone.animator.Play("D_idle");
     }
     public override void Update(Drone drone)
     {
-        if(drone.sightrange != null && drone.sightrange.IsPlayerInSight)
+        idleDuration += Time.deltaTime;
+        if (idleDuration >= waitTime)
         {
-            drone.ChangeState(drone.droneStates[1]);
-            return;
+            Debug.Log("Idle State 종료, Walk State로 전환");
+            float currentDir = Mathf.Sign(drone.transform.localScale.x);
+            drone.FlipDrone(-currentDir);
+            drone.ChangeState(drone.State[DroneStateType.Walk]);
+
+            idleDuration = 0f;
         }
-
-        if (CheckForObstacle(drone))
-        {
-            drone.Movedistance *= -1;
-            drone.FlipDrone(drone, drone.Movedistance); 
-        }
-
-
-        Vector3 movement = Vector3.right * drone.Movedistance * drone.D_Speed * Time.deltaTime;
-        drone.transform.position += movement;
     }
 
     public override void Exit(Drone drone) { }
-    private bool CheckForObstacle(Drone drone)
-    {
 
-        Vector2 checkDirection = (drone.Movedistance > 0) ? Vector2.right : Vector2.left;
-  
-        RaycastHit2D hit = Physics2D.Raycast(drone.transform.position,checkDirection,drone.wallCheckDistance,drone.wallLayer);
-
-        return hit.collider != null;
-    }
 
 }
 
@@ -50,18 +41,22 @@ public class D_Walkstate : DroneState
 {
     public override void Start(Drone drone)
     {
-        Debug.Log("Summon State 시작");
+        Debug.Log("Walk State 시작");
+        drone.animator.Play("D_Walk");
  
     }
     public override void Update(Drone drone)
     {
-        Vector3 target = drone.Resear_trans.position + (Vector3)drone.offset;
-        //drone.transform.position = Vector3.MoveTowards(drone.transform.position, target, drone.D_speed * Time.deltaTime);
-
-        if (Vector3.Distance(drone.transform.position, target) < 0.1f)
+        if(drone.CheckForObstacle())
         {
-       
+            drone.ChangeState(drone.State[DroneStateType.Idle]);
         }
+
+        if(drone.sightrange.PlayerInSight)
+        {
+            drone.ChangeState(drone.State[DroneStateType.Chase]);
+        }
+        drone.Move();
 
     }
 
@@ -69,89 +64,45 @@ public class D_Walkstate : DroneState
 }
 public class D_Attackstate : DroneState
 {
-public override void Start(Drone drone) 
-{
-    drone.SetDroneActive(true);
-    drone.isattack = true;
+    public override void Start(Drone drone) 
+    {
+        Debug.Log("Attack State 시작");
+        drone.Rigid.linearVelocity = Vector2.zero;
+        drone.animator.Play("D_Attack");
+    }
+    public override void Update(Drone drone) 
+    {
+        drone.Attack();
+    }
+    public override void Exit(Drone drone)
+    {
 
-    Debug.Log("Attack State 시작");
-}
-public override void Update(Drone drone) 
-{
-    //drone.transform.position = Vector3.MoveTowards(drone.transform.position, drone.Player_trans.position , drone.D_speed * Time.deltaTime);
-    float directionX = drone.Player_trans.position.x - drone.transform.position.x;
-   
-    if (directionX > 0)
-    {
-        drone.horizontalDirection = 1f;
     }
-    else if (directionX < 0)
-    {
-        drone.horizontalDirection = -1f;
-    }
- 
-        
-    drone.FlipDrone(drone, drone.horizontalDirection);
-    
-}
-public override void Exit(Drone drone) { }
+
 }
 
 public class D_Chasestate : DroneState
 {
     public override void Start(Drone drone)
     {
-        drone.SetDroneActive(true);
-        drone.isattack = true;
-
-        Debug.Log("Attack State 시작");
+        Debug.Log("드론 Chase State 시작");
+        drone.animator.Play("D_Walk");
     }
     public override void Update(Drone drone)
     {
-        //drone.transform.position = Vector3.MoveTowards(drone.transform.position, drone.Player_trans.position , drone.D_speed * Time.deltaTime);
-        float directionX = drone.Player_trans.position.x - drone.transform.position.x;
-
-        if (directionX > 0)
+        if(drone.CheckForObstacle())
         {
-            drone.horizontalDirection = 1f;
-        }
-        else if (directionX < 0)
-        {
-            drone.horizontalDirection = -1f;
+            drone.ChangeState(drone.State[DroneStateType.Return]);
+            return;
         }
 
-
-        drone.FlipDrone(drone, drone.horizontalDirection);
-
-    }
-    public override void Exit(Drone drone) { }
-}
-
-public class D_Hitstate : DroneState
-{
-    public override void Start(Drone drone)
-    {
-        drone.SetDroneActive(true);
-        drone.isattack = true;
-
-        Debug.Log("Attack State 시작");
-    }
-    public override void Update(Drone drone)
-    {
-        //drone.transform.position = Vector3.MoveTowards(drone.transform.position, drone.Player_trans.position , drone.D_speed * Time.deltaTime);
-        float directionX = drone.Player_trans.position.x - drone.transform.position.x;
-
-        if (directionX > 0)
+        if(drone.aimrange.PlayerInSight)
         {
-            drone.horizontalDirection = 1f;
-        }
-        else if (directionX < 0)
-        {
-            drone.horizontalDirection = -1f;
+            drone.ChangeState(drone.State[DroneStateType.Attack]);
+            return;
         }
 
-
-        drone.FlipDrone(drone, drone.horizontalDirection);
+        drone.Chase();
 
     }
     public override void Exit(Drone drone) { }
@@ -161,32 +112,47 @@ public class D_Deadstate : DroneState
 {
     public override void Start(Drone drone)
     {
-        drone.SetDroneActive(true);
-        drone.isattack = true;
-
-        Debug.Log("Attack State 시작");
+        Debug.Log("Dead State 시작");
+        drone.Rigid.linearVelocity = Vector2.zero;
+        drone.animator.Play("D_Dead");
     }
     public override void Update(Drone drone)
     {
-        //drone.transform.position = Vector3.MoveTowards(drone.transform.position, drone.Player_trans.position , drone.D_speed * Time.deltaTime);
-        float directionX = drone.Player_trans.position.x - drone.transform.position.x;
 
-        if (directionX > 0)
-        {
-            drone.horizontalDirection = 1f;
-        }
-        else if (directionX < 0)
-        {
-            drone.horizontalDirection = -1f;
-        }
-
-
-        drone.FlipDrone(drone, drone.horizontalDirection);
 
     }
     public override void Exit(Drone drone) { }
 }
+public class D_Hitstate : DroneState
+{
+    private float hitDuration = 0.1f;
+    private float exitTime;
+    public override void Start(Drone drone)
+    {
+        Debug.Log("HIt State 시작");
+        exitTime = hitDuration + Time.time;
 
+    }
+    public override void Update(Drone drone)
+    {
+        if (Time.time >= exitTime)
+        {
+            drone.Rigid.linearVelocity = Vector2.zero;
+
+            if (drone.sightrange.PlayerInSight && drone.aimrange.PlayerInSight)
+            {
+                drone.ChangeState(drone.State[DroneStateType.Attack]);
+            }
+            else
+            {
+                drone.ChangeState(drone.State[DroneStateType.Chase]);
+            }
+        }
+
+
+    }
+    public override void Exit(Drone drone) { }
+}
 public class D_EnhancedDroneState : DroneState
 {
     public override void Start(Drone drone)
@@ -201,4 +167,26 @@ public class D_EnhancedDroneState : DroneState
     {
         Debug.Log("Enhanced Drone State 종료");
     }
-}   
+}
+public class D_Returnstate : DroneState
+{
+    public override void Start(Drone drone)
+    {
+        drone.animator.Play("D_Walk");
+    }
+    public override void Update(Drone drone)
+    {
+        drone.ReturnToStartPoint();
+        if (!drone.CheckForObstacle())
+        {
+            if (drone.sightrange.PlayerInSight)
+            {
+                drone.ChangeState(drone.State[DroneStateType.Chase]);
+            }
+        }
+    }
+    public override void Exit(Drone drone)
+    {
+        drone.Rigid.linearVelocity = Vector2.zero;
+    }
+}
