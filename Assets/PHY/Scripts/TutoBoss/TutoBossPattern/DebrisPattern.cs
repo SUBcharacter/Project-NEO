@@ -1,9 +1,12 @@
 using System.Threading.Tasks;
 using UnityEngine;
 /// <summary>
-/// 잔해 더미 패턴
+/// [DebrisPattern]
+/// - 보스가 잔해를 던지는 패턴
+/// - ThrowEvent(애니메이션 이벤트) 발생 시 DebrisProjectile 생성
+/// - 플레이어가 공중인지/지상인지에 따라 투척 방식 분기
 /// </summary>
-
+/// 
 [CreateAssetMenu(fileName = "DebrisPattern", menuName = "TutoBoss/TutoBossPattern/Debris")]
 public class DebrisPattern : BossPattern
 {
@@ -65,8 +68,7 @@ public class DebrisPattern : BossPattern
     public override void ExitPattern()
     {
         isThrow = false;
-      
-        //boss.animator.SetTrigger("Walk");
+    
     }
 
 
@@ -97,12 +99,11 @@ public class DebrisPattern : BossPattern
     }
 
     // 기존에 지면에서 던지기 
-
     public void GroundDebris(Vector3 bossPos, Vector3 playerPos)
     {
         Vector2 dir = (playerPos - bossPos);
 
-        // 완전 직선으로 만들기 (y축 제거)
+        // 완전 직선으로 만들기
         dir.y = 0f;
         dir.Normalize();
 
@@ -113,6 +114,7 @@ public class DebrisPattern : BossPattern
 
     }
 
+    // 공중에 던지기 (플레이어가 공중에 있을 때 대각선 방향으로)
     public void AirDebris(Vector3 bossPos, Vector3 playerPos)
     {
         Vector2 dir = (playerPos - bossPos).normalized;

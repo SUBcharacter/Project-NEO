@@ -32,6 +32,12 @@ public class DebrisProjectile : MonoBehaviour
         Destroy(gameObject);
     }
 
+    /// <summary>
+    /// 던지기 초기화
+    /// - 중력 제거
+    /// - 충돌 활성화
+    /// - 지정 방향/속도로 이동 시작
+    /// </summary>
     public void Launch(Vector2 direction, float speed)
     {
         rb.gravityScale = 0f;
