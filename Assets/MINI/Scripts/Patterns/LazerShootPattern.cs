@@ -9,7 +9,7 @@ public class LazerShootPattern : BossPattern
     [SerializeField] private float chargeTime = 1.5f;            // 기모으는 시간
     [SerializeField] private float laserDuration = 1.0f;         // 레이저 줄어드는 시간
     [SerializeField] private float laserThickness = 1.0f;        // 레이저 Y축 두께
-    [SerializeField] private Vector2 muzzleOffset = new Vector2(0f, 0.5f); // 레이저 높이 보정
+    [SerializeField] private Vector2 muzzleOffset = new(0f, 0.5f); // 레이저 높이 보정
 
     private LayerMask terrainLayer;
 
@@ -70,7 +70,7 @@ public class LazerShootPattern : BossPattern
     {
         float timer = 0f;
         Vector3 initialScale = lazerObj.transform.localScale;
-                
+
         // var hitBox = lazerObj.GetComponent<BasicHitBox>();
         // if(hitBox) hitBox.Activate();
 
@@ -94,5 +94,5 @@ public class LazerShootPattern : BossPattern
 
     public override void UpdatePattern() { }
     public override void ExitPattern() { }
-    public override void OnAnimationEvent(string eventName) { }
+    public override void OnAnimationEvent(string eventName) { }   
 }

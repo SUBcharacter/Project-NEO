@@ -21,5 +21,5 @@ public class BossPhase : ScriptableObject
 
     [Header("Available Patterns")]
     [Tooltip("이 페이즈에서 사용 가능한 모든 패턴을 넣으세요")]
-    public List<BossPattern> availablePatterns = new List<BossPattern>();
+    public List<BossPattern> availablePatterns = new();
 }

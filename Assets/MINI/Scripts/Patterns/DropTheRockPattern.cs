@@ -15,7 +15,7 @@ public class DropTheRockPattern : BossPattern
     [SerializeField] private float maxDropDelay = 0.3f;        // 랜덤 시간차 (0 ~ 1초 사이)
 
 
-    private List<GameObject> activeRocks = new List<GameObject>();  // 프리팹 관리용 리스트
+    private List<GameObject> activeRocks = new();  // 프리팹 관리용 리스트
 
     protected override async Awaitable Execute()
     {

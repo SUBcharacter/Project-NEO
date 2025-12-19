@@ -3,99 +3,120 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "ShoulderTacklePattern", menuName = "Boss/Patterns/ShoulderTackle")]
 public class ShoulderTacklePattern : BossPattern
 {
-    [Header("Settings")]
-    [SerializeField] private float preludeDuration = 1f;        // 전조 시간
-    [SerializeField] private float tackleDistance = 10f;        // 돌진 거리
-    [SerializeField] private float dashDuration = 1.2f;         // 돌진하는데 걸리는 총 시간 (짧을수록 빠름)
+    [Header("Time Settings")]
+    [SerializeField] private float preludeDuration = 2.0f;      // 전조 시간
+    [SerializeField] private float dashDuration = 1.0f;         // 돌진 시간
+    [SerializeField] private float postDuration = 1.5f;         // 후딜레이 
 
-    [Header("Motion")]    
-    [SerializeField] private AnimationCurve movementCurve;      // 로그 함수 느낌을 내기 위한 그래프
+    [Header("Physics Settings")]
+    [SerializeField] private float maxSpeed = 25f;              // 순간 최대 속도
 
-    
-    private GameObject tackleHitBox; // 보스한테 붙어있는 히트박스 캐싱용
+    [Header("Motion Curve")]
+    [Tooltip("시간(0~1)에 따른 속도 그래프. \n추천: 시작(0)은 높게, 끝(1)은 0으로 떨어지게 설정")]
+    [SerializeField] private AnimationCurve speedCurve;
 
+    // [캐싱용]
+    [System.NonSerialized] private GameObject tackleHitBox;
+
+    public override void Initialize(BossAI boss)
+    {
+        base.Initialize(boss);
+
+        // 재귀 탐색으로 HitBox 찾기
+        Transform found = FindChildRecursive(boss.transform, "TackleHitBox");
+        if (found != null)
+        {
+            tackleHitBox = found.gameObject;
+            tackleHitBox.SetActive(false);
+        }
+    }
+
+    // [중요] StartPattern이 아니라 Execute를 오버라이드!
     protected override async Awaitable Execute()
     {
         if (boss == null) return;
                
-        if (tackleHitBox == null)
-        {
-            Transform t = boss.transform.Find("TackleHitBox");
-            if (t != null) tackleHitBox = t.gameObject;
-        }
-
-        // 전조 
+        // 전조
+       
         animator.SetTrigger("ShoulderTackleReady");
-
-        // 차징ing
         boss.FaceTarget(boss.player.position);
 
-        // 전조 시간 대기
         try
         {
             await Awaitable.WaitForSecondsAsync(preludeDuration, boss.DestroyCancellationToken);
         }
-        catch (System.OperationCanceledException)
-        {
-            ExitPattern();
-            return;
-        }
+        catch (System.OperationCanceledException) { ExitPattern(); return; }
 
         // 돌진 
+        
         if (tackleHitBox != null) tackleHitBox.SetActive(true);
 
-        await Dash(); // Dash가 끝날 때까지 기다림
+        await Dash();
 
         if (tackleHitBox != null) tackleHitBox.SetActive(false);
-               
-        // 후딜
-        await Awaitable.WaitForSecondsAsync(0.5f, boss.DestroyCancellationToken);
 
+        
+        // 후딜
+        
+        rb.linearVelocity = Vector2.zero;
+
+       
+        // animator.SetTrigger("TackleEnd"); 또는 ("Idle");
+
+        await Awaitable.WaitForSecondsAsync(postDuration, boss.DestroyCancellationToken);
+
+        // 종료
         boss.OnAnimationTrigger("AttackEnd");
     }
 
     async Awaitable Dash()
     {
         animator.SetTrigger("ShoulderTackleDash");
-                
-        Vector3 startPos = boss.transform.position;                     // 시작 위치
-        Vector2 dir = (boss.player.position - boss.transform.position).normalized;      // 방향 벡터
-             
-        dir.y = 0f; // 수평 돌진만 하도록 Y 성분 제거
-        Vector2 targetPos = startPos + (Vector3)(dir * tackleDistance);
 
-        // 이거 고려해보는 거 좋을 수도 생각해보기 <---- !!!
-        //RaycastHit2D raycastHit = Physics2D.Raycast(startPos, dir, tackleDistance, LayerMask.GetMask("Ground"));
-                
+        // 방향 결정
+        float directionX = Mathf.Sign(boss.player.position.x - boss.transform.position.x);
+        Vector2 dashDir = new(directionX, 0);
+
         float t = 0f;
 
+        // FixedUpdate
         while (t < 1f)
         {
-            t += Time.deltaTime / dashDuration;
+            t += Time.fixedDeltaTime / dashDuration;
             if (t > 1f) t = 1f;
-            
-            // 기획하시는 분이 원하시는 대로
-            // Curve를 "처음엔 급격하게 올라가다가 나중에 평평해지는" 모양으로 그리면 됨
-            float curveValue = (movementCurve.length > 0) ? movementCurve.Evaluate(t) : t;
 
-            // Lerp로 위치 이동 (Start -> Target)
-            boss.transform.position = Vector3.Lerp(startPos, targetPos, curveValue);
+            // Curve에서 현재 시간의 속도 배율을 가져옴 // Phase에있는 애니메이션 속도 배율을 패턴 속도로 엮음.
+            float speedMultiplier = (speedCurve.length > 0) ? speedCurve.Evaluate(t) : 1f;
 
-            await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
+            //Y축 속도 유지
+            rb.linearVelocity = new Vector2(dashDir.x * maxSpeed * speedMultiplier, rb.linearVelocity.y);
+
+            await Awaitable.FixedUpdateAsync(boss.DestroyCancellationToken);
         }
-        // 보정       
-        boss.transform.position = targetPos;
+        rb.linearVelocity = Vector2.zero;
     }
-    // 플레이어 방향 구하기
-    
 
     public override void UpdatePattern() { }
 
     public override void ExitPattern()
     {
-        // 패턴 캔슬되면 히트박스 꺼줘야 함
         if (tackleHitBox != null) tackleHitBox.SetActive(false);
+        if (boss != null && rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+        }
     }
 
     public override void OnAnimationEvent(string eventName) { }
+
+    private Transform FindChildRecursive(Transform parent, string name)
+    {
+        foreach (Transform child in parent)
+        {
+            if (child.name == name) return child;
+            Transform result = FindChildRecursive(child, name);
+            if (result != null) return result;
+        }
+        return null;
+    }
 }

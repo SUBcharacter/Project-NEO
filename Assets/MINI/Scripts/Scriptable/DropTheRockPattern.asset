@@ -12,11 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6355c271d58b8e4dadb10f6d2f8ee74, type: 3}
   m_Name: DropTheRockPattern
   m_EditorClassIdentifier: 
+  minRange: 0
+  maxRange: 20
+  cooldownTime: 5
+  priorityWeight: 1
+  comboPatterns: []
+  comboChance: 0.5
   rockPrefab: {fileID: 6785249606073825746, guid: 2c4261a841ded6649bd8c056a0f3ac3f, type: 3}
   terrainLayer:
     serializedVersion: 2
     m_Bits: 8
   rockCount: 6
-  fallSpeed: 10
+  initSpeed: 5
   spawnHeightOffset: 11
   maxDropDelay: 0.3

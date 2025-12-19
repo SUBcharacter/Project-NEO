@@ -12,7 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05dd994ae02d59344b0c345f41896a6f, type: 3}
   m_Name: SmashPattern_Phase 2
   m_EditorClassIdentifier: 
-  beforeYOffSet: 0
+  minRange: 0
+  maxRange: 20
+  cooldownTime: 3
+  priorityWeight: 1
+  comboPatterns: []
+  comboChance: 0.5
   patternDuration: 1.2
   repeatCount: 2
   delayBetweenSmash: 0.2
@@ -20,3 +25,4 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1032
   smashFXPrefab: {fileID: 2574468060663257312, guid: e18e9e0abfc488f408e46eb5e5dd8d1b, type: 3}
+  jumpHeight: 2

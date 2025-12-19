@@ -175,7 +175,7 @@ public class AttackingState : BossState
                 int idx = Random.Range(0, currentPattern.comboPatterns.Count);
                 BossPattern nextPattern = currentPattern.comboPatterns[idx];
 
-                // [핵심] 쿨타임 무시하고 바로 다음 공격 상태로 전이 (콤보)
+                // 쿨타임 무시하고 바로 다음 공격 상태로 전이 (콤보)
                 boss.ChangeState(new AttackingState(boss, nextPattern));
                 return;
             }

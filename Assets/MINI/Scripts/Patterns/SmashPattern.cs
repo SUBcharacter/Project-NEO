@@ -3,21 +3,20 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "SmashPattern", menuName = "Boss/Patterns/Smash")]
 public class SmashPattern : BossPattern
 {
-    [SerializeField] float beforeYOffSet;
     [SerializeField] float patternDuration = 1.2f;
     [SerializeField] int repeatCount = 1;
     [SerializeField] float delayBetweenSmash = 0.4f;
     [SerializeField] LayerMask groundLayer;
+    [SerializeField] GameObject smashFXPrefab;
     //[SerializeField] AnimationCurve jumpCurve; // 높이 조절용 커브 혹시몰라서 생성
 
-    [SerializeField] GameObject smashFXPrefab;
-    private Vector3 smashPrefaboffset;
+    [SerializeField] float jumpHeight = 2.0f;
 
-    Vector3 Parabola(Vector3 start, Vector3 end, float height, float t)
+    Vector2 Parabola(Vector2 start, Vector2 end, float height, float t)
     {
-        Vector3 pos = Vector3.Lerp(start, end, t);
-        pos.y += Mathf.Sin(t * Mathf.PI) * height;
-        return pos;
+        float x = Mathf.Lerp(start.x, end.x, t);
+        float y = Mathf.Lerp(start.y, end.y, t) + Mathf.Sin(t * Mathf.PI) * height;
+        return new Vector2(x, y);
     }
     protected override async Awaitable Execute()
     {
@@ -26,7 +25,7 @@ public class SmashPattern : BossPattern
             Debug.LogError("SmashPattern의 boss참조가 Null임");
             return;
         }
-        if (groundLayer == 0)       
+        if (groundLayer == 0)
             groundLayer = LayerMask.GetMask("Default", "Terrain", "Ground");
 
         for (int i = 0; i < repeatCount; i++)
@@ -34,25 +33,26 @@ public class SmashPattern : BossPattern
             await Smash();
             if (i < repeatCount - 1)
             {
-                await Awaitable.WaitForSecondsAsync(delayBetweenSmash, boss.DestroyCancellationToken);
+                try
+                {
+                    await Awaitable.WaitForSecondsAsync(delayBetweenSmash, boss.DestroyCancellationToken);
+                }
+                catch (System.OperationCanceledException) { return; }
             }
         }
+        await Awaitable.WaitForSecondsAsync(0.5f, boss.DestroyCancellationToken);
+
         boss.OnAnimationTrigger("AttackEnd");
     }
 
     private async Awaitable Smash()
     {
         animator.SetTrigger("ReadySmash");
-        beforeYOffSet = boss.transform.position.y;
         try
         {
             await Awaitable.WaitForSecondsAsync(0.5f, boss.DestroyCancellationToken);
         }
-        catch (System.OperationCanceledException)
-        {
-            ExitPattern();
-            return;
-        }
+        catch (System.OperationCanceledException) { return; }
 
         animator.SetTrigger("DoSmash");
         animator.SetBool("IsSmashing", true);
@@ -67,65 +67,54 @@ public class SmashPattern : BossPattern
         {
             bossHalfHeight = bossCol.bounds.extents.y;
         }
-        Vector3 bossTargetPos = groundPos;
-        bossTargetPos.y += bossHalfHeight;
+        Vector2 targetPos = groundPos;
+        targetPos.y += bossHalfHeight;
 
-        float duration = patternDuration / 2f;
-        float height = 2f;
+        float duration = patternDuration / 2f;        
         float t = 0f;
 
         while (t < 1f)
         {
-            t += Time.deltaTime / duration;
+            t += Time.fixedDeltaTime / duration;
 
             if (t > 1f) t = 1f;
 
-            boss.transform.position = Parabola(start, bossTargetPos, height, t);
+            Vector2 nextPos = Parabola(start, targetPos, jumpHeight, t);
 
-            await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
+            rb.MovePosition(nextPos);
+
+            await Awaitable.FixedUpdateAsync(boss.DestroyCancellationToken);
         }
-        boss.transform.position = bossTargetPos;
+        rb.MovePosition(targetPos);
+
         rb.linearVelocity = Vector2.zero;
 
         boss.animator.SetBool("IsSmashing", false);
+
         if (smashFXPrefab != null)
             Instantiate(smashFXPrefab, groundPos + new Vector3(0f, 0.5f, 0f), Quaternion.identity);
-            
-        
+
+
     }
-    Vector3 GetGroundPosition(Vector3 targetPos)
+    Vector2 GetGroundPosition(Vector3 targetPos)
     {
         // 디버깅용 시각화
-        Vector3 rayStart = targetPos + Vector3.up * 5f;
+        Vector2 rayStart = (Vector2)targetPos + Vector2.up * 5f;
         Debug.DrawRay(rayStart, Vector3.down * 15f, Color.green, 2.0f);
 
         RaycastHit2D hit = Physics2D.Raycast(rayStart, Vector2.down, 15f, groundLayer);
 
-        Vector3 result = targetPos;
-
         if (hit.collider != null)
         {
-            result.y = hit.point.y;
-            //Debug.Log($"Smash 바닥 감지 성공: {hit.collider.name} / Y: {result.y}");
+            return new Vector2(targetPos.x, hit.point.y);
         }
         else
         {
-            Debug.LogWarning("Smash 바닥 감지 실패! (레이어 확인 필요). 보스 현재 Y축으로 대체합니다.");
-            
-            // 일단은 '플레이어의 발 밑'이라 가정하고 조금 내림
-            result.y = targetPos.y - 1.0f;
+            Debug.LogWarning("바닥없음");
+            return new Vector2(targetPos.x, targetPos.y - 1.0f);
         }
-
-        result.x = targetPos.x;
-        return result;
     }
-    public override void OnAnimationEvent(string eventName)
-    {
-        if (eventName == "SmashImpact")
-        {
-
-        }
-    }  
+    public override void OnAnimationEvent(string eventName) { }
     public override void UpdatePattern()
     {
         //animator.SetBool("IsSmashing", false); <- 이거 나중에 애니메이션 클립에서 처리하거나 해야할 듯?

@@ -56,7 +56,7 @@ public abstract class BossPattern : ScriptableObject
         return finalScore;
     }
 
-    public virtual async Task StartPattern()
+    public async void StartPattern()
     {
         lastUsedTime = Time.time;
 

@@ -15,12 +15,12 @@ public class BossAI : MonoBehaviour, IDamageable
     [SerializeField] private List<BossPhase> allPhases = new();
 
     [Header("Status")]
-    [SerializeField] private float maxHp = 10000f; // 임시 체력
+    [SerializeField] private float maxHp = 10000f;          // 임시 체력
     [SerializeField] private float currentHp;
-    [SerializeField] private float currentPoise;  // 강인도
+    [SerializeField] private float currentPoise;            // 강인도
     private bool isGroggy = false;
 
-    private BossState currentState;        // 보스 상태    
+    [SerializeField]private BossState currentState;        // 보스 상태    
     private CancellationTokenSource _cts;// 비동기 작업 취소용 토큰
 
     public BossPhase CurrentPhase => currentPhase;
@@ -44,7 +44,7 @@ public class BossAI : MonoBehaviour, IDamageable
         if (allPhases.Count > 0) SetPhase(0);
         else Debug.LogError("BossAI: Phase미설정상태");
         ChangeState(new BossIdleState(this));
-        //currentState.Start();
+        //currentState.Star t();
     }
     void Update()
     {
