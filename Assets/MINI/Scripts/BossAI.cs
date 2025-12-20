@@ -21,11 +21,10 @@ public class BossAI : MonoBehaviour, IDamageable
     protected bool isGroggy = false;
 
     [SerializeField]private BossState currentState;        // 보스 상태    
-    protected CancellationTokenSource _cts;// 비동기 작업 취소용 토큰
+    protected CancellationTokenSource _cts;                // 비동기 작업 취소용 토큰
 
     public BossPhase CurrentPhase => currentPhase;
-    public CancellationToken DestroyCancellationToken => _cts != null ? _cts.Token : CancellationToken.None;
-    
+    public CancellationToken DestroyCancellationToken => _cts != null ? _cts.Token : CancellationToken.None;    
     public List<BossPhase> AllPhase => allPhases;
 
     [HideInInspector] public List<GameObject> activeLightWaves = new();
