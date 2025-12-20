@@ -6,13 +6,12 @@ public class SightRange : MonoBehaviour
     [Header("FOV Settings")]
     [SerializeField] private float viewRadius = 5f; 
     [Range(0, 360)] 
+
     [SerializeField] private float viewAngle = 90f;
     [SerializeField] public bool IsPlayerInSight { get; private set; } = false;
     [SerializeField] public Transform PlayerInSight { get; private set; }
     [SerializeField] private LayerMask targetLayer; 
     [SerializeField] private LayerMask obstacleLayer;  
-
-    
 
 
     void Update()
@@ -22,6 +21,7 @@ public class SightRange : MonoBehaviour
 
     private void FindTargetsInFOV()
     {
+
       
         float dirMultiplier = Mathf.Sign(transform.localScale.x); // 방향에 따른 조정 : 왼쪽 : 음수 오른쪽 : 양수
         Vector2 fovDirection = Vector2.right * dirMultiplier; // 시야 방향 설정
@@ -29,6 +29,7 @@ public class SightRange : MonoBehaviour
         PlayerInSight = null;
 
         //플레이어가 시야 반경 내에 있다면 플레이어를 향해 레이캐스트
+
         Collider2D targetcollider = Physics2D.OverlapCircle(transform.position, viewRadius, targetLayer);
 
         if (targetcollider == null)
@@ -56,7 +57,6 @@ public class SightRange : MonoBehaviour
 
     
         }
-        
     }
 
     void OnDrawGizmos()
@@ -83,6 +83,7 @@ public class SightRange : MonoBehaviour
             Gizmos.DrawLine(transform.position, PlayerInSight.position);
         }
     }
+
 
 
     // 각도에서 방향 벡터 계산 : 위에 있는 함수 시야 범위를 시각적으로 보여주기 위해 사용

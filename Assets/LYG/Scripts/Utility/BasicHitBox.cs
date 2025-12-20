@@ -18,15 +18,15 @@ public class BasicHitBox : HitBox
         gameObject.SetActive(true);
     }
 
-    protected override void Triggered(Collider2D collision)
+    protected override void Triggered(GameObject collision)
     {
-        if (((1 << collision.gameObject.layer) & stats.attackable) == 0)
+        if (((1 << collision.layer) & stats.attackable) == 0)
             return;
 
         float enhancing = enhance ? 2 : 1;
         float damage = stats.damage * enhancing;
 
-        switch (collision.gameObject.layer)
+        switch (collision.layer)
         {
             case (int)Layers.terrain:
                 triggered = true;
@@ -43,42 +43,6 @@ public class BasicHitBox : HitBox
             case (int)Layers.player:
                 Debug.Log("플레이어 충돌");
                 collision.GetComponent<IDamageable>().TakeDamage(damage);
-                triggered = true;
-                break;
-            case (int)Layers.border:
-                triggered = true;
-                break;
-            case (int)Layers.invincible:
-                triggered = true;
-                break;
-        }
-    }
-
-    protected override void Triggered(Collision2D collision)
-    {
-        if (((1 << collision.gameObject.layer) & stats.attackable) == 0)
-            return;
-
-        float enhancing = enhance ? 2 : 1;
-        float damage = stats.damage * enhancing;
-
-        switch (collision.gameObject.layer)
-        {
-            case (int)Layers.terrain:
-                triggered = true;
-                Debug.Log("충돌");
-                break;
-            case (int)Layers.enviroment:
-                triggered = true;
-                Debug.Log("충돌");
-                break;
-            case (int)Layers.enemy:
-                collision.gameObject.GetComponent<IDamageable>().TakeDamage(damage);
-                triggered = true;
-                break;
-            case (int)Layers.player:
-                Debug.Log("플레이어 충돌");
-                collision.gameObject.GetComponent<IDamageable>().TakeDamage(damage);
                 triggered = true;
                 break;
             case (int)Layers.border:

@@ -82,55 +82,28 @@ public class BossIdleState : BossState
 
 public class BossCoolDownState : BossState
 {
-    private float cooldownTime;
+    private float timer;
     public BossCoolDownState(BossAI boss) : base(boss) { }
 
     public override void Start()
     {
-        switch(boss.CurrentPhase.phaseName)
-        {
-            case "Phase 1":
-                cooldownTime = 2.0f;
-                break;
-            case "Phase 2":
-                cooldownTime = 1.5f;
-                break;
-            case "Berserk":
-                cooldownTime = 1.0f;
-                break;
-            default:          
-                break;
-        }        
+        // Phase에 설정된 휴식 시간 가져오기
+        timer = boss.CurrentPhase.restTime;
+
+        // (선택) 여기서 플레이어와의 거리를 체크해서 너무 멀면 'ChasingState'로 갈 수도 있음      
     }
     public override void Update()
     {
-        if (cooldownTime > 0)
-        {
-            cooldownTime -= Time.deltaTime;
-        }
-        else
-        {
+        timer -= Time.deltaTime;
+                
+        boss.FaceTarget(boss.player.position);
+
+        if (timer <= 0)
+        {        
             boss.ChangeState(new AttackingState(boss));
         }
     }
-    public override void Exit()
-    {
-        // 흠..
-        switch (boss.CurrentPhase.phaseName)
-        {
-            case "Phase 1":
-                cooldownTime = 2.0f;
-                break;
-            case "Phase 2":
-                cooldownTime = 1.5f;
-                break;
-            case "Berserk":
-                cooldownTime = 1.0f;
-                break;
-            default:
-                break;
-        }
-    }
+    public override void Exit() { }
 }
 
 
@@ -154,73 +127,92 @@ public class BossCoolDownState : BossState
 public class AttackingState : BossState
 {
     private BossPattern currentPattern;
-    private int attackCounter;            // 이걸 쓸지 안 쓸지 고민 좀 해야함. 쓴다면 -> 패턴 2개 정도 하고 chasing 상태로 넘어가는 식으로
-    public AttackingState(BossAI boss) : base(boss) { }
+
+    public AttackingState(BossAI boss, BossPattern pattern = null) : base(boss) 
+    {
+        this.currentPattern = pattern;
+    }
 
     public override void Start()
     {
-        switch (boss.CurrentPhase.phaseName)
+        if (currentPattern == null)
         {
-            case "Phase 1":
-                attackCounter = 1;
-                break;
-            case "Phase 2":
-                attackCounter = 2;
-                break;
-            case "Berserk":
-                attackCounter = 4;
-                break;
-            default:                
-                break;
-        }     
-        ExecutePattern();
-    }
-
-    private void ExecutePattern()
-    {
-        float distance = Vector2.Distance(boss.transform.position, boss.player.position);
-
-        List<BossPattern> candidatePatterns = null;
-
-        // 사정거리별 
-        if (distance < 7.0f) candidatePatterns = boss.CurrentPhase.shortPattern;
-        else if (distance < 12.0f) candidatePatterns = boss.CurrentPhase.middlePattern;
-        else candidatePatterns = boss.CurrentPhase.longPattern;
-
-        if (candidatePatterns == null || candidatePatterns.Count == 0) // 혹시 모를 예외처리
-        {
-            //candidatePatterns = boss.CurrentPhase.shortPattern;
-            candidatePatterns = boss.CurrentPhase.middlePattern;
-            //candidatePatterns = boss.CurrentPhase.longPattern;
+            currentPattern = boss.SelectBestPattern();
         }
 
-        int index = Random.Range(0, candidatePatterns.Count);
-        currentPattern = candidatePatterns[index];
+        // 그래도 없으면 (전부 쿨타임 or 거리 안맞음) -> 짧은 대기(CoolDown) 혹은 추격(Move)
+        if (currentPattern == null)
+        {
+            boss.ChangeState(new BossCoolDownState(boss));
+            return;
+        }
 
         currentPattern.Initialize(boss);
         currentPattern.StartPattern();
     }
+    
     public override void OnAnimationEvent(string eventName)
     {
-        if (eventName == "AttackEnd")
+        if (eventName == "AttackEnd") 
         {
             currentPattern.ExitPattern();
-
-            attackCounter--;
-            if (attackCounter > 0)
-            {
-                ExecutePattern();
-            }
-            else
-            {
-                boss.ChangeState(new BossCoolDownState(boss));
-            }
+            TryComboOrExit();
         }
         else
         {
             currentPattern?.OnAnimationEvent(eventName);
         }
     }
+    private void TryComboOrExit()
+    {
+        // 콤보 체크
+        if (currentPattern.comboPatterns != null && currentPattern.comboPatterns.Count > 0)
+        {
+            float roll = Random.Range(0f, 1f);
+            if (roll <= currentPattern.comboChance) // 확률 성공?
+            {
+                // 다음 패턴 랜덤 선택
+                int idx = Random.Range(0, currentPattern.comboPatterns.Count);
+                BossPattern nextPattern = currentPattern.comboPatterns[idx];
+
+                // 쿨타임 무시하고 바로 다음 공격 상태로 전이 (콤보)
+                boss.ChangeState(new AttackingState(boss, nextPattern));
+                return;
+            }
+        }
+        // 콤보 없으면
+        boss.ChangeState(new BossCoolDownState(boss));
+    }
     public override void Update() => currentPattern?.UpdatePattern();
     public override void Exit() => currentPattern?.ExitPattern();
+}
+
+
+public class GroggyState : BossState
+{
+    private float groggyTimer;
+    public GroggyState(BossAI boss,float time) : base(boss)
+    {
+        groggyTimer = time;
+    }
+
+    public override void Start()
+    {
+        Debug.Log("Groggy상태임");
+        boss.animator.SetTrigger("Groggy");
+    }
+    public override void Update()
+    {
+        groggyTimer -= Time.deltaTime;
+
+        if (groggyTimer < 0f)
+        {
+            // 시간 다 되면 ChangeState
+            boss.ChangeState(new AttackingState(boss));
+        }
+    }
+    public override void Exit() 
+    {
+        boss.RecoverPoise();
+    }
 }

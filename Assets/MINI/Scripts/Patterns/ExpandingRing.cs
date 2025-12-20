@@ -1,13 +1,14 @@
 using UnityEngine;
 
-public class ExpandingRing : BaseProjectile
+public class ExpandingRing : BasicHitBox
 {
     [SerializeField] private float ringExpandSpeed = 4f;
     [SerializeField] private float maxScale = 10f;
 
-    private void Start()
+    protected override void Awake()
     {
-        damage = 20f;
+        base.Awake();
+        // stats는 인스펙터에서 HitBoxStat(SO)를 넣어주세요.
     }
 
     private void Update()
@@ -18,16 +19,16 @@ public class ExpandingRing : BaseProjectile
             Destroy(gameObject);
         }
     }
-    protected override void OnHitTerrain(Collider2D collision)
+    // Triggered 등은 부모(BasicHitBox)가 알아서 플레이어 데미지 처리함
+    // 만약 벽에 닿았을 때 사라져야 한다면 오버라이드 필요
+    protected override void Triggered(Collider2D collision)
     {
-       
-    }
-    protected override void OnHitPlayer(Collider2D collision)
-    {
-        IDamageable target = collision.GetComponent<IDamageable>();
-        if (target != null)
-        {
-            target.TakeDamage(damage);
-        }
+        base.Triggered(collision);
+
+        // 벽에 닿으면 삭제되는 로직이 필요하다면:
+        //if (triggered && collision.gameObject.layer == (int)Layers.terrain)
+        //{
+        //    Destroy(gameObject); // 혹은 비활성화
+        //}
     }
 }

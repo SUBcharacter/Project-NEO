@@ -41,7 +41,7 @@ public class GrabPattern : BossPattern
             return;
         }
     }
-    public override async void StartPattern()
+    protected override async Awaitable Execute()
     {
         Initialize();
         if (targetRoot == null) return;
@@ -170,10 +170,7 @@ public class GrabPattern : BossPattern
 
         // 데미지 입히기
         IDamageable victim = targetRoot.GetComponent<IDamageable>();
-        if (victim != null)
-        {
-            victim.TakeDamage(patternDamage);
-        }
+        victim?.TakeDamage(patternDamage);
 
         // 5. 해방
         ReleasePlayer();

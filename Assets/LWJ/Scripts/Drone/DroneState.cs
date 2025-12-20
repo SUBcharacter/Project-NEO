@@ -57,11 +57,12 @@ public class D_Walkstate : DroneState
             drone.ChangeState(drone.State[DroneStateType.Chase]);
         }
         drone.Move();
-
     }
 
     public override void Exit(Drone drone) { }
 }
+
+
 public class D_Attackstate : DroneState
 {
     public override void Start(Drone drone) 
@@ -190,3 +191,4 @@ public class D_Returnstate : DroneState
         drone.Rigid.linearVelocity = Vector2.zero;
     }
 }
+

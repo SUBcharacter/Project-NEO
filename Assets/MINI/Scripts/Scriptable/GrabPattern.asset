@@ -12,6 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da1c615f6aed9af45ab9735d8b79f552, type: 3}
   m_Name: GrabPattern
   m_EditorClassIdentifier: 
+  minRange: 0
+  maxRange: 20
+  cooldownTime: 3
+  priorityWeight: 1
+  comboPatterns: []
+  comboChance: 0.5
   dashSpeed: 12
   dashDuration: 1
   liftOffset: {x: 0.8, y: 0.8, z: 0}
+  patternDamage: 40

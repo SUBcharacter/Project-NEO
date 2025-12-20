@@ -12,6 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14001aec9512e66408801af56a0aa7dc, type: 3}
   m_Name: LightWavePattern
   m_EditorClassIdentifier: 
+  minRange: 0
+  maxRange: 20
+  cooldownTime: 4
+  priorityWeight: 1
+  comboPatterns: []
+  comboChance: 0.5
   lightWaveObject: {fileID: 1933580668229941274, guid: 372cb5b754d3a794c95cde5b74793b3b, type: 3}
   objectSpawnOffset: {x: 3, y: 3}
   maxObejects: 2

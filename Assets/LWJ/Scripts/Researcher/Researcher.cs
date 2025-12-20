@@ -11,9 +11,6 @@ public enum ResearcherStateType
     Idle, Walk, Chase, Summon, Attack, Hit, Dead
 }
 
-// hitFlash 머티리얼을 인자로 받기
-// bool hitted 선언
-// HitFlash코루틴은 비실이, 퉁퉁이, EnhancableMelee 스크립트 참고 할 것.
 
 public class Researcher : Enemy
 {
@@ -110,6 +107,7 @@ public class Researcher : Enemy
         r_states[ResearcherStateType.Chase] = new R_ChaseState();
         r_states[ResearcherStateType.Dead] = new R_Deadstate();
     }
+
     void Update()
     {
         currentStates?.Update(this);
@@ -141,7 +139,7 @@ public class Researcher : Enemy
 
         float distance = Mathf.Abs(xDirection); 
 
-        if (distance > 1.0f) // 일정 거리 이상일 때만 이동
+        if (distance > 1.0f)
         {
             FlipResearcher(directionSign);
             Rigid.linearVelocity = new Vector2(directionSign * Stat.moveSpeed, Rigid.linearVelocity.y);
@@ -158,10 +156,8 @@ public class Researcher : Enemy
     protected override void Die()
     {
         gameObject.SetActive(false);
-        Debug.Log("Researcher 사망");
     }
 
-    #region 애니메이션 키 이벤트 함수
     public void R_die()
     {
       Die();
@@ -183,9 +179,7 @@ public class Researcher : Enemy
         isarmlock = false;
         isbodylock = false;
     }
-    #endregion
 
-    #region 벽과 낭떠러지 체크
     public bool CheckForObstacle()
     {
         float direction = Mathf.Sign(transform.localScale.x);
@@ -206,9 +200,7 @@ public class Researcher : Enemy
 
         return hit.collider == null;
     }
-    #endregion
 
-    #region 팔 관련 함수
     public void Armsetactive(bool isactive)
     {
         arm.gameObject.SetActive(isactive);
@@ -262,14 +254,14 @@ public class Researcher : Enemy
 
         Vector3 armLocalScale = arm.localScale;
 
-        if (direction < 0) // 왼쪽을 바라볼 때
+        if (direction < 0) 
         {
 
             armLocalScale.x = -1;
             armLocalScale.y = -1;
 
         }
-        else // 오른쪽을 바라볼 때
+        else 
         {
 
             armLocalScale.x = 1;
@@ -279,7 +271,6 @@ public class Researcher : Enemy
 
         arm.localScale = armLocalScale;
     }
-    #endregion
 
     public void FlipToTargetX(float targetX)
     {
@@ -299,8 +290,6 @@ public class Researcher : Enemy
         Vector2 dirToTarget = arm.right;
 
         bulletpool.Fire(dirToTarget, startPosition,false);
-
-        Debug.Log("발사");
     }
     public override void Attack()
     {
@@ -315,14 +304,10 @@ public class Researcher : Enemy
         }
         else
         {
-            Debug.Log("사격 범위 이탈, 시야 유지. 추적으로 전환.");
             ChangeState(r_states[ResearcherStateType.Chase]);
         }
     }
 
-
-
-    #region 방향 전환
     public void WallorLedgeFlip()
     {
         if (CheckForObstacle() || CheckForLedge())
@@ -351,7 +336,6 @@ public class Researcher : Enemy
             transform.localScale = new Vector3(-Mathf.Abs(currentScale.x), currentScale.y, currentScale.z);
         }
     }
-    #endregion
 
     public void SummonDrone()
     {
@@ -369,7 +353,6 @@ public class Researcher : Enemy
     public override void TakeDamage(float damage)
     {
         currnetHealth -= damage;
-        Debug.Log("체력 : " + currnetHealth);
 
         StartCoroutine(HitFlash());
 

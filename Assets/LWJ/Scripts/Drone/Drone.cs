@@ -36,6 +36,7 @@ public class Drone : Enemy
 
     [SerializeField] bool hitted;
     public bool isattack { get; set; }
+
     protected override void Awake()
     {
         sightrange = GetComponent<SightRange>();
@@ -50,10 +51,12 @@ public class Drone : Enemy
         startPos = transform.position;
        
     }
+
     void Start()
     {
         
     }
+
     private void OnEnable()
     {
         Init();
@@ -83,12 +86,12 @@ public class Drone : Enemy
 
         ChangeState(Dronestate[DroneStateType.Idle]);
     }
+
     public void ChangeState(DroneState drone)
     {
         currentstates?.Exit(this);
         currentstates = drone;
         currentstates?.Start(this);  
-       
     }
     public void Move()
     {
@@ -115,7 +118,7 @@ public class Drone : Enemy
             Vector2 moveDir = ((Vector2)startPos - (Vector2)transform.position).normalized;
 
             FlipDrone(moveDir.x);
-        
+
             Rigid.linearVelocity = moveDir * Stat.moveSpeed;
         }
         else
@@ -123,9 +126,7 @@ public class Drone : Enemy
             Rigid.linearVelocity = Vector2.zero;
             ChangeState(Dronestate[DroneStateType.Idle]);
         }
-
     }
-
 
     public override void TakeDamage(float damage)
     {

@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using static UnityEngine.RuleTile.TilingRuleOutput;
 
+
 public abstract class ResearcherState 
 {
     public abstract void Start(Researcher researcher);
@@ -38,11 +39,11 @@ public class R_IdleState : ResearcherState
         researcher.Rigid.linearVelocity = Vector2.zero;
     }
 
-
     public override void Exit(Researcher researcher)
     {
         Debug.Log("Researcher Idle State 종료");
     }
+
 
 }
 
@@ -86,6 +87,7 @@ public class R_WalkState : ResearcherState
     }
 
 }
+
 
 public class R_SummonDroneState : ResearcherState
 {
@@ -221,3 +223,4 @@ public class R_Deadstate : ResearcherState
         Debug.Log("Researcher Dead State 종료");
     }
 }
+
