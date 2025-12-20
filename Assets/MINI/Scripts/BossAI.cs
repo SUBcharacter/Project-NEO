@@ -11,17 +11,17 @@ public class BossAI : MonoBehaviour, IDamageable
     public GameObject tackleHitbox;
 
     [Header("State Info")]
-    [SerializeField] private BossPhase currentPhase;        // 보스 현재 페이즈
-    [SerializeField] private List<BossPhase> allPhases = new();
+    [SerializeField] protected BossPhase currentPhase;        // 보스 현재 페이즈
+    [SerializeField] protected List<BossPhase> allPhases = new();
 
     [Header("Status")]
-    [SerializeField] private float maxHp = 10000f;          // 임시 체력
-    [SerializeField] private float currentHp;
-    [SerializeField] private float currentPoise;            // 강인도
-    private bool isGroggy = false;
+    [SerializeField] protected float maxHp = 10000f;          // 임시 체력
+    [SerializeField] protected float currentHp;
+    [SerializeField] protected float currentPoise;            // 강인도
+    protected bool isGroggy = false;
 
     [SerializeField]private BossState currentState;        // 보스 상태    
-    private CancellationTokenSource _cts;// 비동기 작업 취소용 토큰
+    protected CancellationTokenSource _cts;// 비동기 작업 취소용 토큰
 
     public BossPhase CurrentPhase => currentPhase;
     public CancellationToken DestroyCancellationToken => _cts != null ? _cts.Token : CancellationToken.None;
