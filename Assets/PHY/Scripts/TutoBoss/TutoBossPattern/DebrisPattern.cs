@@ -21,11 +21,11 @@ public class DebrisPattern : BossPattern
     private bool isThrow = false;
 
 
-    public override async Task StartPattern()
-    {
-        Debug.Log("DebrisPattern StartPattern ½ÇÇàµÊ");
-        await Execute();
-    }
+    //public override async Task StartPattern()
+    //{
+    //    Debug.Log("DebrisPattern StartPattern ½ÇÇàµÊ");
+    //    await Execute();
+    //}
 
     protected override async Awaitable Execute()
     {

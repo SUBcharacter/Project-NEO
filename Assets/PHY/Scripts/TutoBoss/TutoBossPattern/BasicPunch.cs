@@ -10,13 +10,13 @@ public class BasicPunch : BossPattern
     private bool isRightPunchDone = false;
     private bool isLeftPunchDone = false;
 
-    public override async Task StartPattern()
-    {
-        Debug.Log("BasicPunch StartPattern ½ÇÇàµÊ");
-        isRightPunchDone = false;
-        isLeftPunchDone = false;
-        await Execute();
-    }
+    //public override async Task StartPattern()
+    //{
+    //    Debug.Log("BasicPunch StartPattern ½ÇÇàµÊ");
+    //    isRightPunchDone = false;
+    //    isLeftPunchDone = false;
+    //    await Execute();
+    //}
 
     protected override async Awaitable Execute()
     {
