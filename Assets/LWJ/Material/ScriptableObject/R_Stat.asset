@@ -16,5 +16,5 @@ MonoBehaviour:
   moveDistance: 1
   MaxHp: 50
   bulletcount: 0
-  fireCooldown: 1
+  fireCooldown: 2
   Damage: 5

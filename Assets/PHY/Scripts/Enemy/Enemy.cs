@@ -32,6 +32,7 @@ public abstract class Enemy : MonoBehaviour, IResetable, IDamageable
 
     // 공통 사망 처리
     protected abstract void Die();
-    
+
     public abstract void Attack();
 }
+
