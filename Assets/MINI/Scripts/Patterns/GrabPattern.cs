@@ -12,7 +12,7 @@ public class GrabPattern : BossPattern
 
     // 캐싱
     [NonSerialized] private Rigidbody2D targetRb;       // RealPlayer의 RB (물리 끄기용)
-    [NonSerialized] private Transform targetRoot;       // Player(껍데기) (이동/납치용)
+    [NonSerialized] private Transform targetRoot;       // detectedPlayer(껍데기) (이동/납치용)
     [NonSerialized] private PlayerMove targetMoveScript; // PlayerMove 스크립트 (이동 잠금용)
     [NonSerialized] bool isCaught = false;
 
@@ -90,7 +90,7 @@ public class GrabPattern : BossPattern
         rb.linearVelocity = dir * dashSpeed;
 
         float t = 0f;
-        int playerLayer = LayerMask.GetMask("Player");
+        int playerLayer = LayerMask.GetMask("detectedPlayer");
 
         while (t < dashDuration)
         {
