@@ -15,18 +15,13 @@ public class ElecHitBox : HitBox
         col.enabled = false;    // 패턴 시작될 때까지 비활성
     }
 
-    public override void Init()
+    public override void Init(bool enhanced = false)
     {
         triggered = true;       // HitBox 동작 플래그
         col.enabled = true;     // 실제로 충돌 판정 시작
     }
 
-    protected override void Triggered(Collision2D collision)
-    {
-        // 2D Trigger 충돌이므로 여기서는 사용하지 않음
-    }
-
-    protected override void Triggered(Collider2D collision)
+    protected override void Triggered(GameObject collision)
     {
         if (!triggered) return; // 활성화 안됐으면 무시
 

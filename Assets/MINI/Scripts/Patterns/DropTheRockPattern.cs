@@ -29,7 +29,7 @@ public class DropTheRockPattern : BossPattern
         boss.animator.SetTrigger("DropTheRockRaw");
         
         // Ω¶≈∂ Ω¶Ω¶≈∂
-        CameraShake.instance.Shake(0.3f, 2f);
+        //CameraManager.instance.Shake(0.3f, 2f);
 
         // ¥Î±‚
         try
@@ -45,7 +45,7 @@ public class DropTheRockPattern : BossPattern
         boss.animator.SetTrigger("HitTheGround");
 
         // 2¬˜ Ω¶≈∂ Ω¶Ω¶≈∂
-        CameraShake.instance.Shake(0.6f, 0.3f);
+        //CameraManager.instance.Shake(0.6f, 0.3f);
 
         // µπ∏Ê¿Ã ≈ı«œ!
         DropTheRock(minX, maxX);

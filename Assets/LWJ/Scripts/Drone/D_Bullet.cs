@@ -52,7 +52,7 @@ public class D_Bullet : Bullet
             case (int)Layers.enemy:
                 break;
             case (int)Layers.player:
-                player.Hit((int)stats.damage);
+                player.GetComponent<IDamageable>().TakeDamage(stats.damage);
                 transform.SetParent(parent);
                 gameObject.SetActive(false);
                 break;

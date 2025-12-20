@@ -17,19 +17,15 @@ public abstract class HitBox : MonoBehaviour
 
     public abstract void Init(bool enhanced = false);
 
-    // OnCollision 이벤트 용
-    protected abstract void Triggered(Collision2D collision);
-
-    // OnTriggered 이벤트 용
-    protected abstract void Triggered(Collider2D collision);
+    protected abstract void Triggered(GameObject collision);
 
     protected void OnCollisionEnter2D(Collision2D collision)
     {
-        Triggered(collision);
+        Triggered(collision.gameObject);
     }
 
     protected void OnTriggerEnter2D(Collider2D collision)
     {
-        Triggered(collision);
+        Triggered(collision.gameObject);
     }
 }

@@ -21,7 +21,7 @@ public class ExpandingRing : BasicHitBox
     }
     // Triggered 등은 부모(BasicHitBox)가 알아서 플레이어 데미지 처리함
     // 만약 벽에 닿았을 때 사라져야 한다면 오버라이드 필요
-    protected override void Triggered(Collider2D collision)
+    protected override void Triggered(GameObject collision)
     {
         base.Triggered(collision);
 

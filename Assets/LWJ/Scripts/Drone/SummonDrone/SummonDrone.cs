@@ -165,26 +165,8 @@ public class SummonDrone : Enemy
     {
         yield return CoroutineCasher.Wait(3f);
         ChangeState(SD_states[SummonDroneStateType.Dead]);
-        PerformExplosion();
+        //PerformExplosion();
        
-    }
-
-    void PerformExplosion()
-    {
-
-        Collider2D hitCollider = Physics2D.OverlapCircle(transform.position, explosionRadius, damagelayer);
-
-        if (hitCollider != null)
-        {
-            Player player = hitCollider.GetComponent<Player>();
-
-            if (player != null)
-            { 
-                player.Hit(1);
-            }
-        }
-
-
     }
 
     private void OnDrawGizmos()

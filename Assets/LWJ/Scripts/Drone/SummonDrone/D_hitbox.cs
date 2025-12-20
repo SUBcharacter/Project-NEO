@@ -14,12 +14,7 @@ public class D_hitbox : HitBox
         triggered = false;
     }
 
-    protected override void Triggered(Collision2D collision)
-    {
-
-    }
-
-    protected override void Triggered(Collider2D collision)
+    protected override void Triggered(GameObject collision)
     {
         if(summondrone.currentStates is SD_Attackstate == false) return;
 

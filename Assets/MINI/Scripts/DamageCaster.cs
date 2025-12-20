@@ -15,7 +15,7 @@ public class DamageCaster : BasicHitBox
         }
     }
 
-    protected override void Triggered(Collider2D collision)
+    protected override void Triggered(GameObject collision)
     {        
         if (oneHitEnable)
         {

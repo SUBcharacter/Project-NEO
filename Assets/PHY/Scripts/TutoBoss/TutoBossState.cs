@@ -67,7 +67,7 @@ public class TutoIdleState : TutoBossState
         // 패트롤 시작
         // await을 붙지 않는 이유:
         // → 비동기 루틴이 끝날 때까지 대기하지 않고, Start 흐름은 그대로 진행
-        _ = PatrolRoutine();
+        await PatrolRoutine();
     }
 
     // 좌우로 자동 이동하는 루틴

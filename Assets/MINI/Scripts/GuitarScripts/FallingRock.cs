@@ -11,7 +11,7 @@ public class FallingRock : BasicHitBox
     private Rigidbody2D rb;
     private bool isImpacted = false;
 
-    public override void Init()
+    public override void Init(bool enhanced = false)
     {
         base.Init(); 
         rb = GetComponent<Rigidbody2D>();
@@ -37,7 +37,7 @@ public class FallingRock : BasicHitBox
         }
     }
 
-    protected override void Triggered(Collider2D collision)
+    protected override void Triggered(GameObject collision)
     {
         if (isImpacted) return;
 
