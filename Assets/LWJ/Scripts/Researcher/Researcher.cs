@@ -138,18 +138,17 @@ public class Researcher : Enemy
         float xDirection = Player_Trans.position.x - transform.position.x;
         float directionSign = Mathf.Sign(xDirection);
 
-        // 2. 거리 체크
-        float distance = Mathf.Abs(xDirection); // X축 거리만 체크하거나 Vector2.Distance 사용
+
+        float distance = Mathf.Abs(xDirection); 
 
         if (distance > 1.0f) // 일정 거리 이상일 때만 이동
         {
             FlipResearcher(directionSign);
-            // Y축은 기존 물리(중력)를 유지하고 X축만 이동
             Rigid.linearVelocity = new Vector2(directionSign * Stat.moveSpeed, Rigid.linearVelocity.y);
         }
         else
         {
-            // 사거리 안으로 들어오면 정지
+   
             Rigid.linearVelocity = new Vector2(0, Rigid.linearVelocity.y);
         }
 

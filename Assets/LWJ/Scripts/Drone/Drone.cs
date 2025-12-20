@@ -120,7 +120,6 @@ public class Drone : Enemy
         }
         else
         {
-            // 5. 도착 시 정지 및 상태 전환
             Rigid.linearVelocity = Vector2.zero;
             ChangeState(Dronestate[DroneStateType.Idle]);
         }

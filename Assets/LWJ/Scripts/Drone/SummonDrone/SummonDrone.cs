@@ -64,7 +64,7 @@ public class SummonDrone : Enemy
         Init();
 
     }
-    // 초기화 (원하면 override 가능)
+
     public override void Init()
     {
         currnetHealth = Stat.MaxHp;
@@ -113,7 +113,7 @@ public class SummonDrone : Enemy
             hitted = false;
         }
     }
-    // 공통 사망 처리
+
 
     public void DroneDie()
     {
