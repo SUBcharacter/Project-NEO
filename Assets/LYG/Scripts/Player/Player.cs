@@ -133,6 +133,7 @@ public class Player : MonoBehaviour, IDamageable
             return;
 
         Move();
+        //Move1();
     }
 
     void StateInit()
@@ -217,6 +218,32 @@ public class Player : MonoBehaviour, IDamageable
             }
         }
             facingRight = !ren.flipX;
+    }
+
+    void Move1()
+    {
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState 
+            || dodging || skillManager.Charging || attacking || arm.Firing)
+            return;
+
+        float targetInput = input.MoveVec.x;
+        float currentX = rigid.linearVelocityX;
+
+        float accel = 60f;
+        float decel = 80f;
+
+        if (Mathf.Abs(targetInput) > 0.01f)
+        {
+            currentX += targetInput * accel * Time.fixedDeltaTime;
+        }
+        else
+        {
+            currentX = Mathf.MoveTowards(currentX, 0f, decel * Time.fixedDeltaTime);
+        }
+
+        currentX = Mathf.Clamp(currentX, -stats.speed, stats.speed);
+
+        rigid.linearVelocity = new Vector2(currentX, rigid.linearVelocityY);
     }
 
     void Move()

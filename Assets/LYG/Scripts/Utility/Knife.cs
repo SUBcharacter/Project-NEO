@@ -1,8 +1,12 @@
+using System.Diagnostics.Tracing;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 public class Knife : Bullet
 {
+    [SerializeField] AudioSource source;
+    [SerializeField] AudioClip active;
+    [SerializeField] AudioClip fire;
     [SerializeField] Vector2 attackDir;
     Camera cam;
 
@@ -11,6 +15,7 @@ public class Knife : Bullet
     protected override void Awake()
     {
         base.Awake();
+        source = GetComponent<AudioSource>();
         attacking = false;
         cam = Camera.main;
     }
@@ -34,6 +39,7 @@ public class Knife : Bullet
     {
         parent = GetComponentInParent<Transform>();
         transform.SetParent(parent);
+        source.PlayOneShot(active);
         rigid.simulated = false;
         timer = 0;
         attacking = false;
@@ -44,6 +50,7 @@ public class Knife : Bullet
 
     public override void Shoot(Vector2 _)
     {
+        source.PlayOneShot(fire);
         attacking = true;
         rigid.simulated = true;
         transform.SetParent(null);
@@ -70,7 +77,10 @@ public class Knife : Bullet
                 transform.SetParent(parent);
                 gameObject.SetActive(false);
                 break;
-            case (int)Layers.player:
+            case (int)Layers.boss:
+                collision.GetComponent<IDamageable>().TakeDamage(stats.damage * enhancing);
+                transform.SetParent(parent);
+                gameObject.SetActive(false);
                 break;
             case (int)Layers.border:
                 transform.SetParent(parent);
