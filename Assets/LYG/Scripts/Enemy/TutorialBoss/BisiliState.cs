@@ -13,6 +13,7 @@ public class BSBattleIdleState : BisiliState
     public override void Start(Bisili bs)
     {
         timer = 0;
+        bs.AniCon.Play("BS_BattleIdle");
     }
 
     public override void Update(Bisili bs)
@@ -34,7 +35,7 @@ public class BSBattleIdleState : BisiliState
 
     public override void Exit(Bisili bs)
     {
-        
+        bs.AniCon.Play("BS_ReadyToBattle");
     }
 }
 
@@ -46,7 +47,7 @@ public class BSChasingState : BisiliState
     {
         speed = 0;
         bs.SpriteControl();
-        
+        bs.AniCon.Play("BS_Move");
     }
 
     public override void Update(Bisili bs)
@@ -80,6 +81,7 @@ public class BSSwayState : BisiliState
         bs.SpriteControl();
         dir = bs.FacingRight ? Vector2.left : Vector2.right;
         speed = bs.Stat.swaySpeed;
+        bs.AniCon.Play("BS_Sway");
     }
 
     public override void Update(Bisili bs)
@@ -104,7 +106,7 @@ public class BSAttackState : BisiliState
     public override void Start(Bisili bs)
     {
         timer = 0;
-        bs.StartAttack();
+        bs.AniCon.Play("BS_Attack");
     }
 
     public override void Update(Bisili bs)
@@ -121,7 +123,7 @@ public class BSAttackState : BisiliState
 
     public override void Exit(Bisili bs)
     {
-
+        bs.Attack.gameObject.SetActive(false);
     }
 }
 
@@ -132,6 +134,7 @@ public class BSHitState : BisiliState
     {
         timer = 0;
         bs.StopAttack();
+        bs.AniCon.Play("BS_BattleIdle");
     }
 
     public override void Update(Bisili bs)
@@ -152,7 +155,7 @@ public class BSHitState : BisiliState
 
     public override void Exit(Bisili bs)
     {
-
+        
     }
 }
 
@@ -163,6 +166,7 @@ public class BSDeathState : BisiliState
     {
         bs.gameObject.layer = LayerMask.NameToLayer("Invincible");
         bs.Rigid.linearVelocity = Vector2.zero;
+        bs.AniCon.Play("BS_Death");
     }
 
     public override void Update(Bisili bs)
@@ -172,6 +176,6 @@ public class BSDeathState : BisiliState
 
     public override void Exit(Bisili bs)
     {
-
+        bs.gameObject.layer = bs.OriginMask;
     }
 }

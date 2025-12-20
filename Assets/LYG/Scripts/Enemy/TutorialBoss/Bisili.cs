@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class Bisili : MonoBehaviour, IDamageable
 {
+    [SerializeField] Animator animator;
     [SerializeField] HitBox swing;
     [SerializeField] Transform target;
     [SerializeField] Rigidbody2D rigid;
@@ -18,7 +19,7 @@ public class Bisili : MonoBehaviour, IDamageable
     [SerializeField] Dictionary<string, BisiliState> states = new();
     CancellationTokenSource _cts;
 
-    [SerializeField] Color baseColor;
+    [SerializeField] LayerMask originMask;
 
     [SerializeField] float health;
 
@@ -26,6 +27,8 @@ public class Bisili : MonoBehaviour, IDamageable
     [SerializeField] bool facingRight;
     [SerializeField] bool hitted;
 
+    public Animator AniCon => animator;
+    public HitBox Attack => swing;
     public Transform Target => target;
     public BisiliState CrSt => currentState;
     public BisiliStat Stat => stat;
@@ -33,19 +36,22 @@ public class Bisili : MonoBehaviour, IDamageable
     public Rigidbody2D Rigid { get => rigid; set => rigid = value; }
     public CapsuleCollider2D Col { get => col; set => col = value; }
 
+    public LayerMask OriginMask => originMask;
+
     public bool FacingRight => facingRight;
-    public bool Attacking => attacking;
+    public bool Attacking { get => attacking; set => attacking = value; }
 
     private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
         col = GetComponent<CapsuleCollider2D>();
         detector = GetComponent<Detector>();
+        animator = GetComponentInChildren<Animator>();
         ren = GetComponentInChildren<SpriteRenderer>();
         target = detector.Detect();
         health = stat.maxHealth;
-        baseColor = ren.color;
         hitted = false;
+        originMask = gameObject.layer;
         StateInit();
         ChangeState(states["BattleIdle"]);
     }
@@ -147,14 +153,12 @@ public class Bisili : MonoBehaviour, IDamageable
     {
         try
         {
-            attacking = true;
             swing.Init();
             await Awaitable.WaitForSecondsAsync(0.15f, token);
             swing.gameObject.SetActive(false);
         }
         finally
         {
-            attacking = false;
             swing.gameObject.SetActive(false);
         }
     }

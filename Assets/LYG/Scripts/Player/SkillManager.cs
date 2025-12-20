@@ -407,12 +407,12 @@ public class SkillManager : MonoBehaviour
                 case (int)Layers.enemy:
                     Debug.Log("HeadShot");
                     player.BulletCount--;
-                    t.GetComponent<Enemy>().TakeDamage(autoTargeting.damage * enhancing);
+                    t.GetComponent<IDamageable>().TakeDamage(autoTargeting.damage * enhancing);
                     break;
                 case (int)Layers.boss:
                     Debug.Log("HeadShot");
                     player.BulletCount--;
-                    //t.GetComponent<Boss>().TakeDamage(autoTargeting.damage * enhancing);
+                    t.GetComponent<IDamageable>().TakeDamage(autoTargeting.damage * enhancing);
                     break;
             }
         }

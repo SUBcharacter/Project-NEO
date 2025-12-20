@@ -18,5 +18,5 @@ MonoBehaviour:
   returnSpeed: 3
   waitTime: 1
   attackDistance: 1
-  attackDuration: 0.5
-  hitDuration: 0.5
+  attackDuration: 0.2
+  hitDuration: 0.1
