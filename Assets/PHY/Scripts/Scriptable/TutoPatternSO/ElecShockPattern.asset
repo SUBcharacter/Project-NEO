@@ -20,4 +20,4 @@ MonoBehaviour:
   comboChance: 0.5
   ShockWavePrefab: {fileID: 7777895436838574327, guid: ffb93343f0537524fa34fdfd67fca43a, type: 3}
   shockSpawnY: 0.1
-  delay: 0.5
+  holdTime: 3.5

@@ -13,19 +13,12 @@ public class DebrisPattern : BossPattern
     [Header("더미 오브젝트")]
     [SerializeField] private GameObject DebrisPrefab;
 
-    // 밑에 변수들 SO로 빼도 될 거같은데..
+    // SO로 뺄 예정
     [SerializeField] private float throwSpeed = 10f;    // 던지는 속도
     [SerializeField] private float throwX = 6f;        // 보스 기준 얼마나 떨어진 곳으로 던질지
     [SerializeField] private float throwY = 0.5f;      // 던지는 높이 (플레이어 몸통쪽으로)
 
     private bool isThrow = false;
-
-
-    //public override async Task StartPattern()
-    //{
-    //    Debug.Log("DebrisPattern StartPattern 실행됨");
-    //    await Execute();
-    //}
 
     protected override async Awaitable Execute()
     {
@@ -61,14 +54,12 @@ public class DebrisPattern : BossPattern
         }
     }
 
-    public override void UpdatePattern()
-    {
-
-    }
+    public override void UpdatePattern() { }
+  
     public override void ExitPattern()
     {
         isThrow = false;
-    
+        lastUsedTime = Time.time;
     }
 
 
@@ -135,3 +126,4 @@ public class DebrisPattern : BossPattern
         debrisProjectile.Launch(dir, throwSpeed);
     }
 }
+ 
