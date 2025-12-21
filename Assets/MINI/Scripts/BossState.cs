@@ -20,6 +20,8 @@ public class BossIdleState : BossState
     float distanceToPlayer = 99f;
     public BossIdleState(BossAI boss) : base(boss) { }
 
+    // 미니님 기준 밑의 코드들은 사실상 필요가 없음   boss.ChangeState(new AttackingState(boss)); 를 제외하곤 필요가 없음 
+    // 그럼 어케해야하는가?
     public override async void Start()
     {
         isPatrolling = true;
@@ -31,6 +33,13 @@ public class BossIdleState : BossState
             return;
         }
         await PatrolRoutine();
+
+        // 튜토보스 페이즈 관련 코드 (예시 코드 이런 방향으로 갈 수도 있다는 것)
+        //if (boss.AllPhase[0].phaseName == "TutoPhase")
+        //{
+        //    boss.ChangeState(new AttackingState(boss));
+        //    return;
+        //}
     }
     private async Task PatrolRoutine()
     {
