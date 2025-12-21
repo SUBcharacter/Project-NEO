@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Threading;
+using UnityEngine.Rendering;
 
 public class BossAI : MonoBehaviour, IDamageable
 {
@@ -13,6 +14,8 @@ public class BossAI : MonoBehaviour, IDamageable
     [Header("State Info")]
     [SerializeField] protected BossPhase currentPhase;        // 보스 현재 페이즈
     [SerializeField] protected List<BossPhase> allPhases = new();
+    private int phaseIndex = 0;
+
 
     [Header("Status")]
     [SerializeField] protected float maxHp = 10000f;          // 임시 체력
@@ -22,12 +25,13 @@ public class BossAI : MonoBehaviour, IDamageable
 
     [SerializeField]private BossState currentState;        // 보스 상태    
     protected CancellationTokenSource _cts;                // 비동기 작업 취소용 토큰
+     
 
+    // 캡슐화
     public BossPhase CurrentPhase => currentPhase;
-
+    public List<BossPhase> AllPhase => allPhases;
     public CancellationToken DestroyCancellationToken => _cts != null ? _cts.Token : CancellationToken.None;    
 
-    public List<BossPhase> AllPhase => allPhases;
 
     [HideInInspector] public List<GameObject> activeLightWaves = new();
 
@@ -123,13 +127,15 @@ public class BossAI : MonoBehaviour, IDamageable
     }
     void CheckPhaseTransition()     // 페이즈 체크 함수
     {
-        float ratio = currentHp / maxHp;
-        int nextPhaseIndex = -1;
-
-        if (ratio <= 0.2f && currentPhase != allPhases[2]) nextPhaseIndex = 2; 
-        else if (ratio <= 0.5f && currentPhase != allPhases[1]) nextPhaseIndex = 1;
-
-        if (nextPhaseIndex != -1) SetPhase(nextPhaseIndex);
+        float ratio = currentHp / maxHp;     
+ 
+        float nextRatio = currentPhase.nextRatio;
+        
+        if (ratio <=nextRatio)
+        {
+            phaseIndex++;
+            SetPhase(phaseIndex);
+        }
     }
     public void SetPhase(int index)
     {

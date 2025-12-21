@@ -27,13 +27,13 @@ public class TutoSwayState : BossState
     {
     }
     public override void Start()
-    {
-      
+    {    
+
     }
 
     public override void Update()
     {
-        
+
     }
 
     public override void Exit()
@@ -69,16 +69,5 @@ public class TutoDashState : BossState
 /// <summary>
 /// 어태킹이랑 쿨다운은 모르겠음 일단 가져옴
 /// </summary>
-public class TutoAttackingState : AttackingState
-{
-    public TutoAttackingState(BossAI boss, BossPattern pattern = null) : base(boss, pattern)
-    {
-    }
-}
 
-public class TutoCoolDownState : BossCoolDownState
-{
-    public TutoCoolDownState(BossAI boss) : base(boss)
-    {
-    }
-}
+

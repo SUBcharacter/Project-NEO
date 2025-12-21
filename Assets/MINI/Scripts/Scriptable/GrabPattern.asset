@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: GrabPattern
   m_EditorClassIdentifier: 
   minRange: 0
-  maxRange: 20
+  maxRange: 11
   cooldownTime: 3
-  priorityWeight: 1
+  priorityWeight: 1.2
   comboPatterns: []
   comboChance: 0.5
   dashSpeed: 12

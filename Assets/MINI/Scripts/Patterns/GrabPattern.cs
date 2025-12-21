@@ -21,6 +21,7 @@ public class GrabPattern : BossPattern
 
     public void Initialize()
     {
+        base.Initialize(boss);
         if (boss == null)
         {
             Debug.LogError("GrabPattern의 boss참조가 Null임");
@@ -90,7 +91,7 @@ public class GrabPattern : BossPattern
         rb.linearVelocity = dir * dashSpeed;
 
         float t = 0f;
-        int playerLayer = LayerMask.GetMask("detectedPlayer");
+        int playerLayer = LayerMask.GetMask("Player");
 
         while (t < dashDuration)
         {

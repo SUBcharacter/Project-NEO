@@ -15,7 +15,7 @@ MonoBehaviour:
   minRange: 0
   maxRange: 20
   cooldownTime: 3
-  priorityWeight: 1
+  priorityWeight: 1.4
   comboPatterns: []
   comboChance: 0.5
   patternDuration: 1.2
