@@ -165,7 +165,6 @@ public class SummonDrone : Enemy
     {
         yield return CoroutineCasher.Wait(3f);
         ChangeState(SD_states[SummonDroneStateType.Dead]);
-        //PerformExplosion();
        
     }
 

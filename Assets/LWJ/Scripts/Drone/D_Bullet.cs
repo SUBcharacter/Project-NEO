@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class D_Bullet : Bullet
 {
+
     protected override void Awake()
     {
         base.Awake();
@@ -14,6 +15,7 @@ public class D_Bullet : Bullet
 
     public override void Init(Vector2 dir, Vector3 pos, bool enhanced = false)
     {
+        enhance = enhanced;
         parent = GetComponentInParent<Transform>();
         transform.SetParent(parent);
         rigid.simulated = false;
@@ -26,9 +28,10 @@ public class D_Bullet : Bullet
 
     public override void Shoot(Vector2 dir)
     {
+        float enhancing = enhance ? 2 : 1;
         rigid.simulated = true;
         transform.SetParent(null);
-        rigid.linearVelocity = dir * stats.speed;
+        rigid.linearVelocity = dir * stats.speed * enhancing;
     }
     public override void Rotating(Vector2 dir)
     {
@@ -41,6 +44,9 @@ public class D_Bullet : Bullet
 
         Player player = collision.GetComponent<Player>();
 
+        float enhancing = enhance ? 2 : 1;
+        float damage = stats.damage * enhancing;
+
         switch (collision.gameObject.layer)
         {
             case (int)Layers.terrain:
@@ -52,7 +58,7 @@ public class D_Bullet : Bullet
             case (int)Layers.enemy:
                 break;
             case (int)Layers.player:
-                player.GetComponent<IDamageable>().TakeDamage(stats.damage);
+                player.GetComponent<IDamageable>().TakeDamage(damage);
                 transform.SetParent(parent);
                 gameObject.SetActive(false);
                 break;

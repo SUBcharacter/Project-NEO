@@ -15,6 +15,7 @@ public class R_IdleState : ResearcherState
     public override void Start(Researcher researcher)
     {
         Debug.Log("Researcher Idle State Ω√¿€");
+        researcher.animator.Play("R_Idle");
     }
     public override void Update(Researcher researcher)
     {
