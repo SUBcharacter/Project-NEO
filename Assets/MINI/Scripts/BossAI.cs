@@ -25,7 +25,14 @@ public class BossAI : MonoBehaviour, IDamageable
 
     [SerializeField]private BossState currentState;        // 보스 상태    
     protected CancellationTokenSource _cts;                // 비동기 작업 취소용 토큰
-     
+
+    // 2025-12-21 효영 추가
+    [Header("TutoBoss")]
+    public bool Attacking = false;      // 공격 중인지 여부
+    public BossState previousState;
+
+
+
 
     // 캡슐화
     public BossPhase CurrentPhase => currentPhase;
@@ -95,6 +102,18 @@ public class BossAI : MonoBehaviour, IDamageable
         if (isGroggy) damage *= 1.5f; // 그로기 때는 더 아프게
 
         currentHp = Mathf.Max(0, currentHp - damage);
+
+        #region 효 튜토보스 맞았을 때 상태 전환
+        if (currentHp <= 0)
+        {
+            ChangeState(new TutoBossDeathState(this));
+            return;
+        }
+
+        // Hit 전환 (튜토전용)
+        previousState = currentState;
+        ChangeState(new TutoBossHitState(this));
+        #endregion
 
         // 강인도 깎기 (데미지에 비례하거나 고정값) <- 어째해야할지 논의해야 함
         if (!isGroggy)

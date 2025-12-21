@@ -23,6 +23,10 @@ public abstract class BossPattern : ScriptableObject
     public List<BossPattern> comboPatterns;
     [Range(0f, 1f)] public float comboChance = 0.5f;
 
+    // 2025-12-21 효영 추가
+    [Header("TutoBoss")]
+    public bool IsFinished = false; // 패턴 종료 여부
+
     // 런타임 데이터 (쿨타임 체크용)
     [System.NonSerialized] public float lastUsedTime = -999f;
 
