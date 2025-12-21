@@ -303,7 +303,7 @@ public class TutoAttackingState : TutoBossState
             sum += p.EvaluateScore(boss);
             if (rand <= sum)
                 return p;
-        }
+        }  
 
         return valid[0];
     }
@@ -319,13 +319,13 @@ public class TutoAttackingState : TutoBossState
         Debug.Log($"[Attack] AnimationEvent → {eventName}");
 
         if (eventName == "AttackEnd")
-        {
+        {            
             // 공격 쿨타임 기록
             tuto.lastAttackTime = Time.time;
-
+            
             Debug.Log("[Attack] AttackEnd → CoolDown");
             currentPattern?.ExitPattern();
-
+            
             RequestChange(new TutoCoolDownState(boss, 1f));
         }
         else
