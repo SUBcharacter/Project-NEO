@@ -2,55 +2,92 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-// ==========================
-//   TUTO IDLE (대기)
-// ==========================
 public class TutoIdleBattleState : BossIdleState
 {
     float timer;
 
+    // 거리 기준값 (튜닝 포인트)
+    // SO로 빼야하나? 따로 거리체크가 있나? 패턴에 있는 Min Max Range로 한다했나..? 
+    float close = 2f;
+    float swayRange = 6f;
+    float dashRange = 10f;
+
     public TutoIdleBattleState(BossAI boss) : base(boss) { }
 
+  
     public override void Start()
     {
-        timer = 0f;
+        timer =0f;
         boss.animator.SetTrigger("Idle");
         boss.rb.linearVelocity = Vector2.zero;
     }
 
     public override void Update()
     {
+        
         timer += Time.deltaTime;
+        if (timer < boss.CurrentPhase.restTime) return;
 
-        if (timer >= boss.CurrentPhase.restTime)
+        float dist = Vector2.Distance(boss.transform.position, boss.player.position);
+
+        // 너무 가까움 → 뒤로 빠지기
+        if (dist < close)
         {
-            if (Random.value < 0.5f)
-                boss.ChangeState(new TutoSwayState(boss));
-            else
-                boss.ChangeState(new TutoDashState(boss));
+            boss.ChangeState(new TutoSwayState(boss, false));
+            return;
         }
+
+        // 너무 멂 → Dash
+        if (dist > dashRange)
+        {
+            boss.ChangeState(new TutoDashState(boss));
+            return;
+        }
+
+        // 너무 가까움 → Sway 접근
+        if (dist > swayRange)
+        {
+            boss.ChangeState(new TutoSwayState(boss, true));
+            return;
+        }
+
+        // 적절한 거리 → (나중에 Attack)
+        
+        boss.ChangeState(new TutoBossAttackingState(boss));
+        // boss.ChangeState(new TutoBossAttackingState(boss));
     }
+
+    public override void Exit() { }
+    
 }
-
-
-
 
 
 public class TutoSwayState : BossState
 {
     float speed;
     Vector2 dir;
+    bool approach; // true = 접근, false = 후퇴
 
-    public TutoSwayState(BossAI boss) : base(boss) { }
+    public TutoSwayState(BossAI boss, bool _approach) : base(boss)
+    {
+        approach = _approach;
+    }
 
     public override void Start()
     {
         boss.animator.SetTrigger("Sway");
 
-        bool faceRight = boss.transform.localScale.x > 0;
-        dir = faceRight ? Vector2.left : Vector2.right;
+        float dx = boss.player.position.x - boss.transform.position.x;
 
-        speed = 4f;
+        // 방향 결정
+        if (approach)
+            dir = dx > 0 ? Vector2.right : Vector2.left;   // 플레이어 쪽
+        else
+            dir = dx > 0 ? Vector2.left : Vector2.right;   // 플레이어 반대
+
+        boss.FaceTarget(boss.player.position);
+
+        speed = 7f;
     }
 
     public override void Update()
@@ -58,17 +95,11 @@ public class TutoSwayState : BossState
         speed = Mathf.Lerp(speed, 0f, 3f * Time.deltaTime);
         boss.rb.linearVelocity = dir * speed;
 
-        float dist = Vector2.Distance(boss.transform.position, boss.player.position);
-
-        // ← 여기서 BossPattern 기반 공격으로 진입
-        if (dist <= 3f)
+        // 이동 끝나면 다시 판단
+        if (speed <= 0.05f)
         {
-            boss.ChangeState(new TutoBossAttackingState(boss));
-            return;
-        }
-
-        if (speed <= 0.01f)
             boss.ChangeState(new TutoIdleBattleState(boss));
+        }
     }
 
     public override void Exit()
@@ -78,11 +109,6 @@ public class TutoSwayState : BossState
 }
 
 
-
-
-// ==========================
-//   TUTO DASH (근접 돌진)
-// ==========================
 public class TutoDashState : BossState
 {
     float speed;
@@ -94,10 +120,10 @@ public class TutoDashState : BossState
     {
         boss.animator.SetTrigger("Dash");
 
-        bool facingRight = boss.transform.localScale.x > 0;
-        dir = facingRight ? Vector2.right : Vector2.left;
-
-        speed = boss.CurrentPhase.speedMultiplier * 5f;
+        float dx = boss.player.position.x - boss.transform.position.x;
+        dir = dx > 0 ? Vector2.right : Vector2.left;
+        boss.FaceTarget(boss.player.position);
+        speed = boss.CurrentPhase.speedMultiplier * 6f;
     }
 
     public override void Update()
@@ -106,9 +132,10 @@ public class TutoDashState : BossState
 
         float dist = Vector2.Distance(boss.transform.position, boss.player.position);
 
-        if (dist < 3f)
+        // 충분히 가까워지면 다시 판단
+        if (dist <= 6f)
         {
-            boss.ChangeState(new TutoBossAttackingState(boss));
+            boss.ChangeState(new TutoIdleBattleState(boss));
         }
     }
 
@@ -117,8 +144,6 @@ public class TutoDashState : BossState
         boss.rb.linearVelocity = Vector2.zero;
     }
 }
-
-
 
 public class TutoBossAttackingState : BossState
 {
@@ -130,7 +155,7 @@ public class TutoBossAttackingState : BossState
     public override void Start()
     {
         boss.rb.linearVelocity = Vector2.zero;
-        boss.Attacking = true;                   // 팀장이 말한 bool 분기
+        boss.Attacking = true;                   // 
         timer = 0f;
 
         //  튜토보스 전용 패턴 가져오기
@@ -141,8 +166,8 @@ public class TutoBossAttackingState : BossState
 
         if (currentPattern != null)
         {
-            currentPattern.Initialize(boss);     // 필수
-            currentPattern.StartPattern();       // 필수
+            currentPattern.Initialize(boss);     
+            currentPattern.StartPattern();       
         }
 
         boss.animator.SetTrigger("Attack");

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: TutoBossPhase
   m_EditorClassIdentifier: 
   phaseName: TutoBossPhase1
+  nextRatio: 0
   speedMultiplier: 1
   restTime: 1
   maxPoise: 100

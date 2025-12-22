@@ -31,6 +31,8 @@ public class BossAI : MonoBehaviour, IDamageable
     public bool Attacking = false;      // 공격 중인지 여부
     public BossState previousState;
 
+    [Header("Boss Type")]
+    [SerializeField] bool isTutorialBoss;
 
 
 
@@ -54,8 +56,14 @@ public class BossAI : MonoBehaviour, IDamageable
     {
         currentHp = maxHp;
         if (allPhases.Count > 0) SetPhase(0);
-        else Debug.LogError("BossAI: Phase미설정상태");
-        ChangeState(new BossIdleState(this));
+        //else Debug.LogError("BossAI: Phase미설정상태");
+        //ChangeState(new BossIdleState(this));
+
+        // 튜토리얼 보스 분기조건때문에 이렇게 했습니다.. 
+        if (isTutorialBoss)
+            ChangeState(new TutoIdleBattleState(this));
+        else
+            ChangeState(new BossIdleState(this));
         //currentState.Star t();
     }
     void Update()
