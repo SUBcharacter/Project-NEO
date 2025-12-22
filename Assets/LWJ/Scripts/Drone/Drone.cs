@@ -31,6 +31,11 @@ public class Drone : Enemy
 
     [SerializeField] bool enhanced;
     [SerializeField] bool hitted;
+
+    [SerializeField] private PatrolPoints patrolPath; 
+    public PatrolPoints PatrolPath => patrolPath;
+
+    public int currentPatrolIndex = -1;
     public SightRange sightrange { get; private set; }
     public AimRange aimrange { get; private set; } 
     public Animator animator { get; private set; }
@@ -39,12 +44,22 @@ public class Drone : Enemy
 
     protected override void Awake()
     {
+       
         sightrange = GetComponent<SightRange>();
         aimrange = GetComponent<AimRange>();
         ren = GetComponentInChildren<SpriteRenderer>();
         animator = GetComponentInChildren<Animator>();
         Rigid = GetComponent<Rigidbody2D>();
-        Statinit();
+        patrolPath = GetComponentInChildren<PatrolPoints>();
+        if (patrolPath != null)
+        {
+            patrolPath.Initialize();
+        }
+        else
+        {
+            Debug.LogError("자식 오브젝트에서 PatrolPoints를 찾을 수 없습니다!");
+        }
+        Stateinit();
         currnetHealth = Stat.MaxHp;
         hitted = false;
         startPos = transform.position;  
@@ -63,9 +78,9 @@ public class Drone : Enemy
 
     private void OnDisable()
     {
-        EventManager.Subscribe(Event.Enemy_Enhance, Enhance);
+        EventManager.Unsubscribe(Event.Enemy_Enhance, Enhance);
     }
-    private void Statinit()
+    private void Stateinit()
     {
         Dronestate[DroneStateType.Idle] = new D_Idlestate();
         Dronestate[DroneStateType.Attack] = new D_Attackstate();
@@ -97,12 +112,20 @@ public class Drone : Enemy
         currentstates = drone;
         currentstates?.Start(this);  
     }
-    public void Move()
+    public void Move(Vector3 nextpos)
     {
-        float enhancing = enhanced ? 2f : 1f;
-        float movedirection = Mathf.Sign(transform.localScale.x);
-        float velocityX = movedirection * Stat.moveSpeed * enhancing;
-        Rigid.linearVelocity = new Vector2(velocityX, Rigid.linearVelocity.y);
+        float distance = Vector2.Distance(transform.position, nextpos);
+        if (distance > 0.2f) 
+        {
+            Vector2 moveDir = (nextpos - transform.position).normalized;
+            float enhancing = Enhanced ? 2f : 1f;
+            Rigid.linearVelocity = moveDir * Stat.moveSpeed * enhancing;
+        }
+        else
+        {
+            Rigid.linearVelocity = Vector2.zero;
+            ChangeState(State[DroneStateType.Idle]);
+        }
     }
 
     void Enhance()
@@ -132,17 +155,11 @@ public class Drone : Enemy
         float lookDir = Mathf.Sign(transform.localScale.x);
         Vector2 checkDirection = (lookDir > 0) ? Vector2.right : Vector2.left;
 
-        // 2. 시작 지점 보정: 드론 중심에서 앞쪽으로 0.3f 만큼 떨어진 곳에서 시작
-        // 이렇게 해야 드론 자신의 콜라이더에 원이 겹치지 않습니다.
         Vector2 origin = (Vector2)transform.position + (checkDirection * 0.3f);
 
-        // 3. CircleCast 실행
-        // 반지름(radius)은 wallCheckDistance를 그대로 쓰고, 
-        // 발사 거리(distance)를 아주 짧게(0.1f) 설정하여 바로 앞만 체크합니다.
+
         RaycastHit2D hit = Physics2D.CircleCast(origin, wallCheckDistance, checkDirection, 0.1f, wallLayer);
 
-        // 디버그용: Scene 뷰에서 원의 범위를 확인하세요.
-        // 검은색 선이 원이 지나가는 경로입니다.
         Debug.DrawRay(origin, checkDirection * 0.5f, Color.green);
 
         return hit.collider != null;

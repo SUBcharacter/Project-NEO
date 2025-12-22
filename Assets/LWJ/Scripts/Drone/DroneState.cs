@@ -39,11 +39,14 @@ public class D_Idlestate : DroneState
 
 public class D_Walkstate : DroneState
 {
+    Vector3 nextPos;
     public override void Start(Drone drone)
     {
         Debug.Log("Walk State Ω√¿€");
         drone.animator.Play("D_Walk");
- 
+        nextPos = drone.PatrolPath.GetRandomPoint();
+        float dir = nextPos.x - drone.transform.position.x;
+        drone.FlipDrone(dir);
     }
     public override void Update(Drone drone)
     {
@@ -58,7 +61,7 @@ public class D_Walkstate : DroneState
             drone.ChangeState(drone.State[DroneStateType.Chase]);
             return;
         }
-        drone.Move();
+        drone.Move(nextPos);
     }
 
     public override void Exit(Drone drone) { }
@@ -104,7 +107,6 @@ public class D_Chasestate : DroneState
             drone.ChangeState(drone.State[DroneStateType.Attack]);
             return;
         }
-
         drone.Chase();
 
     }
