@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Phase 2
   m_EditorClassIdentifier: 
   phaseName: Phase 2
+  nextRatio: 0.2
   speedMultiplier: 1
   restTime: 0.5
   maxPoise: 200
@@ -20,3 +21,7 @@ MonoBehaviour:
   availablePatterns:
   - {fileID: 11400000, guid: 09df5b6e7688fcb43a715ddf0a05b07d, type: 2}
   - {fileID: 11400000, guid: 90a2c7ae9d7a2c044b6280cb3e373a98, type: 2}
+  - {fileID: 11400000, guid: 4bc7c005e8a29484fbd455ce7ec10f17, type: 2}
+  - {fileID: 11400000, guid: b7d633381b856664d9806ad8efe3344f, type: 2}
+  minDelay: 0.5
+  maxDelay: 0.8

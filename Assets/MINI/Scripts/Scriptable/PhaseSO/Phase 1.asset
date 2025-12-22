@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Phase 1
   m_EditorClassIdentifier: 
   phaseName: Phase 1
+  nextRatio: 0.4
   speedMultiplier: 1
   restTime: 0.8
   maxPoise: 150
@@ -23,3 +24,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 181773eb8357dbe4f8041afa736829fe, type: 2}
   - {fileID: 11400000, guid: 6b0b919ea2bdfb348b83ae47d5455b05, type: 2}
   - {fileID: 11400000, guid: 5039437a524a3ab4b86abfae3cd2d855, type: 2}
+  minDelay: 0.7
+  maxDelay: 1

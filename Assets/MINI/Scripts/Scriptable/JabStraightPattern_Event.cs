@@ -1,45 +1,42 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "JabStraightPattern", menuName = "Boss/Patterns/JabStraight")]
-public class JabStraightPattern : BossPattern
+
+[CreateAssetMenu(fileName = "JabStraightPattern_Event", menuName = "Boss/Patterns/JabStraight_EventVer")]
+public class JabStraightPattern_Event : BossPattern
 {
-    [Header("Pre")]
+    [Header("1. Preparation")]
     [SerializeField] private float prepTime = 0.5f;
 
-    [Header("Jab")]
-    [Tooltip("이동 시간")]
-    [SerializeField] private float jabStepDuration = 0.1f;
-    [Tooltip("전진 속도")]
-    [SerializeField] private float jabStepSpeed = 15f;
-    [Tooltip("총 대기 시간")]
-    [SerializeField] private float jabImpactTime = 0.25f;
-    [SerializeField] private float jabTotalDuration = 0.5f; // 전체 모션 시간
+    [Header("2. Jab Settings")]    
+    [SerializeField] private float jabStepDuration = 0.1f;  // 스텝 밟는 시간
+    [SerializeField] private float jabStepSpeed = 15f;      // 스텝 속도
+    [SerializeField] private float jabTotalDuration = 0.5f; // 전체 동작 시간
 
     [SerializeField] private HitBoxStat jabStat;
     [SerializeField] private float jabWidth = 1.5f;
-    [SerializeField] private Vector2 jabOffset = new(1.0f, 0f);
+    [SerializeField] private Vector2 jabOffset = new Vector2(1.0f, 0f);
 
-    [Header("Straight")]
-    [Tooltip("스텝 시간")]
+    [Header("3. Straight Settings")]   
     [SerializeField] private float straightStepDuration = 0.15f;
     [SerializeField] private float straightStepSpeed = 20f;
-    [SerializeField] private float straightImpactTime = 0.4f;
     [SerializeField] private float straightTotalDuration = 0.8f;
 
     [SerializeField] private HitBoxStat straightStat;
     [SerializeField] private float straightWidth = 2.5f;
-    [SerializeField] private Vector2 straightOffset = new(1.5f, 0f);
+    [SerializeField] private Vector2 straightOffset = new Vector2(1.5f, 0f);
 
-    [Header("Recovery")]
-    [SerializeField] private float recoveryTime = 1.0f; // 후딜
+    [Header("4. Recovery")]
+    [SerializeField] private float recoveryTime = 1.0f;
 
     // 캐싱 변수
     private Collider2D bossCol;
+    private int targetLayer;
 
     public override void Initialize(BossAI boss)
     {
         base.Initialize(boss);
         bossCol = boss.GetComponent<Collider2D>();
+        targetLayer = LayerMask.GetMask("Player");
     }
 
     protected override async Awaitable Execute()
@@ -51,78 +48,76 @@ public class JabStraightPattern : BossPattern
         boss.FaceTarget(boss.player.position);
         try { await Awaitable.WaitForSecondsAsync(prepTime, boss.DestroyCancellationToken); }
         catch (System.OperationCanceledException) { ExitPattern(); return; }
-                
-        // 잽 실행        
-        animator.SetTrigger("DoJab");        
-        await StepAndPunch(jabStepSpeed, jabStepDuration, jabImpactTime, jabStat, jabWidth, jabOffset);
 
-        // 대기
-        float remainJab = Mathf.Max(0, jabTotalDuration - jabImpactTime);
-        try { await Awaitable.WaitForSecondsAsync(remainJab, boss.DestroyCancellationToken); }
-        catch (System.OperationCanceledException) { ExitPattern(); return; }
-                
-        // 스트레이트 실행        
-        animator.SetTrigger("DoStraight");
-        boss.FaceTarget(boss.player.position);                
-        await StepAndPunch(straightStepSpeed, straightStepDuration, straightImpactTime, straightStat, straightWidth, straightOffset);
+       
+        // 잽        
+        animator.SetTrigger("DoJab");
+
+        // 스텝         
+        await StepMove(jabStepSpeed, jabStepDuration);
 
         // 남은 시간 대기
-        float remainStraight = Mathf.Max(0, straightTotalDuration - straightImpactTime);
+        float remainJab = Mathf.Max(0, jabTotalDuration - jabStepDuration);
+        try { await Awaitable.WaitForSecondsAsync(remainJab, boss.DestroyCancellationToken); }
+        catch (System.OperationCanceledException) { ExitPattern(); return; }
+
+        // 스트레이트
+        animator.SetTrigger("DoStraight");
+        boss.FaceTarget(boss.player.position);
+
+        // 스텝
+        await StepMove(straightStepSpeed, straightStepDuration);
+
+        // 남은 시간 대기
+        float remainStraight = Mathf.Max(0, straightTotalDuration - straightStepDuration);
         try { await Awaitable.WaitForSecondsAsync(remainStraight, boss.DestroyCancellationToken); }
         catch (System.OperationCanceledException) { ExitPattern(); return; }
-        
+
         // 후딜
         try { await Awaitable.WaitForSecondsAsync(recoveryTime, boss.DestroyCancellationToken); }
         catch (System.OperationCanceledException) { ExitPattern(); return; }
 
         boss.OnAnimationTrigger("AttackEnd");
     }
-        
-    private async Awaitable StepAndPunch(float speed, float stepTime, float impactTime, HitBoxStat stat, float width, Vector2 offset)
+
+    // 이동 로직 
+    private async Awaitable StepMove(float speed, float duration)
     {
         float facingDir = Mathf.Sign(boss.transform.localScale.x);
-
-        //  전진!
         rb.linearVelocity = new Vector2(facingDir * speed, 0f);
 
-        try
-        {
-            // 시간만큼만 이동
-            await Awaitable.WaitForSecondsAsync(stepTime, boss.DestroyCancellationToken);
-        }
+        try { await Awaitable.WaitForSecondsAsync(duration, boss.DestroyCancellationToken); }
         catch (System.OperationCanceledException) { throw; }
 
-        // 급정지 
         rb.linearVelocity = Vector2.zero;
-        // 타격 판정
-        CheckHitBox(offset, width, stat);
-
-        // 타격 대기 (이미 스텝 시간만큼 지났으니, 남은 시간만 대기)
-        float remainWait = Mathf.Max(0, impactTime - stepTime);
-
-        if (remainWait > 0)
-        {
-            try
-            {
-                await Awaitable.WaitForSecondsAsync(remainWait, boss.DestroyCancellationToken);
-            }
-            catch (System.OperationCanceledException) { throw; }
-        }
-
     }
 
+    public override void OnAnimationEvent(string eventName)
+    {
+        // BossAI에서 호출할 "JabHit"
+        if (eventName == "JabHit")
+        {
+            CheckHitBox(jabOffset, jabWidth, jabStat);
+        }
+        // BossAI에서 호출할 "StraightHit"
+        else if (eventName == "StraightHit")
+        {
+            CheckHitBox(straightOffset, straightWidth, straightStat);
+        }
+    }
+
+    
+    // HitBox 판정 로직     
     private void CheckHitBox(Vector2 offset, float width, HitBoxStat stats)
     {
         if (stats == null) return;
 
         float facingDir = Mathf.Sign(boss.transform.localScale.x);
-        Vector2 actualOffset = new(offset.x * facingDir, offset.y);
-
-        // 보스의 위치를 기준으로 박스 생성
+        Vector2 actualOffset = new Vector2(offset.x * facingDir, offset.y);
         Vector2 centerPos = (Vector2)boss.transform.position + actualOffset;
 
         float autoHeight = bossCol != null ? bossCol.bounds.size.y : 2.0f;
-        Vector2 boxSize = new(width, autoHeight);
+        Vector2 boxSize = new Vector2(width, autoHeight);
 
         // 디버깅
         DebugDrawBox(centerPos, boxSize, Color.red, 0.2f);
@@ -132,7 +127,11 @@ public class JabStraightPattern : BossPattern
         foreach (var hit in hits)
         {
             IDamageable damageable = hit.GetComponent<IDamageable>();
-            damageable?.TakeDamage(stats.damage);
+            if (damageable != null)
+            {
+                damageable.TakeDamage(stats.damage);
+                Debug.Log($"[Event Triggered] {hit.name}에게 {stats.damage} 데미지!");
+            }
         }
     }
 
@@ -155,6 +154,4 @@ public class JabStraightPattern : BossPattern
     {
         if (boss != null && rb != null) rb.linearVelocity = Vector2.zero;
     }
-
-    public override void OnAnimationEvent(string eventName) { }
 }

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SmashPattern_Phase 1
   m_EditorClassIdentifier: 
   minRange: 0
-  maxRange: 20
+  maxRange: 30
   cooldownTime: 3
   priorityWeight: 1.4
   comboPatterns: []
