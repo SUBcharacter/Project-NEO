@@ -60,6 +60,7 @@ public class Player : MonoBehaviour, IDamageable
     [SerializeField] bool hit;
     [SerializeField] bool attacking;
     [SerializeField] bool isDead;
+    [SerializeField] bool moveable;
     
 
     public SpriteRenderer Ren => ren;
@@ -84,11 +85,12 @@ public class Player : MonoBehaviour, IDamageable
     public int MeleeAttackIndex { get => meleeAttackIndex; set => meleeAttackIndex = value; }
     public int BulletCount { get => bulletCount; set => bulletCount = value; }
 
+    public bool IsDead => isDead;
     public bool Aiming { get => aiming; set => aiming = value; }
     public bool Dodging { get => dodging; set => dodging = value; }
     public bool _Hit { get => hit; set => hit = value; }
     public bool Attacking { get => attacking; set => attacking = value; }
-    public bool IsDead => isDead;
+    public bool Moveable { get => moveable; set => moveable = value; }
 
 
 
@@ -113,32 +115,35 @@ public class Player : MonoBehaviour, IDamageable
 
     private void Update()
     {
+
+        currentState?.Update(this);
         if (isDead)
             return;
         if(Input.GetKeyDown(KeyCode.P))
         {
             GetOverFlowEnergy(10f);
         }
-        currentState?.Update(this);
         StaminaTimer();
         MouseConvert();
         if (hit)
             return;
-        SpriteControl();
+        
     }
 
     private void FixedUpdate()
     {
-        if (isDead || hit)
+        if (isDead || hit || moveable)
             return;
 
         Move();
         //Move1();
+        SpriteControl();
     }
 
     void StateInit()
     {
         // 현재까지 작업한 상태 등록
+        states["Scene"] = new PlayerSceneState();
         states["Idle"] = new PlayerIdleState();
         states["RangeAttack"] = new PlayerRangeAttackState();
         states["MeleeAttack"] = new PlayerMeleeAttackState();
@@ -255,7 +260,7 @@ public class Player : MonoBehaviour, IDamageable
 
         // 기본 속도 최대 속도
         float speed;
-        if(arm.Mode == ShotMode.Minigun && aiming)
+        if((arm.Mode == ShotMode.Minigun && aiming) || currentState is PlayerSceneState)
         {
             speed = stats.speed / 2f;
         }
@@ -478,6 +483,18 @@ public class Player : MonoBehaviour, IDamageable
         arm.transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 
+    public void FlipX(bool facingRight)
+    {
+        if(facingRight)
+        {
+            transform.localScale = new Vector3(1, 1, 1);
+        }
+        else
+        {
+            transform.localScale = new Vector3(-1, 1, 1);       
+        }
+    }
+
     public void TakeDamage(float damage)
     {
         Debug.Log("피격 됨!");
@@ -544,7 +561,7 @@ public class Player : MonoBehaviour, IDamageable
     // 입력 함수들
     public void Jump(InputAction.CallbackContext context)
     {
-        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState || currentState is PlayerSceneState
             || skillManager.Charging || dodging)
             return;
 
@@ -583,7 +600,7 @@ public class Player : MonoBehaviour, IDamageable
 
     public void SwitchWeapon(InputAction.CallbackContext context)
     {
-        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState || currentState is PlayerSceneState
             || skillManager.Charging || dodging)
             return;
 
@@ -610,7 +627,7 @@ public class Player : MonoBehaviour, IDamageable
 
     public void InitiateAttack(InputAction.CallbackContext context)
     {
-        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState || currentState is PlayerSceneState
             || dodging || skillManager.Charging)
             return;
 
@@ -649,7 +666,7 @@ public class Player : MonoBehaviour, IDamageable
 
     public void Dodge(InputAction.CallbackContext context)
     {
-        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState || currentState is PlayerSceneState
             || skillManager.Charging || dodging || !check.CanDodge)
             return;
         // 회피 상태 or 회피 기회 소모시 불가
@@ -669,7 +686,7 @@ public class Player : MonoBehaviour, IDamageable
     public void Skill1(InputAction.CallbackContext context)
     {
         Debug.Log("스킬 1");
-        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState || currentState is PlayerSceneState)
             return;
 
         if (context.performed)
@@ -689,7 +706,7 @@ public class Player : MonoBehaviour, IDamageable
     public void Skill2(InputAction.CallbackContext context)
     {
         Debug.Log("스킬 2");
-        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState || currentState is PlayerSceneState)
             return;
 
         if (context.performed)
@@ -708,7 +725,7 @@ public class Player : MonoBehaviour, IDamageable
 
     public void Parrying(InputAction.CallbackContext context)
     {
-        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState || skillManager.Charging)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState || currentState is PlayerSceneState || skillManager.Charging)
             return;
         // 제작 중
         if (context.performed)
@@ -719,7 +736,7 @@ public class Player : MonoBehaviour, IDamageable
 
     public void OverFlowSkill(InputAction.CallbackContext context)
     {
-        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState)
+        if (currentState is PlayerHitState || currentState is PlayerCrowdControlState || currentState is PlayerSceneState)
             return;
 
         if(context.performed)

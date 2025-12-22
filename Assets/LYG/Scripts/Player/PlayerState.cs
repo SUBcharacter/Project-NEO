@@ -12,6 +12,25 @@ public abstract class PlayerState
     public abstract void Exit(Player player);
 }
 
+public class PlayerSceneState : PlayerState
+{
+    
+    public override void Start(Player player)
+    {
+        
+    }
+
+    public override void Update(Player player)
+    {
+        
+    }
+
+    public override void Exit(Player player)
+    {
+
+    }
+}
+
 public class PlayerIdleState : PlayerState
 {
     // 통상 상태 - 제어, 통제 없음
