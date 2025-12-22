@@ -9,15 +9,11 @@ public class BSAnimationEvent : MonoBehaviour
         bs = GetComponentInParent<Bisili>();
     }
 
-    public void StartAttack()
+    public void Attacking(int value)
     {
-        bs.Attacking = true;
+        bs.Attacking = value == 1 ? true : false;
     }
 
-    public void EndAttack()
-    {
-        bs.Attacking = false;
-    }
 
     public void Swing()
     {

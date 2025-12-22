@@ -10,14 +10,14 @@ public class Scene1Direct : Director
         base.Start();
     }
 
-    public override void Play(int sceneIndex)
+    public override void Play(int sequanceIndex)
     {
-        StartCoroutine(PlaySequance(sceneIndex));
+        StartCoroutine(PlaySequance(sequanceIndex));
     }
 
-    public override IEnumerator PlaySequance(int sceneIndex)
+    public override IEnumerator PlaySequance(int sequanceIndex)
     {
-        foreach(var step in sequance[sceneIndex].eventSteps)
+        foreach(var step in sequance[sequanceIndex].eventSteps)
         {
             yield return step.Execute(player);
         }
