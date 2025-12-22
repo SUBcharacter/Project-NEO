@@ -13,11 +13,12 @@ MonoBehaviour:
   m_Name: ElecShockPattern
   m_EditorClassIdentifier: 
   minRange: 3
-  maxRange: 999
+  maxRange: 6
   cooldownTime: 3
   priorityWeight: 1
   comboPatterns: []
   comboChance: 0.5
+  IsFinished: 0
   ShockWavePrefab: {fileID: 7777895436838574327, guid: ffb93343f0537524fa34fdfd67fca43a, type: 3}
   shockSpawnY: 0.1
   holdTime: 3.5

@@ -59,6 +59,7 @@ public class DebrisPattern : BossPattern
     public override void ExitPattern()
     {
         isThrow = false;
+        IsFinished = true;
         lastUsedTime = Time.time;
     }
 

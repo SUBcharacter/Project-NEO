@@ -41,6 +41,8 @@ public class ElecShockPattern : BossPattern
     /// </summary>
     protected override async Awaitable Execute()
     {
+        IsFinished = false;
+        isShockTriggered = false;
         boss.FaceTarget(boss.player.position);
         animator.SetTrigger("ElecShock");
         Debug.Log("[전충] 패턴 시작");
@@ -76,6 +78,7 @@ public class ElecShockPattern : BossPattern
     public override void ExitPattern()
     {
         isShockTriggered = false;  // 다음 실행 대비 초기화
+        IsFinished = true;
         Debug.Log("[전충] ExitPattern 호출됨");
     }
 

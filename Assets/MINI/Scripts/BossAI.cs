@@ -27,13 +27,15 @@ public class BossAI : MonoBehaviour, IDamageable
     protected CancellationTokenSource _cts;                // 비동기 작업 취소용 토큰
 
     // 2025-12-21 효영 추가
+    #region 튜토보스용..
     [Header("TutoBoss")]
     public bool Attacking = false;      // 공격 중인지 여부
-    public BossState previousState;
+
+    public BossPattern CurrentPattern { get; private set; }
 
     [Header("Boss Type")]
     [SerializeField] bool isTutorialBoss;
-
+    #endregion
 
 
     // 캡슐화
@@ -111,17 +113,17 @@ public class BossAI : MonoBehaviour, IDamageable
 
         currentHp = Mathf.Max(0, currentHp - damage);
 
-        #region 효 튜토보스 맞았을 때 상태 전환
-        if (currentHp <= 0)
-        {
-            ChangeState(new TutoBossDeathState(this));
-            return;
-        }
+        //#region 효 튜토보스 맞았을 때 상태 전환
+        //if (currentHp <= 0)
+        //{
+        //    ChangeState(new TutoBossDeathState(this));
+        //    return;
+        //}
 
-        // Hit 전환 (튜토전용)
-        previousState = currentState;
-        ChangeState(new TutoBossHitState(this));
-        #endregion
+        //// Hit 전환 (튜토전용)
+        //previousState = currentState;
+        //ChangeState(new TutoBossHitState(this));
+        //#endregion
 
         // 강인도 깎기 (데미지에 비례하거나 고정값) <- 어째해야할지 논의해야 함
         if (!isGroggy)
@@ -196,5 +198,26 @@ public class BossAI : MonoBehaviour, IDamageable
             TakeDamage(1000f);
             Debug.Log($"Test Damage Current HP: {currentHp}");
         }
-    }   
+    }
+
+    #region 튜토보스용 함수들..
+    public void SetCurrentPattern(BossPattern pattern)
+    {
+        CurrentPattern = pattern;
+    }
+
+    // 패턴마다 거리가 다르니까 Sway랑 Dash의 거리검사를 위해 만들었는데.... 살려주세요
+    public DistanceDecision DecideDistance()
+    {
+        BossPattern p = CurrentPattern;
+        if (p == null) return DistanceDecision.Attack;
+
+        float dist = Vector2.Distance(transform.position, player.position);
+
+        if (dist < p.minRange) return DistanceDecision.Retreat;
+        if (dist > p.maxRange) return DistanceDecision.Approach;
+        return DistanceDecision.Attack;
+    }
+    #endregion
+
 }
