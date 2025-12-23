@@ -28,6 +28,20 @@ public class DebrisPattern : BossPattern
         // 최대 사거리보다 거리가 크다면 Dash 상태로 ChangeState 후 return
         // 리턴만 잘 실행해 준다면, 패턴이 실행되지 않고, 곧바로 Sway나 Dash로 전환 할 수 있음
 
+        float dist = boss.DistanceToPlayer();
+
+        if(dist <minRange)
+        {
+            boss.ChangeState(new TutoSwayState(boss, this));
+            return;
+        }
+
+        if (dist > maxRange)
+        {
+            boss.ChangeState(new TutoDashState(boss, this));
+            return;
+        }
+     
         isThrow = false;
 
         // 1. 보스 방향 조정

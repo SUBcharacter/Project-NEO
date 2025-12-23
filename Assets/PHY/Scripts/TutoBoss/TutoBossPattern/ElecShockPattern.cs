@@ -26,13 +26,6 @@ public class ElecShockPattern : BossPattern
     private bool isShockTriggered = false;
     // ShockEvent 들어오면 true → 로직 진행
 
-    //public override async Task StartPattern()
-    //{
-    //    isShockTriggered = false;
-    //    await Execute();
-    //    // StartPattern은 보통 Setup → Execute 구조
-    //}
-
     /// <summary>
     /// 메인 패턴 동작
     /// - ShockEvent 올 때까지 대기

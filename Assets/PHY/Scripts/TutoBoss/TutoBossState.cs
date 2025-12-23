@@ -46,7 +46,6 @@ public class TutoIdleBattleState : BossState // 작업 완
         timer += Time.deltaTime;
         if (timer < boss.CurrentPhase.restTime) return;
 
-        // 판단은 Sway/Dash에게 넘김
         boss.ChangeState(new TutoBossAttackingState(boss, currentPattern));
     }
 
@@ -63,6 +62,8 @@ public class TutoSwayState : BossState
     Vector2 dir;
 
     float speed = 7f; // 이 속도는 플레이어와 동일한 속도
+    float decelSpeed = 6f;   // 감속 속도 (중간에서 컷 해주는거 인듯)
+    float stop = 0.2f;
 
     // 스웨이 연출법
     // - 진행할 방향으로 X축 속도를 적정하게 준다 ex. rigid.linearVelocityX = direction(float 아니면 Vector2.x) * 30f
@@ -80,6 +81,10 @@ public class TutoSwayState : BossState
 
         float dx = boss.player.position.x - boss.transform.position.x;
         dir = dx > 0 ? Vector2.left : Vector2.right; // 후퇴
+
+        speed = Mathf.Abs(boss.rb.linearVelocity.x);
+        if (speed < 0.01f)
+            speed = 7f;
     }
 
     public override void Update()
@@ -88,22 +93,17 @@ public class TutoSwayState : BossState
         // 스웨이가 끝나면 바로 Attacking 상태로 넘겨버리면 됨
         // 거리판단 로직은 필요하나 현재 사용되고 있는 DecideDistance로는 한계가 있음
         // 스웨이 로직은 BisiliState의 BSSwayState.Update를 참고 할 것
-        switch (boss.DecideDistance())
+
+        speed = Mathf.Lerp(speed, 0, Time.deltaTime * decelSpeed);
+
+        boss.rb.linearVelocityX = dir.x * speed;
+
+        if(speed <= stop)
         {
-            case DistanceDecision.Attack:
-                boss.ChangeState(new TutoBossAttackingState(boss, currentPattern));
-                return;
-
-            case DistanceDecision.Approach:
-                boss.ChangeState(new TutoDashState(boss, currentPattern));
-                return;
-
-            case DistanceDecision.Retreat:
-                // 등속 운동이 아닌 감속(빠름 -> 느림)변화가 필요함
-                // 계속 후퇴
-                boss.rb.linearVelocity = dir * speed;
-                break;
+            boss.rb.linearVelocity = Vector2.zero;
+            boss.ChangeState(new TutoBossAttackingState(boss, currentPattern));
         }
+
     }
 
     public override void Exit()
@@ -117,6 +117,8 @@ public class TutoDashState : BossState
     BossPattern currentPattern;
 
     float speed;
+    float decelSpeed = 8f;
+    float stop = 0.2f;
     Vector2 dir;
 
     // 대쉬 연출법
@@ -145,22 +147,19 @@ public class TutoDashState : BossState
         // 스웨이가 끝나면 바로 Attacking 상태로 넘겨버리면 됨
         // 거리판단 로직은 필요하나 현재 사용되고 있는 DecideDistance로는 한계가 있음
         // 대쉬 로직은 Player.Dodge와 PlayerDodgeState.Update를 참고 할 것
-        switch (boss.DecideDistance())
+
+        speed = Mathf.Lerp(speed, 0, Time.deltaTime * decelSpeed);
+
+        boss.rb.linearVelocityX = dir.x * speed;
+
+        if(Mathf.Abs(speed) <= stop)
         {
-            case DistanceDecision.Attack:
-                boss.ChangeState(new TutoBossAttackingState(boss, currentPattern));
-                return;
+            boss.rb.linearVelocity = Vector2.zero;
 
-            case DistanceDecision.Retreat:
-                boss.ChangeState(new TutoSwayState(boss, currentPattern));
-                return;
-
-            case DistanceDecision.Approach:
-                // 등속 운동이 아닌 감속(빠름 -> 느림)변화가 필요함
-                // 계속 접근
-                boss.rb.linearVelocity = dir * speed;
-                break;
+            boss.ChangeState(new TutoBossAttackingState(boss, currentPattern));
         }
+        
+        
     }
 
     public override void Exit()
@@ -195,7 +194,7 @@ public class TutoBossAttackingState : BossState
         boss.rb.linearVelocity = Vector2.zero;
         boss.Attacking = true;
 
-        currentPattern = boss.CurrentPattern;
+       // currentPattern = boss.CurrentPattern;
         if (currentPattern == null)
         {
             boss.ChangeState(new TutoIdleBattleState(boss));
@@ -245,35 +244,3 @@ public class TutoBossDeathState : BossState
 
     public override void Exit() { }
 }
-
-
-
-
-//public class TutoBossHitState : BossState
-//{
-//    float timer;
-
-//    public TutoBossHitState(BossAI boss) : base(boss) { }
-
-//    public override void Start()
-//    {
-//        timer = 0f;
-//        boss.rb.linearVelocity = Vector2.zero;
-//        boss.animator.SetTrigger("Hit");
-//    }
-
-//    public override void Update()
-//    {
-//        timer += Time.deltaTime;
-
-//        if (timer >= 0.3f)
-//        {
-//            boss.ChangeState(boss.previousState ?? new TutoIdleBattleState(boss));
-//        }
-//    }
-
-//    public override void Exit()
-//    {
-
-//    }
-//}
