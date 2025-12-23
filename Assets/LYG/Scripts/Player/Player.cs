@@ -100,7 +100,7 @@ public class Player : MonoBehaviour, IDamageable
         col = GetComponent<CapsuleCollider2D>();
         input = GetComponent<PlayerInput>();
         check = GetComponent<TerrainCheck>();
-        ui = GetComponentInChildren<PlayerUI>();
+        ui = FindAnyObjectByType<PlayerUI>();
         ren = GetComponentInChildren<SpriteRenderer>();
         arm = GetComponentInChildren<Weapon>();
         skillManager = GetComponentInChildren<SkillManager>();
