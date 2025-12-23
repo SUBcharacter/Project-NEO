@@ -29,7 +29,6 @@ public class SummonDrone : Enemy
     [SerializeField] public Animator animator { get; private set; }
 
     [SerializeField] public Material hitFlash;
-    [SerializeField] LayerMask damagelayer;
 
     public bool isExploding { get; private set; }
     [SerializeField] bool hitted = false;
@@ -87,7 +86,6 @@ public class SummonDrone : Enemy
         Player_trans = player;
         ChangeState(SD_states[SummonDroneStateType.Summon]);
     }
-    // 알아서 수정할 것
     public override void TakeDamage(float damage)
     {
         if (isExploding) return;
@@ -157,6 +155,7 @@ public class SummonDrone : Enemy
     {
         if (isExploding) return;
         isExploding = true;
+        Debug.Log("폭발 시작");
         StartCoroutine(Explosion_timer());
     }
 

@@ -167,11 +167,12 @@ public class Drone : Enemy
 
     public void ReturnToStartPoint()
     {
-        float distance = Vector2.Distance(transform.position, startPos);
+        Vector3 targetPos = patrolPath.GetRandomPoint();
+        float distance = Vector2.Distance(transform.position, targetPos);
 
-        if (distance > 0.1f)
+        if (distance > 0.2f)
         {
-            Vector2 moveDir = ((Vector2)startPos - (Vector2)transform.position).normalized;
+            Vector2 moveDir = ((Vector2)patrolPath.GetRandomPoint() - (Vector2)transform.position).normalized;
 
             FlipDrone(moveDir.x);
 

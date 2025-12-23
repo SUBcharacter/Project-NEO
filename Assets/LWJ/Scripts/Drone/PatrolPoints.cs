@@ -13,15 +13,10 @@ public class PatrolPoints : MonoBehaviour
             points.Add(child.position);
         }
 
-        // 2. 좌표를 다 땄으므로, 이제 자식 오브젝트들은 필요 없습니다.
-        // 자식을 파괴하거나 비활성화하여 드론이 움직일 때 연산되지 않도록 합니다.
         foreach (Transform child in transform)
         {
             child.gameObject.SetActive(false);
         }
-
-        // 3. (중요) 자기 자신도 부모(드론)와의 연결을 끊습니다.
-        // 이제 이 스크립트가 붙은 오브젝트는 세계 어딘가에 고정됩니다.
         transform.SetParent(null);
     }
     public Vector3 GetRandomPoint()
