@@ -1,22 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+/// <summary>
+/// 2025-12-23
+/// TODO: 팀장 피드백 후 추가 수정 및 보스패턴+기본공격 작업 예정
+/// </summary>
 
-// 분기 설정 제대로 하려고 만든건데...tq 샤이샤이한 보스가 되버렷네.... 패턴 수정도 못햇음....
-
-public enum DistanceDecision
-{
-    // 필요 없을 거 같지만, 이를 이용한 로직이 생각났다면 사용해도 됨.
-    // 사용하지 않을 시에는 과감히 버릴 것.
-    Retreat,   // 너무 가까움 → Sway
-    Approach,  // 너무 멂 → Dash
-    Attack     // 적정 거리
-}
 
 // #TODO
-// 1. BossAI에 플레이어와 보스의 X축 거리(float)를 반환하는 public 함수를 작성
-// 2. BossPattern을 상속한 패턴들의 Execute함수 초반에 거리 판단 로직을 작성
-// 3. 상태 전환 흐름 재정비
+// 1. BossAI에 플레이어와 보스의 X축 거리(float)를 반환하는 public 함수를 작성 -> 완료
+// 2. BossPattern을 상속한 패턴들의 Execute함수 초반에 거리 판단 로직을 작성 -> 완료
+// 3. 상태 전환 흐름 재정비 -> 의도대로 작동하는지 확인필요
 // ※ 모르는 것이 있다면 언제든 알릴 것!
 
 // BossIdleState를 상속 받는게 아닌 추상 클래스인 BossState를 상속 받아야함
@@ -61,9 +55,10 @@ public class TutoSwayState : BossState
 
     Vector2 dir;
 
-    float speed = 7f; // 이 속도는 플레이어와 동일한 속도
-    float decelSpeed = 6f;   // 감속 속도 (중간에서 컷 해주는거 인듯)
-    float stop = 0.2f;
+    // 상태패턴이 안정되면 SO로 뺄 예정
+    float speed = 30f; // 이 속도는 플레이어와 동일한 속도 => // 플레이어 이동 속도 기준으로 조정 예정 7
+    float decelSpeed = 3f;   // 감속 속도 (중간에서 컷 해주는거 인듯) 3
+    float stop = 0.5f;      // 0.5
 
     // 스웨이 연출법
     // - 진행할 방향으로 X축 속도를 적정하게 준다 ex. rigid.linearVelocityX = direction(float 아니면 Vector2.x) * 30f
@@ -72,7 +67,7 @@ public class TutoSwayState : BossState
     // - 해당 프레임에 마지막으로 산출된 speed를 기준으로 상한선 설정(Lerp 특성상 설정한 타겟에는 도달하기 힘들기에, 중간에서 컷 해줘야한다)
     // - 속도 업데이트가 중단됨과 동시에 다시 AttackingState로 전환
 
-    public TutoSwayState(BossAI boss, BossPattern currentPattern) : base(boss) { this.currentPattern = currentPattern; }
+    public TutoSwayState(BossAI boss, BossPattern _currentPattern) : base(boss) { currentPattern = _currentPattern; }
 
     public override void Start()
     {
@@ -84,7 +79,7 @@ public class TutoSwayState : BossState
 
         speed = Mathf.Abs(boss.rb.linearVelocity.x);
         if (speed < 0.01f)
-            speed = 7f;
+            speed = 30f;
     }
 
     public override void Update()
@@ -116,9 +111,11 @@ public class TutoDashState : BossState
 {
     BossPattern currentPattern;
 
+    // 상태패턴이 안정되면 SO로 뺄 예정
     float speed;
-    float decelSpeed = 8f;
-    float stop = 0.2f;
+    float decelSpeed = 4f;      // 4
+    float stop = 0.5f;          // 0.5
+
     Vector2 dir;
 
     // 대쉬 연출법
@@ -128,7 +125,7 @@ public class TutoDashState : BossState
     // - 해당 프레임에 마지막으로 산출된 speed를 기준으로 상한선 설정(Lerp 특성상 설정한 타겟에는 도달하기 힘들기에, 중간에서 컷 해줘야한다)
     // - 속도 업데이트가 중단됨과 동시에 다시 AttackingState로 전환
 
-    public TutoDashState(BossAI boss, BossPattern currentPattern) : base(boss) { this.currentPattern = currentPattern; }
+    public TutoDashState(BossAI boss, BossPattern _currentPattern) : base(boss) { currentPattern = _currentPattern; }
 
     public override void Start()
     {
@@ -138,7 +135,8 @@ public class TutoDashState : BossState
         float dx = boss.player.position.x - boss.transform.position.x;
         dir = dx > 0 ? Vector2.right : Vector2.left;
 
-        speed = boss.CurrentPhase.speedMultiplier * 6f;
+        speed = boss.CurrentPhase.speedMultiplier * 30f;     // TODO: 플레이어 이동 속도 기준으로 튜닝이 필요할진 모르지만 일단 보류
+
     }
 
     public override void Update()
@@ -194,7 +192,6 @@ public class TutoBossAttackingState : BossState
         boss.rb.linearVelocity = Vector2.zero;
         boss.Attacking = true;
 
-       // currentPattern = boss.CurrentPattern;
         if (currentPattern == null)
         {
             boss.ChangeState(new TutoIdleBattleState(boss));
@@ -204,7 +201,6 @@ public class TutoBossAttackingState : BossState
         currentPattern.Initialize(boss);
         currentPattern.StartPattern();
 
-        boss.animator.SetTrigger("Attack");
     }
 
     public override void Update()

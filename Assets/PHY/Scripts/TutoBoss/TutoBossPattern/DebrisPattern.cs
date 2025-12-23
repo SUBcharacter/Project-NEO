@@ -41,7 +41,8 @@ public class DebrisPattern : BossPattern
             boss.ChangeState(new TutoDashState(boss, this));
             return;
         }
-     
+
+        IsFinished = false;
         isThrow = false;
 
         // 1. 보스 방향 조정

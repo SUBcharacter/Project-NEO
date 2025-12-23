@@ -195,7 +195,7 @@ public class BossAI : MonoBehaviour, IDamageable
 
 
     
-    #region 튜토보스용 함수들..
+    #region 튜토보스용 함수들
     public void SetCurrentPattern(BossPattern pattern)
     {
         CurrentPattern = pattern;
@@ -210,17 +210,7 @@ public class BossAI : MonoBehaviour, IDamageable
         // x축만 사용
         return Mathf.Abs(player.position.x - transform.position.x);
     }
-    public DistanceDecision DecideDistance()
-    {
-        BossPattern p = CurrentPattern;
-        if (p == null) return DistanceDecision.Attack;
-
-        float dist = DistanceToPlayer();
-
-        if (dist < p.minRange) return DistanceDecision.Retreat;
-        if (dist > p.maxRange) return DistanceDecision.Approach;
-        return DistanceDecision.Attack;
-    }
+ 
     #endregion
 
 }

@@ -34,6 +34,20 @@ public class ElecShockPattern : BossPattern
     /// </summary>
     protected override async Awaitable Execute()
     {
+        float dist = boss.DistanceToPlayer();
+
+        if(dist < minRange)
+        {
+            boss.ChangeState(new TutoSwayState(boss, this));
+            return;
+        }
+
+        if(dist > maxRange) 
+        {
+            boss.ChangeState(new TutoDashState(boss, this));
+            return;
+        }
+
         IsFinished = false;
         isShockTriggered = false;
         boss.FaceTarget(boss.player.position);

@@ -758,7 +758,7 @@ Transform:
   m_GameObject: {fileID: 279640192}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.21, y: -0.4000001, z: -10}
+  m_LocalPosition: {x: -10.87, y: -0.4000001, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2396,7 +2396,7 @@ Transform:
   m_GameObject: {fileID: 811185460}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.21, y: -0.40000004, z: -10}
+  m_LocalPosition: {x: -10.87, y: -0.4000001, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2761,11 +2761,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2790391508819898091, guid: 279264dcb96387a489879d672b1c9ace, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.21
+      value: -10.87
       objectReference: {fileID: 0}
     - target: {fileID: 2790391508819898091, guid: 279264dcb96387a489879d672b1c9ace, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.44
+      value: -0.95
       objectReference: {fileID: 0}
     - target: {fileID: 2790391508819898091, guid: 279264dcb96387a489879d672b1c9ace, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3132,7 +3132,7 @@ Transform:
   m_GameObject: {fileID: 1754630442}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.34, y: -1.86, z: 0}
+  m_LocalPosition: {x: 0.2, y: -1.2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3162,7 +3162,6 @@ MonoBehaviour:
   currentHp: 0
   currentPoise: 0
   Attacking: 0
-  isTutorialBoss: 1
   activeLightWaves: []
 --- !u!1 &1915067708
 GameObject:
