@@ -10,13 +10,15 @@ public class Sequance
 
 public abstract class Director : MonoBehaviour
 {
+    [SerializeField] protected Animator animator;
     [SerializeField] protected Player player;
     [SerializeField] protected List<Sequance> sequance;
-    
-    
+
+    public Animator AniCon => animator;
 
     protected virtual void Start()
     {
+        animator = GetComponent<Animator>();
         player = FindAnyObjectByType<Player>();
     }
 

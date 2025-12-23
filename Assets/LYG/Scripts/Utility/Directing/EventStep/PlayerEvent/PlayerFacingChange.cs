@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "EventStep", menuName = "EventStep/Player/PlayerFacingChange")]
 public class PlayerFacingChange : EventStep
 {
     [SerializeField] bool facingRight;

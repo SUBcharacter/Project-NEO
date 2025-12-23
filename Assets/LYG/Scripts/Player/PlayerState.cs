@@ -17,7 +17,7 @@ public class PlayerSceneState : PlayerState
     
     public override void Start(Player player)
     {
-        
+        Debug.Log("연출 상태");
     }
 
     public override void Update(Player player)

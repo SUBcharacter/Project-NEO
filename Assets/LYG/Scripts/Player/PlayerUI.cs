@@ -23,7 +23,7 @@ public class PlayerUI : MonoBehaviour
 
     private void Awake()
     {
-        player = GetComponentInParent<Player>();
+        player = FindAnyObjectByType<Player>();
         for(int i = 0; i< 12; i++)
         {
             Image instance = Instantiate(targetCrossHairPrefab, transform);

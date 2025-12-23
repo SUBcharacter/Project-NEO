@@ -17,6 +17,7 @@ public class CameraManager : MonoBehaviour
     {
         instance = this;
         cm = GetComponent<CinemachineCamera>();
+        cmp = GetComponent<CinemachinePositionComposer>();
         perlin = GetComponent<CinemachineBasicMultiChannelPerlin>();
     }
 
@@ -35,6 +36,8 @@ public class CameraManager : MonoBehaviour
 
     public void DeadZoneControl(Vector2 size)
     {
+        size.x = Mathf.Clamp(size.x, 0, 2);
+        size.y = Mathf.Clamp(size.y, 0, 2);
         cmp.Composition.DeadZone.Size = size;
     }
 
@@ -53,15 +56,17 @@ public class CameraManager : MonoBehaviour
 
     IEnumerator Zoom(float amount, float duration)
     {
-        float targetSize = Mathf.Clamp(cm.Lens.OrthographicSize + amount,0.5f, 10f);
+        float targetSize = Mathf.Clamp(amount, 0.5f, 20f);
 
+        float startSize = cm.Lens.OrthographicSize;
         float timer = 0;
         
         while(timer < duration)
         {
             timer += Time.deltaTime;
+            float t = timer / duration;
 
-            cm.Lens.OrthographicSize = Mathf.Lerp(cm.Lens.OrthographicSize, targetSize, timer / duration);
+            cm.Lens.OrthographicSize = Mathf.Lerp(cm.Lens.OrthographicSize, targetSize, t);
             yield return null;
         }
 

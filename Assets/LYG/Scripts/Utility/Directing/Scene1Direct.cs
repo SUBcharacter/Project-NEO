@@ -4,10 +4,13 @@ using UnityEngine;
 
 public class Scene1Direct : Director
 {
+    public static Scene1Direct instance;
 
     protected override void Start()
     {
         base.Start();
+        instance = this;
+        Play(0);
     }
 
     public override void Play(int sequanceIndex)

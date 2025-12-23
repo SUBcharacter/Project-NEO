@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
+[CreateAssetMenu(fileName = "EventStep", menuName = "EventStep/Player/MovePlayer")]
 public class MovePlayer : EventStep
 {
     [SerializeField] float velocity;
