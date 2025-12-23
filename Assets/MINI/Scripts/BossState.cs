@@ -21,14 +21,14 @@ public class BossIdleState : BossState
 
     public override void Start()
     {    
-       //if (boss.AllPhase[0].phaseName == "Phase 1")
-       //{
-       //    boss.ChangeState(new AttackingState(boss));
-       //}
-       //else if (boss.AllPhase[0].phaseName == "TutoBossPhase")
-       //{
-       //    boss.ChangeState(new TutoBossAttackingState(boss));
-       //}
+       if (boss.AllPhase[0].phaseName == "Phase 1")
+       {
+           boss.ChangeState(new AttackingState(boss));
+       }
+       else if (boss.AllPhase[0].phaseName == "TutoBossPhase")
+       {
+           boss.ChangeState(new TutoIdleBattleState(boss));
+       }
     }
     public override void Update()
     {      

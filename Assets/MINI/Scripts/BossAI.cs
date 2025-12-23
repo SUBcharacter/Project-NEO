@@ -33,8 +33,11 @@ public class BossAI : MonoBehaviour, IDamageable
 
     public BossPattern CurrentPattern { get; private set; }
 
-    [Header("Boss Type")]
-    [SerializeField] bool isTutorialBoss;
+    // 이 부분은 필요 없음
+    // BossIdleState로 진입시에 페이즈 이름(string)으로 분기를 나눠둠
+    // 페이즈 이름이 "TutoBossPhase"이면 자동으로 TutoIdleBattleState로 넘어감. 자세한건  BossState 참고
+    //[Header("Boss Type")]
+    //[SerializeField] bool isTutorialBoss;
     #endregion
 
 
@@ -58,14 +61,17 @@ public class BossAI : MonoBehaviour, IDamageable
     {
         currentHp = maxHp;
         if (allPhases.Count > 0) SetPhase(0);
-        //else Debug.LogError("BossAI: Phase미설정상태");
-        //ChangeState(new BossIdleState(this));
+        else Debug.LogError("BossAI: Phase미설정상태");
+        ChangeState(new BossIdleState(this));
 
         // 튜토리얼 보스 분기조건때문에 이렇게 했습니다.. 
-        if (isTutorialBoss)
-            ChangeState(new TutoIdleBattleState(this));
-        else
-            ChangeState(new BossIdleState(this));
+        // 이 부분은 필요 없음
+        // BossIdleState로 진입시에 페이즈 이름(string)으로 분기를 나눠둠
+        // 페이즈 이름이 "TutoBossPhase"이면 자동으로 TutoIdleBattleState로 넘어감. 자세한건  BossState 참고
+        //if (isTutorialBoss)
+        //    ChangeState(new TutoIdleBattleState(this));
+        //else
+        //    ChangeState(new BossIdleState(this));
         //currentState.Star t();
     }
     void Update()
@@ -200,6 +206,8 @@ public class BossAI : MonoBehaviour, IDamageable
         }
     }
 
+
+    
     #region 튜토보스용 함수들..
     public void SetCurrentPattern(BossPattern pattern)
     {
@@ -207,6 +215,8 @@ public class BossAI : MonoBehaviour, IDamageable
     }
 
     // 패턴마다 거리가 다르니까 Sway랑 Dash의 거리검사를 위해 만들었는데.... 살려주세요
+    // 복잡하게 생각 할 필요 없이 단순하게 플레이어와 보스간의 x축 거리를 구해서 float로 반환하는 함수를 만들면 됨
+    // 이 함수가 호출 될 곳은 각 패턴이 시작되는 Execute의 초반 부분임.
     public DistanceDecision DecideDistance()
     {
         BossPattern p = CurrentPattern;

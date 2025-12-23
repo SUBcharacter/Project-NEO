@@ -22,6 +22,12 @@ public class DebrisPattern : BossPattern
 
     protected override async Awaitable Execute()
     {
+        // 이곳에서 if 문(또는 다른 조건문)을 통해서 사거리 판단을 진행하면 됨
+        // BossAI에 만들어둔 거리 산출 함수를 이용할 것.
+        // 최소 사거리보다 거리가 작다면 Sway 상태로 ChangeState 후 return
+        // 최대 사거리보다 거리가 크다면 Dash 상태로 ChangeState 후 return
+        // 리턴만 잘 실행해 준다면, 패턴이 실행되지 않고, 곧바로 Sway나 Dash로 전환 할 수 있음
+
         isThrow = false;
 
         // 1. 보스 방향 조정
