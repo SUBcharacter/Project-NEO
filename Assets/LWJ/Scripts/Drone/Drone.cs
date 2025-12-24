@@ -207,7 +207,6 @@ public class Drone : Enemy
         Vector3 currentScale = transform.localScale;
         float newX = Mathf.Abs(currentScale.x) * Mathf.Sign(direction);
         transform.localScale = new Vector3(newX, currentScale.y, currentScale.z);
-
     }
 
     public void waitgameobjectfalse()
