@@ -1,6 +1,11 @@
 using System.Threading.Tasks;
 using UnityEngine;
 
+/// <summary>
+/// 왜왜왜 쌰갈 안나오는데 로그도 다 찍히는데 왜 안나오는데 쌰갈
+/// </summary>
+
+[CreateAssetMenu(fileName = "BasicPunch", menuName = "TutoBoss/TutoBossPattern/BasicPunch")]
 public class BasicPunch : BossPattern
 {
     [Header("히트박스 2개 (오른손 / 왼손)")]
@@ -12,11 +17,27 @@ public class BasicPunch : BossPattern
 
     protected override async Awaitable Execute()
     {
+        Debug.Log("기본공격 들어옴");
+        float dist = boss.DistanceToPlayer();
+
+        if (dist < minRange)
+        {
+            boss.ChangeState(new TutoSwayState(boss, this));
+            return;
+        }
+
+        if (dist > maxRange)
+        {
+            boss.ChangeState(new TutoDashState(boss, this));
+            return;
+        }
+
         // 플레이어 바라보기
         boss.FaceTarget(boss.player.position);
 
         // 애니메이션 실행
         animator.SetTrigger("Punch");
+        Debug.Log("원투펀치 들어옴");
 
         // 오른손 펀치 기다리기
         while (!isRightPunchDone)
@@ -31,7 +52,7 @@ public class BasicPunch : BossPattern
 
         ExitPattern();
     }
-    
+
 
     public override void OnAnimationEvent(string eventName)
     {
@@ -56,7 +77,7 @@ public class BasicPunch : BossPattern
 
     public override void UpdatePattern()
     {
-       
+
     }
 
     public override void ExitPattern()
