@@ -12,12 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5997957e09f96df4683b5952ac2836a4, type: 3}
   m_Name: BasicPunch
   m_EditorClassIdentifier: 
-  minRange: 5
-  maxRange: 10
+  minRange: 2
+  maxRange: 4
   cooldownTime: 3
   priorityWeight: 1
   comboPatterns: []
   comboChance: 0.5
-  IsFinished: 0
-  rightPunchHitbox: {fileID: 862063190529311659, guid: bd3dd100a9e4b4c4e8ee7986b2e5f084, type: 3}
-  leftPunchHitbox: {fileID: 862063190529311659, guid: e74dcee5dc7a9db4aa4173de5e015fe7, type: 3}
+  IsFinished: 1
+  punchHitbox: {fileID: 5040630670938801102, guid: bd3dd100a9e4b4c4e8ee7986b2e5f084, type: 3}

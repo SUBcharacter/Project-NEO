@@ -216,6 +216,7 @@ public class TutoBossAttackingState : BossState
 
     public override void OnAnimationEvent(string eventName)
     {
+        Debug.Log($"[State] Event: {eventName}, pattern = {currentPattern}");
         currentPattern.OnAnimationEvent(eventName);
     }
 

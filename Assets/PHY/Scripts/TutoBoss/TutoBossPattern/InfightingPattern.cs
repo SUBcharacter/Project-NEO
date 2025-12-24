@@ -11,16 +11,16 @@ public class InfightingPattern : BossPattern
     }
     public override void UpdatePattern()
     {
-        throw new System.NotImplementedException();
+        
     }
     public override void OnAnimationEvent(string eventName)
     {
-        throw new System.NotImplementedException();
+        
     }
 
     public override void ExitPattern()
     {
-        throw new System.NotImplementedException();
+       
     }
 
 
