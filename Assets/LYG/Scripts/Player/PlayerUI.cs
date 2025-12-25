@@ -7,6 +7,7 @@ public class PlayerUI : MonoBehaviour
 {
     [SerializeField] Player player;
 
+    [SerializeField] Canvas canvas;
     [SerializeField] Image targetCrossHairPrefab;
     [SerializeField] GameObject meleeSkills;
     [SerializeField] GameObject rangeSkills;
@@ -20,10 +21,12 @@ public class PlayerUI : MonoBehaviour
 
     public Image playerCrossHair;
     public List<Image> targetCrossHair;
+    public Canvas Cnvs { get => canvas; set => canvas = value; }
 
     private void Awake()
     {
         player = FindAnyObjectByType<Player>();
+        canvas = GetComponent<Canvas>();
         for(int i = 0; i< 12; i++)
         {
             Image instance = Instantiate(targetCrossHairPrefab, transform);

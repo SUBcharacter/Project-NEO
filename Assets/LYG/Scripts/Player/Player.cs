@@ -120,8 +120,8 @@ public class Player : MonoBehaviour, IDamageable
         if (!(isDead || hit || currentState is PlayerSceneState))
         {
             StaminaTimer();
-            MouseConvert();
         }
+        MouseConvert();
         //if(Input.GetKeyDown(KeyCode.P))
         //{
         //    GetOverFlowEnergy(10f);

@@ -8,7 +8,7 @@ public class PlayerUIActive : EventStep
 
     public override IEnumerator Execute(Player player)
     {
-        player.UI.gameObject.SetActive(value);
+        player.UI.Cnvs.enabled = value;
         yield return null;
     }
 }
