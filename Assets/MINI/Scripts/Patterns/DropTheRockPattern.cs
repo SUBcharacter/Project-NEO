@@ -34,7 +34,7 @@ public class DropTheRockPattern : BossPattern
         // 대기
         try
         {
-            await Awaitable.WaitForSecondsAsync(2f, boss.DestroyCancellationToken);
+            await Awaitable.WaitForSecondsAsync(2f, boss.PatternCancellationToken);
         }
         catch (System.OperationCanceledException) { ExitPattern(); return; }
 
@@ -53,7 +53,7 @@ public class DropTheRockPattern : BossPattern
         // 종료 대기 (돌이 다 떨어지고 정리될 시간만큼 대기)
         try
         {
-            await Awaitable.WaitForSecondsAsync(maxDropDelay + 2.0f, boss.DestroyCancellationToken);
+            await Awaitable.WaitForSecondsAsync(maxDropDelay + 2.0f, boss.PatternCancellationToken);
         }
         catch (System.OperationCanceledException) { ExitPattern(); return; }
 
@@ -127,7 +127,7 @@ public class DropTheRockPattern : BossPattern
         try
         {
             // 랜덤 대기
-            await Awaitable.WaitForSecondsAsync(delay, boss.DestroyCancellationToken);
+            await Awaitable.WaitForSecondsAsync(delay, boss.PatternCancellationToken);
 
             // 돌 생성
             GameObject rock = Instantiate(rockPrefab, pos, Quaternion.identity);

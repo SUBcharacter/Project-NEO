@@ -40,7 +40,7 @@ public class LightWavePattern : BossPattern
 
         try
         {
-            await Awaitable.WaitForSecondsAsync(0.5f, boss.DestroyCancellationToken);
+            await Awaitable.WaitForSecondsAsync(0.5f, boss.PatternCancellationToken);
         }
         catch (System.OperationCanceledException) { ExitPattern(); return; }
 

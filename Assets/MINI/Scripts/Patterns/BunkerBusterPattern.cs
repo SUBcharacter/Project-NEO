@@ -3,25 +3,30 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "BunkerBusterPattern", menuName = "Boss/Patterns/BunkerBuster")]
 public class BunkerBusterPattern : BossPattern
 {
-    [Header("Settings")]
-    [SerializeField] private float prepTime = 0.5f;         // 점프 전 준비 시간
-    [SerializeField] private float jumpSpeed = 40f;         // 올라가는 속도
-    [SerializeField] private float jumpHeight = 15f;        // 화면 밖으로 나갈 높이 (Y축 거리)
+    [Header("Jump")]
+    [SerializeField] private float prepTime = 0.5f;
+    [SerializeField] private float jumpSpeed = 40f;
 
-    
-    [SerializeField] private GameObject warningPrefab;      // 바닥에 깔릴 경고 장판
-    [SerializeField] private float aimingDuration = 2.0f;   // 플레이어를 따라다니는 시간
-    [SerializeField] private float lockOnTime = 0.5f;       // 피할 시간
+    [Tooltip("천장이 없을 때 최대 상승 높이")]
+    [SerializeField] private float maxJumpHeight = 20f;
+    [Tooltip("천장 감지 거리 (이 거리만큼 남기고 멈춤)")]
+    [SerializeField] private float ceilingStopDist = 3.0f;
 
-    
-    [SerializeField] private float dropSpeed = 60f;         // 낙하 속도
-    [SerializeField] private LayerMask groundLayer;         // 바닥 감지용
+    [Header("Targeting")]
+    [SerializeField] private GameObject warningPrefab;
+    [SerializeField] private float trackingTime = 1.0f;     // 따라다니는 시간
+    [SerializeField] private float lockOnTime = 0.5f;       // 멈춰있는 시간
 
-    [SerializeField] private HitBoxStat explosionStat;      // 폭발 데미지 정보
-    [SerializeField] private Vector2 explosionSize = new(8f, 3f); // 충격파 범위
-    [SerializeField] private float recoveryTime = 1.5f;     // 착지 후 후딜레이
+    [Header("Drop")]
+    [SerializeField] private float dropSpeed = 60f;
+    [SerializeField] private LayerMask groundLayer;         // 천장 겸 바닥 레이어
 
-    // 캐싱용 변수
+    [Header("Impact")]
+    [SerializeField] private HitBoxStat explosionStat;
+    [SerializeField] private Vector2 explosionSize = new(8f, 3f);
+    [SerializeField] private float recoveryTime = 1.5f;
+
+    // 캐싱용
     private SpriteRenderer spriteRenderer;
     private Collider2D bossCol;
     private GameObject currentWarning;
@@ -39,88 +44,107 @@ public class BunkerBusterPattern : BossPattern
     protected override async Awaitable Execute()
     {
         if (boss == null) return;
-    
+
+        // 원상복구용 백업
+        float originalGravity = rb.gravityScale;
+        bool originalTrigger = bossCol != null ? bossCol.isTrigger : false;
+
+       
         // 준비
-        animator.SetTrigger("Prep"); // 웅크리는 모션 등
+        
+        animator.SetTrigger("Prep");
+        boss.FaceTarget(boss.player.position);
         rb.linearVelocity = Vector2.zero;
 
-        try { await Awaitable.WaitForSecondsAsync(prepTime, boss.DestroyCancellationToken); }
+        try { await Awaitable.WaitForSecondsAsync(prepTime, boss.PatternCancellationToken); }
         catch (System.OperationCanceledException) { ExitPattern(); return; }
-                
-        // Jump
-       
+
+
+        
+        // 상승 (천장 감지)       
         animator.SetTrigger("Jump");
 
-        // 물리 엔진으로 상승
+        // 올라갈 때는 물리 충돌 끄고 중력 끄고 올라감
+        if (bossCol != null) bossCol.isTrigger = true;
+        rb.gravityScale = 0f;
         rb.linearVelocity = Vector2.up * jumpSpeed;
 
-        // 목표 높이까지 대기
         float startY = boss.transform.position.y;
-        while (boss.transform.position.y < startY + jumpHeight)
+
+        // 천장에 머리 박기 직전까지만 상승
+        while (true)
         {
-            await Awaitable.FixedUpdateAsync(boss.DestroyCancellationToken);
+            RaycastHit2D hit = Physics2D.Raycast(boss.transform.position, Vector2.up, ceilingStopDist + 1.0f, groundLayer);
+
+            // 천장이 감지되었고, 3f보다 가까워지면 정지
+            if (hit.collider != null && hit.distance <= ceilingStopDist)
+            {
+                break;
+            }
+            // 혹은 최대 높이까지 올라갔으면 정지
+            if (boss.transform.position.y >= startY + maxJumpHeight)
+            {
+                break;
+            }
+            await Awaitable.FixedUpdateAsync(boss.PatternCancellationToken);
         }
 
-        // 모습 숨기기 & 물리 끄기
-        SetBossVisible(false);
+        // 정지 및 숨기기
         rb.linearVelocity = Vector2.zero;
-        rb.gravityScale = 0f; // 고정
-                     
-        // 조준 Tracking
+        SetBossVisible(false);
         
-        Vector3 targetPos = boss.player.position;
-        targetPos.y = GetGroundY(targetPos); // 바닥 높이 찾기
+        // 트래킹        
+        float hoverY = boss.transform.position.y;
 
+        // 경고 장판 생성
+        Vector3 warnPos = boss.player.position;
+        warnPos.y = GetGroundY(warnPos);
         if (warningPrefab != null)
-        {
-            currentWarning = Instantiate(warningPrefab, targetPos, Quaternion.identity);
-        }
+            currentWarning = Instantiate(warningPrefab, warnPos, Quaternion.identity);
 
         float timer = 0f;
-
-        // 플레이어 따라다니기
-        while (timer < aimingDuration)
+        while (timer < trackingTime)
         {
             timer += Time.deltaTime;
 
-            // 플레이어 이동
-            Vector3 followPos = boss.player.position;
-            followPos.y = GetGroundY(followPos);
+            float targetX = boss.player.position.x;
+            
+            // 보스가 천장 속에 파묻히지 않게 아까 멈춘 높이(hoverY) 유지
+            boss.transform.position = new Vector3(targetX, hoverY, 0f);
 
-            // 따라가기 
+            // 경고 장판 이동
             if (currentWarning != null)
             {
-                currentWarning.transform.position = Vector3.Lerp(currentWarning.transform.position, followPos, Time.deltaTime * 10f);
+                Vector3 followPos = new Vector3(targetX, GetGroundY(new Vector3(targetX, hoverY, 0)), 0);
+                // 부드럽게 따라가기
+                currentWarning.transform.position = Vector3.Lerp(currentWarning.transform.position, followPos, Time.deltaTime * 15f);
             }
 
-            await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
+            await Awaitable.NextFrameAsync(boss.PatternCancellationToken);
         }
 
-        // 피할 시간
-        try { await Awaitable.WaitForSecondsAsync(lockOnTime, boss.DestroyCancellationToken); }
+        // 락온         
+        try { await Awaitable.WaitForSecondsAsync(lockOnTime, boss.PatternCancellationToken); }
         catch (System.OperationCanceledException) { ExitPattern(); return; }
 
-        // 순간이동
-        Vector3 dropPos = boss.transform.position;
-        if (currentWarning != null) dropPos.x = currentWarning.transform.position.x;
-        boss.transform.position = dropPos;
-
-        // 낙하 시작
+        // 낙하   
+        if (currentWarning != null)
+        {
+            Vector3 finalPos = boss.transform.position;
+            finalPos.x = currentWarning.transform.position.x;
+            boss.transform.position = finalPos;
+        }
         SetBossVisible(true);
-        rb.gravityScale = 1f; 
-        rb.linearVelocity = Vector2.down * dropSpeed;
-
-        // 낙하 모션
         animator.SetTrigger("Fall");
 
-        // 바닥에 닿을 때까지 대기      
+        rb.linearVelocity = Vector2.down * dropSpeed;
+
+        // 바닥 감지
         while (true)
         {
-            // 발밑 감지
-            float checkDist = 1.0f;
-            if (dropSpeed > 50f) checkDist = 3.0f; // 속도가 빠르면 더 멀리서 감지
-
+            float checkDist = (dropSpeed * Time.fixedDeltaTime) + 2.0f;
             RaycastHit2D hit = Physics2D.Raycast(boss.transform.position, Vector2.down, checkDist, groundLayer);
+
             if (hit.collider != null)
             {
                 Vector3 landPos = boss.transform.position;
@@ -128,58 +152,58 @@ public class BunkerBusterPattern : BossPattern
                 boss.transform.position = landPos;
                 break;
             }
-            await Awaitable.FixedUpdateAsync(boss.DestroyCancellationToken);
+            await Awaitable.FixedUpdateAsync(boss.PatternCancellationToken);
         }
-        
-        // 충격      
+        // 충격 및 종료
         rb.linearVelocity = Vector2.zero;
 
-        // 착지 모션     
+        // 물리 상태 복구
+        if (bossCol != null) bossCol.isTrigger = originalTrigger;
+        rb.gravityScale = originalGravity;
+
         animator.SetTrigger("Land");
+        //CameraShake.instance.Shake(0.8f, 5f);
 
-        // 경고 장판 삭제
         if (currentWarning != null) Destroy(currentWarning);
-
-        // 광역 데미지 판정
         CheckExplosionDamage();
 
-        // 후딜레이    
-        try { await Awaitable.WaitForSecondsAsync(recoveryTime, boss.DestroyCancellationToken); }
+        try { await Awaitable.WaitForSecondsAsync(recoveryTime, boss.PatternCancellationToken); }
         catch (System.OperationCanceledException) { ExitPattern(); return; }
 
         boss.OnAnimationTrigger("AttackEnd");
     }
     private void SetBossVisible(bool isVisible)
     {
-        // Boss 하위 렌더러들 끄고 켬
         if (spriteRenderer != null) spriteRenderer.enabled = isVisible;
-        if (bossCol != null) bossCol.enabled = isVisible;                
     }
 
     private float GetGroundY(Vector3 pos)
     {
-        // 하늘에서 바닥으로 레이를 쏴서 Y값 찾기
-        RaycastHit2D hit = Physics2D.Raycast(pos + Vector3.up * 10f, Vector2.down, 20f, groundLayer);
-        if (hit.collider != null) return hit.point.y;
-        return pos.y; // 바닥 못 찾으면 그냥 현재 Y 사용
+        Vector2 origin = pos + Vector3.up * 1.0f;
+
+        // ContactFilter로 'Trigger'는 무시하도록 설정
+        ContactFilter2D filter = new ContactFilter2D();
+        filter.SetLayerMask(groundLayer);
+        filter.useTriggers = false; 
+
+        RaycastHit2D[] results = new RaycastHit2D[1];
+        int hitCount = Physics2D.Raycast(origin, Vector2.down, filter, results, 20f);
+
+        if (hitCount > 0)
+        {
+            return results[0].point.y;
+        }
+        // 바닥 못 찾으면 플레이어 발밑(현재 Y) 리턴
+        return pos.y;
     }
 
     private void CheckExplosionDamage()
     {
         if (explosionStat == null) return;
-
-        // 보스 발밑 중심
         Vector2 center = (Vector2)boss.transform.position + new Vector2(0, -0.5f);
-
-        // 디버깅
         DebugDrawBox(center, explosionSize, Color.red, 1.0f);
-
-        // 범위 내 적 타격
         Collider2D[] hits = Physics2D.OverlapBoxAll(center, explosionSize, 0f, explosionStat.attackable);
-        foreach (var hit in hits)
-        {
-            hit.GetComponent<IDamageable>()?.TakeDamage(explosionStat.damage);
-        }
+        foreach (var hit in hits) hit.GetComponent<IDamageable>()?.TakeDamage(explosionStat.damage);
     }
 
     private void DebugDrawBox(Vector2 center, Vector2 size, Color color, float duration)
@@ -199,12 +223,11 @@ public class BunkerBusterPattern : BossPattern
 
     public override void ExitPattern()
     {
-        //안전장치
         SetBossVisible(true);
-        if (boss != null && rb != null)
+        if (boss != null)
         {
-            rb.linearVelocity = Vector2.zero;
-            rb.gravityScale = 1f;
+            if (boss.GetComponent<Collider2D>()) boss.GetComponent<Collider2D>().isTrigger = false;
+            if (rb != null) { rb.linearVelocity = Vector2.zero; rb.gravityScale = 1f; }
         }
         if (currentWarning != null) Destroy(currentWarning);
     }

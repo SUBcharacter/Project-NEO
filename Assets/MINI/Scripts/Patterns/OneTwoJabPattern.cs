@@ -49,7 +49,7 @@ public class JabStraightPattern : BossPattern
         // 전조
         animator.SetTrigger("JabPrep");
         boss.FaceTarget(boss.player.position);
-        try { await Awaitable.WaitForSecondsAsync(prepTime, boss.DestroyCancellationToken); }
+        try { await Awaitable.WaitForSecondsAsync(prepTime, boss.PatternCancellationToken); }
         catch (System.OperationCanceledException) { ExitPattern(); return; }
                 
         // 잽 실행        
@@ -58,7 +58,7 @@ public class JabStraightPattern : BossPattern
 
         // 대기
         float remainJab = Mathf.Max(0, jabTotalDuration - jabImpactTime);
-        try { await Awaitable.WaitForSecondsAsync(remainJab, boss.DestroyCancellationToken); }
+        try { await Awaitable.WaitForSecondsAsync(remainJab, boss.PatternCancellationToken); }
         catch (System.OperationCanceledException) { ExitPattern(); return; }
                 
         // 스트레이트 실행        
@@ -68,11 +68,11 @@ public class JabStraightPattern : BossPattern
 
         // 남은 시간 대기
         float remainStraight = Mathf.Max(0, straightTotalDuration - straightImpactTime);
-        try { await Awaitable.WaitForSecondsAsync(remainStraight, boss.DestroyCancellationToken); }
+        try { await Awaitable.WaitForSecondsAsync(remainStraight, boss.PatternCancellationToken); }
         catch (System.OperationCanceledException) { ExitPattern(); return; }
         
         // 후딜
-        try { await Awaitable.WaitForSecondsAsync(recoveryTime, boss.DestroyCancellationToken); }
+        try { await Awaitable.WaitForSecondsAsync(recoveryTime, boss.PatternCancellationToken); }
         catch (System.OperationCanceledException) { ExitPattern(); return; }
 
         boss.OnAnimationTrigger("AttackEnd");
@@ -88,7 +88,7 @@ public class JabStraightPattern : BossPattern
         try
         {
             // 시간만큼만 이동
-            await Awaitable.WaitForSecondsAsync(stepTime, boss.DestroyCancellationToken);
+            await Awaitable.WaitForSecondsAsync(stepTime, boss.PatternCancellationToken);
         }
         catch (System.OperationCanceledException) { throw; }
 
@@ -104,7 +104,7 @@ public class JabStraightPattern : BossPattern
         {
             try
             {
-                await Awaitable.WaitForSecondsAsync(remainWait, boss.DestroyCancellationToken);
+                await Awaitable.WaitForSecondsAsync(remainWait, boss.PatternCancellationToken);
             }
             catch (System.OperationCanceledException) { throw; }
         }
@@ -115,7 +115,7 @@ public class JabStraightPattern : BossPattern
     {
         if (stats == null) return;
 
-        float facingDir = Mathf.Sign(boss.transform.localScale.x);
+        float facingDir = Mathf.Sign(boss.transform.localScale.x)+ Mathf.Sign(boss.transform.localScale.x);
         Vector2 actualOffset = new(offset.x * facingDir, offset.y);
 
         // 보스의 위치를 기준으로 박스 생성

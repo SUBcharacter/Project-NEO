@@ -23,24 +23,32 @@ public class BossAI : MonoBehaviour, IDamageable
     [SerializeField] protected float currentPoise;            // 강인도
     protected bool isGroggy = false;
 
-    [SerializeField]private BossState currentState;        // 보스 상태    
-    protected CancellationTokenSource _cts;                // 비동기 작업 취소용 토큰
-     
+    [SerializeField] private BossState currentState;        // 보스 상태    
+
+    private CancellationTokenSource _cts;                // 비동기 작업 취소용 토큰
+    private CancellationTokenSource _patternCts;           // [추가] 패턴 중단용 12/25
+
 
     // 캡슐화
     public BossPhase CurrentPhase => currentPhase;
     public List<BossPhase> AllPhase => allPhases;
-    public CancellationToken DestroyCancellationToken => _cts != null ? _cts.Token : CancellationToken.None;    
-
-
+    public CancellationToken DestroyCancellationToken => _cts != null ? _cts.Token : CancellationToken.None;
+    public CancellationToken PatternCancellationToken // 프로퍼티
+    {
+        get
+        {
+            if (_patternCts != null) { _patternCts = new CancellationTokenSource(); }
+            return _patternCts.Token;
+        }
+    }
     [HideInInspector] public List<GameObject> activeLightWaves = new();
-
-
     private void Awake()
     {
         _cts = new CancellationTokenSource();
-        if(!animator) animator = GetComponent<Animator>();
-        if(!rb) rb = GetComponent<Rigidbody2D>();
+        _patternCts = new CancellationTokenSource();
+
+        if (!animator) animator = GetComponent<Animator>();
+        if (!rb) rb = GetComponent<Rigidbody2D>();
     }
 
     void Start()
@@ -54,19 +62,19 @@ public class BossAI : MonoBehaviour, IDamageable
     void Update()
     {
         currentState?.Update();
-        
+
         PhaseTestDamage();
-    }
+    }    
     public BossPattern SelectBestPattern() // 패턴 선택 알고리즘
-    {        
-        if (currentPhase == null) return null; 
+    {
+        if (currentPhase == null) return null;
 
         List<BossPattern> candidates = currentPhase.availablePatterns;  // 후보
         float totalWeight = 0f;                                         // 가중치 변수
 
         // 가중치 합산
         foreach (var p in candidates)
-        {            
+        {
             float score = p.EvaluateScore(this);
             if (score > 0) totalWeight += score;
         }
@@ -105,7 +113,7 @@ public class BossAI : MonoBehaviour, IDamageable
                 StartGroggy();
             }
         }
-    
+
         CheckPhaseTransition();
     }
     void StartGroggy()
@@ -116,6 +124,8 @@ public class BossAI : MonoBehaviour, IDamageable
     }
     public void ChangeState(BossState newState)
     {
+        StopCurrentPattern(); // 토큰 삭제 
+
         currentState?.Exit();
         currentState = newState;
         currentState.Start();
@@ -127,11 +137,11 @@ public class BossAI : MonoBehaviour, IDamageable
     }
     void CheckPhaseTransition()     // 페이즈 체크 함수
     {
-        float ratio = currentHp / maxHp;     
- 
+        float ratio = currentHp / maxHp;
+
         float nextRatio = currentPhase.nextRatio;
-        
-        if (ratio <=nextRatio)
+
+        if (ratio <= nextRatio)
         {
             phaseIndex++;
             SetPhase(phaseIndex);
@@ -144,7 +154,7 @@ public class BossAI : MonoBehaviour, IDamageable
         currentPhase = allPhases[index];
         animator.speed = currentPhase.speedMultiplier;
         currentPoise = currentPhase.maxPoise; // 페이즈 바뀔 때 강인도 리셋
-        
+
         Debug.Log($"Phase : {currentPhase.phaseName}");
 
         // 페이즈 진입 패턴이 있다면 즉시 실행 (기믹 패턴)
@@ -161,7 +171,12 @@ public class BossAI : MonoBehaviour, IDamageable
         if (targetPos.x > transform.position.x) transform.localScale = new Vector3(scaleX, transform.localScale.y, 1);
         else transform.localScale = new Vector3(-scaleX, transform.localScale.y, 1);
     }
-    private void OnDestroy() { _cts?.Cancel(); _cts?.Dispose(); }
+    private void OnDestroy() 
+    {
+        StopCurrentPattern();
+        _cts?.Cancel(); 
+        _cts?.Dispose(); 
+    }
     private void PhaseTestDamage()
     {
         if (Input.GetKeyDown(KeyCode.P))
@@ -169,5 +184,15 @@ public class BossAI : MonoBehaviour, IDamageable
             TakeDamage(1000f);
             Debug.Log($"Test Damage Current HP: {currentHp}");
         }
-    }   
+    }
+    
+    public void StopCurrentPattern() // 스테이트 변경 시 패턴 강제종료 시키는 함수
+    {
+        if (_patternCts != null)
+        {
+            _patternCts.Cancel();
+            _patternCts.Dispose();
+        }
+        _patternCts = new CancellationTokenSource();
+    }
 }

@@ -43,7 +43,7 @@ public class ShoulderTacklePattern : BossPattern
 
         try
         {
-            await Awaitable.WaitForSecondsAsync(preludeDuration, boss.DestroyCancellationToken);
+            await Awaitable.WaitForSecondsAsync(preludeDuration, boss.PatternCancellationToken);
         }
         catch (System.OperationCanceledException) { ExitPattern(); return; }
 
@@ -63,7 +63,7 @@ public class ShoulderTacklePattern : BossPattern
        
         // animator.SetTrigger("TackleEnd"); 또는 ("Idle");
 
-        await Awaitable.WaitForSecondsAsync(postDuration, boss.DestroyCancellationToken);
+        await Awaitable.WaitForSecondsAsync(postDuration, boss.PatternCancellationToken);
 
         // 종료
         boss.OnAnimationTrigger("AttackEnd");
@@ -91,7 +91,7 @@ public class ShoulderTacklePattern : BossPattern
             //Y축 속도 유지
             rb.linearVelocity = new Vector2(dashDir.x * maxSpeed * speedMultiplier, rb.linearVelocity.y);
 
-            await Awaitable.FixedUpdateAsync(boss.DestroyCancellationToken);
+            await Awaitable.FixedUpdateAsync(boss.PatternCancellationToken);
         }
         rb.linearVelocity = Vector2.zero;
     }

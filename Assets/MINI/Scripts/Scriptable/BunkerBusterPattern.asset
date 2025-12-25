@@ -19,15 +19,16 @@ MonoBehaviour:
   comboPatterns: []
   comboChance: 0.5
   prepTime: 1
-  jumpSpeed: 40
-  jumpHeight: 15
-  warningPrefab: {fileID: 0}
-  aimingDuration: 2
+  jumpSpeed: 50
+  maxJumpHeight: 20
+  ceilingStopDist: 3
+  warningPrefab: {fileID: 5872173232802487009, guid: 8a848c3b830f0df43848b2e7e82deac3, type: 3}
+  trackingTime: 1
   lockOnTime: 0.5
   dropSpeed: 60
   groundLayer:
     serializedVersion: 2
-    m_Bits: 0
-  explosionStat: {fileID: 0}
-  explosionSize: {x: 8, y: 3}
+    m_Bits: 8
+  explosionStat: {fileID: 11400000, guid: e6996dba06c59544ebf2e4bc0bf5756f, type: 2}
+  explosionSize: {x: 6, y: 3}
   recoveryTime: 1.5
