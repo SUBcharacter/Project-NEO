@@ -16,10 +16,12 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] Image autoTargetingIcon;
     [SerializeField] Image stamina;
     [SerializeField] Image overFlowEnergy;
+    [SerializeField] Image lifeIcon;
     [SerializeField] Text bulletCount;
 
     public Image playerCrossHair;
     public List<Image> targetCrossHair;
+
 
     private void Awake()
     {
@@ -59,6 +61,11 @@ public class PlayerUI : MonoBehaviour
                 autoTargetingIcon.fillAmount = player.SkMn.AutoTargetingTimer / player.SkMn.AutoTargetingStat.coolTime;
                 break;
         }
+    }
+
+    void LifeUI()
+    {
+       
     }
 
 }
