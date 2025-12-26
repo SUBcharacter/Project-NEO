@@ -1,25 +1,25 @@
+using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 
-public enum DroneStateType
+public enum LRBStateType
 {
-    Idle, Attack, Dead, Hit, Walk, Chase, Enhance, Return
+    Idle, Attack, Dead, Hit, Walk, Chase, Enhance
 }
-public class Drone : Enemy
+public class LongRobot : Enemy
 {
-    public DroneState currentstates;
+    public LongRobot_State currentstates;
 
     [SerializeField] private Magazine bulletPool;
 
     [SerializeField] Transform Player_position;
     public Transform Pl_trans => Player_position;
-    [SerializeField] Vector2 target;
+    [SerializeField] public Vector2 target;
 
 
     [SerializeField] Material hitFlash;
-    [SerializeField] Dictionary<DroneStateType, DroneState> Dronestate = new(); 
-    public Dictionary<DroneStateType, DroneState> State => Dronestate;
+    [SerializeField] Dictionary<LRBStateType, LongRobot_State> LRBstate = new();
+    public Dictionary<LRBStateType, LongRobot_State> states => LRBstate;
 
     [SerializeField] LayerMask playerLayer;
     [SerializeField] public LayerMask groundLayer;
@@ -32,42 +32,25 @@ public class Drone : Enemy
     [SerializeField] bool enhanced;
     [SerializeField] bool hitted;
 
-    [SerializeField] private PatrolPoints patrolPath; 
-    public PatrolPoints PatrolPath => patrolPath;
-
     public int currentPatrolIndex = -1;
     public SightRange sightrange { get; private set; }
-    public AimRange aimrange { get; private set; } 
+    public AimRange aimrange { get; private set; }
     public Animator animator { get; private set; }
     public bool Enhanced { get => enhanced; set => enhanced = value; }
     public bool isattack { get; set; }
 
     protected override void Awake()
     {
-       
         sightrange = GetComponent<SightRange>();
         aimrange = GetComponent<AimRange>();
         ren = GetComponentInChildren<SpriteRenderer>();
         animator = GetComponentInChildren<Animator>();
         Rigid = GetComponent<Rigidbody2D>();
-        patrolPath = GetComponentInChildren<PatrolPoints>();
-        if (patrolPath != null)
-        {
-            patrolPath.Initialize();
-        }
-        else
-        {
-            Debug.LogError("자식 오브젝트에서 PatrolPoints를 찾을 수 없습니다!");
-        }
+        bulletPool = GetComponentInChildren<Magazine>();
         Stateinit();
-        currnetHealth = Stat.MaxHp;
-        hitted = false;
-        startPos = transform.position;  
-    }
 
-    void Start()
-    {
-        
+        hitted = false;
+        startPos = transform.position;
     }
 
     private void OnEnable()
@@ -82,55 +65,46 @@ public class Drone : Enemy
     }
     private void Stateinit()
     {
-        Dronestate[DroneStateType.Idle] = new D_Idlestate();
-        Dronestate[DroneStateType.Attack] = new D_Attackstate();
-        Dronestate[DroneStateType.Dead] = new D_Deadstate();
-        Dronestate[DroneStateType.Hit] = new D_Hitstate();
-        Dronestate[DroneStateType.Chase] = new D_Chasestate();
-        Dronestate[DroneStateType.Walk] = new D_Walkstate();
-        Dronestate[DroneStateType.Enhance] = new D_EnhancedDroneState();
-        Dronestate[DroneStateType.Return] = new D_Returnstate();
+        LRBstate[LRBStateType.Idle] = new LRB_Idlestate();
+        LRBstate[LRBStateType.Attack] = new LRB_Attackstate();
+        LRBstate[LRBStateType.Dead] = new LRB_Deadstate();
+        LRBstate[LRBStateType.Hit] = new LRB_Hitstate();
+        LRBstate[LRBStateType.Chase] = new LRB_Chasestate();
+        LRBstate[LRBStateType.Walk] = new LRB_Walkstate();
+        LRBstate[LRBStateType.Enhance] = new LRB_EnhancedState();
     }
     void Update()
     {
         currentstates?.Update(this);
     }
 
-    public override void Init() 
+    public override void Init()
     {
         currnetHealth = Stat.MaxHp;
         Rigid.linearVelocity = Vector2.zero;
         transform.position = startPos;
         isattack = false;
-        ChangeState(Dronestate[DroneStateType.Idle]);
+        ChangeState(LRBstate[LRBStateType.Idle]);
     }
 
-    public void ChangeState(DroneState drone)
+    public void ChangeState(LongRobot_State newstate)
     {
         currentstates?.Exit(this);
-        currentstates = drone;
-        currentstates?.Start(this);  
+        currentstates = newstate;
+        currentstates?.Start(this);
     }
-    public void Move(Vector3 nextpos)
+    public void Move()
     {
-        float distance = Vector2.Distance(transform.position, nextpos);
-        if (distance > 0.2f) 
-        {
-            Vector2 moveDir = (nextpos - transform.position).normalized;
-            float enhancing = Enhanced ? 2f : 1f;
-            Rigid.linearVelocity = moveDir * Stat.moveSpeed * enhancing;
-        }
-        else
-        {
-            Rigid.linearVelocity = Vector2.zero;
-            ChangeState(State[DroneStateType.Idle]);
-        }
+        float enghancing = enhanced ? 2f : 1f;
+        float M_direction = Mathf.Sign(transform.localScale.x);
+        float velocityX = M_direction * D_Speed * enghancing;
+        Rigid.linearVelocity = new Vector2(velocityX, Rigid.linearVelocity.y);
     }
 
     void Enhance()
     {
-        if (currentstates is D_Deadstate) return;
-        ChangeState(Dronestate[DroneStateType.Enhance]);
+        if (currentstates is LRB_Deadstate) return;
+        ChangeState(LRBstate[LRBStateType.Enhance]);
         StartCoroutine(Enhancing());
     }
     IEnumerator Enhancing()
@@ -156,32 +130,11 @@ public class Drone : Enemy
 
         Vector2 origin = (Vector2)transform.position + (checkDirection * 0.3f);
 
-
-        RaycastHit2D hit = Physics2D.CircleCast(origin, wallCheckDistance, checkDirection, 0.1f, wallLayer);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, checkDirection, wallCheckDistance, wallLayer);
 
         Debug.DrawRay(origin, checkDirection * 0.5f, Color.green);
 
         return hit.collider != null;
-    }
-
-    public void ReturnToStartPoint()
-    {
-        Vector3 targetPos = patrolPath.GetRandomPoint();
-        float distance = Vector2.Distance(transform.position, targetPos);
-
-        if (distance > 0.2f)
-        {
-            Vector2 moveDir = ((Vector2)patrolPath.GetRandomPoint() - (Vector2)transform.position).normalized;
-
-            FlipDrone(moveDir.x);
-
-            Rigid.linearVelocity = moveDir * Stat.moveSpeed;
-        }
-        else
-        {
-            Rigid.linearVelocity = Vector2.zero;
-            ChangeState(Dronestate[DroneStateType.Idle]);
-        }
     }
 
     public override void TakeDamage(float damage)
@@ -193,15 +146,14 @@ public class Drone : Enemy
 
         if (currnetHealth <= 0)
         {
-            ChangeState(Dronestate[DroneStateType.Dead]);
+            ChangeState(LRBstate[LRBStateType.Dead]);
             return;
         }
 
-        ChangeState(Dronestate[DroneStateType.Hit]);
-
+        ChangeState(LRBstate[LRBStateType.Hit]);
     }
 
-    public void FlipDrone(float direction)
+    public void FlipRobot(float direction)
     {
         Vector3 currentScale = transform.localScale;
         float newX = Mathf.Abs(currentScale.x) * Mathf.Sign(direction);
@@ -211,7 +163,6 @@ public class Drone : Enemy
     public void waitgameobjectfalse()
     {
         StartCoroutine(Dead());
-
     }
 
     IEnumerator Dead()
@@ -233,23 +184,15 @@ public class Drone : Enemy
                 {
                     isattack = true;
                     nextFiretime = Time.time + Stat.fireCooldown;
-
-                    Resetplayerposition();
-                    ChangeState(Dronestate[DroneStateType.Attack]);
+                    ChangeState(LRBstate[LRBStateType.Attack]);
                 }
             }
             else
             {
                 Debug.Log("사격 범위 이탈. 추적으로 전환.");
-                ChangeState(Dronestate[DroneStateType.Chase]);
-            }        
+                ChangeState(LRBstate[LRBStateType.Chase]);
+            }
         }
-    }
-    public void Resetplayerposition()
-    {
-        target = Pl_trans.position;
-        float direction = target.x - transform.position.x;
-        FlipDrone(direction);
     }
 
     public void Shoot()
@@ -261,19 +204,26 @@ public class Drone : Enemy
 
     public void Chase()
     {
-        float enhancing = enhanced ? 2f : 1f;   
+        float enhancing = enhanced ? 2f : 1f;
 
-        Vector2 direction = (Pl_trans.position - transform.position).normalized;
+        float targerdirection = Pl_trans.position.x - transform.position.x;
+        float directionSign = Mathf.Sign(targerdirection);
 
-        FlipDrone(direction.x);
-
-        Rigid.linearVelocity = direction * Stat.moveSpeed * enhancing;
-
-        float distance = Vector2.Distance(transform.position, Pl_trans.position);
+        float distance = Mathf.Abs(targerdirection);
 
         if (distance < 1.0f)
         {
             Rigid.linearVelocity = Vector2.zero;
+        }
+
+        if (distance > 1.0f)
+        {
+            FlipRobot(directionSign);
+            Rigid.linearVelocity = new Vector2(directionSign * Stat.moveSpeed * enhancing, Rigid.linearVelocity.y);
+        }
+        else
+        {
+            Rigid.linearVelocity = new Vector2(0, Rigid.linearVelocity.y);
         }
     }
 

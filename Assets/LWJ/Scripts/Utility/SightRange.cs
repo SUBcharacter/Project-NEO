@@ -61,27 +61,27 @@ public class SightRange : MonoBehaviour
 
     void OnDrawGizmos()
     {
-       //Gizmos.color = Color.yellow; 
-       //Gizmos.DrawWireSphere(transform.position, viewRadius);
-       //
-       //Gizmos.color = Color.red; 
-       //
-       //
-       //float dirMultiplier = Mathf.Sign(transform.localScale.x); // 방향에 따른 조정 : 왼쪽 : 음수 오른쪽 : 양수
-       //float baseAngle = (dirMultiplier > 0) ? 0f : 180f; // 기본 각도 설정
-       //
-       //Vector3 viewAngleA = DirFromAngle(baseAngle - viewAngle / 2); // 왼쪽 시야각
-       //Vector3 viewAngleB = DirFromAngle(baseAngle + viewAngle / 2); // 오른쪽 시야각
-       //
-       //Gizmos.DrawLine(transform.position, transform.position + viewAngleA * viewRadius); // 왼쪽 시야선
-       //Gizmos.DrawLine(transform.position, transform.position + viewAngleB * viewRadius); // 오른쪽 시야선
-       //
-       //// 플레이어가 시야에 들어왔을 때 선 그리기
-       //if (IsPlayerInSight && PlayerInSight != null)
-       //{
-       //    Gizmos.color = Color.green;
-       //    Gizmos.DrawLine(transform.position, PlayerInSight.position);
-       //}
+       Gizmos.color = Color.yellow; 
+       Gizmos.DrawWireSphere(transform.position, viewRadius);
+       
+       Gizmos.color = Color.red; 
+       
+       
+       float dirMultiplier = Mathf.Sign(transform.localScale.x); // 방향에 따른 조정 : 왼쪽 : 음수 오른쪽 : 양수
+       float baseAngle = (dirMultiplier > 0) ? 0f : 180f; // 기본 각도 설정
+       
+       Vector3 viewAngleA = DirFromAngle(baseAngle - viewAngle / 2); // 왼쪽 시야각
+       Vector3 viewAngleB = DirFromAngle(baseAngle + viewAngle / 2); // 오른쪽 시야각
+       
+       Gizmos.DrawLine(transform.position, transform.position + viewAngleA * viewRadius); // 왼쪽 시야선
+       Gizmos.DrawLine(transform.position, transform.position + viewAngleB * viewRadius); // 오른쪽 시야선
+       
+       // 플레이어가 시야에 들어왔을 때 선 그리기
+       if (IsPlayerInSight && PlayerInSight != null)
+       {
+           Gizmos.color = Color.green;
+           Gizmos.DrawLine(transform.position, PlayerInSight.position);
+       }
     }
 
 

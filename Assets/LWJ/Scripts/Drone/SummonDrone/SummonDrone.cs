@@ -141,7 +141,7 @@ public class SummonDrone : Enemy
     public void Flip(SummonDrone drone,float direction)
     {
         Vector3 currentScale = drone.transform.localScale;
-        if (direction > 0)
+       if (direction > 0)
        {
             drone.transform.localScale = new Vector3(Mathf.Abs(currentScale.x), currentScale.y, currentScale.z);
        }

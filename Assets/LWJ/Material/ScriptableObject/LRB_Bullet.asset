@@ -9,12 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c5e7173ada36b74787c0e0e68686cd5, type: 3}
-  m_Name: Guard_Stat
+  m_Script: {fileID: 11500000, guid: cd3645f468a289f4cb9a70b8bd3125ee, type: 3}
+  m_Name: LRB_Bullet
   m_EditorClassIdentifier: 
-  moveSpeed: 2
-  moveDistance: 1
-  MaxHp: 50
-  bulletcount: 0
-  fireCooldown: 1
-  Damage: 5
+  attackable:
+    serializedVersion: 2
+    m_Bits: 264
+  speed: 15
+  damage: 1
+  lifeTime: 3

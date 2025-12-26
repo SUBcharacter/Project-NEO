@@ -16,6 +16,8 @@ public class Security_Guard : Enemy
     [SerializeField] Magazine bulletpool;
     [SerializeField] Material hitFlash;
 
+    [SerializeField] HitBox impact;
+
     [SerializeField] bool hitted;
 
     public LayerMask groundLayer;
@@ -23,17 +25,18 @@ public class Security_Guard : Enemy
     [SerializeField] public Animator animator { get; private set; }
     public SightRange sightRange { get; private set; }
 
-    [SerializeField] Transform Target;
-    public Transform target => Target;
-
+    [SerializeField] bool Isattack; 
+    public Transform target;
     private float wallCheckDistance = 1f;
     private float groundCheckDistance = 1f;
-
-    public float nextFireTime { get; private set; }
+    public bool isattack { get => Isattack; set => Isattack = value; }
+    public float nextFireTime;
     protected override void Awake()
     {
         animator = GetComponentInChildren<Animator>();
+        ren = GetComponentInChildren<SpriteRenderer>();
         sightRange = GetComponent<SightRange>();
+        Rigid = GetComponent<Rigidbody2D>();
         StateInit();
     }
 
@@ -44,6 +47,7 @@ public class Security_Guard : Enemy
     public override void Init()
     {
         currnetHealth = Stat.MaxHp;
+        isattack = false;
         ChangeState(Guardstates[GuardStateType.Idle]);
     }
     
@@ -63,6 +67,7 @@ public class Security_Guard : Enemy
 
     public void ChangeState(Security_State newstate)
     {
+
         currentState?.Exit(this);
         currentState = newstate;
         currentState.Start(this);
@@ -70,22 +75,17 @@ public class Security_Guard : Enemy
 
     public override void Attack()
     {
-
+        StartCoroutine(falsehitbox());  
     }
 
-    public override void TakeDamage(float damage)
+    IEnumerator falsehitbox()
     {
-        currnetHealth -= damage;
-
-        StartCoroutine(HitFlash());
-
-        if (currnetHealth <= 0)
-        {
-            ChangeState(Guardstates[GuardStateType.Dead]);
-            return;
-        }
-        ChangeState(Guardstates[GuardStateType.Hit]);
+        impact.Init(false);
+        yield return CoroutineCasher.Wait(0.2f);
+        impact.gameObject.SetActive(false);
+        isattack = false;
     }
+
     public void FlipGuard(float direction)
     {
         Vector3 currentScale = transform.localScale;
@@ -95,9 +95,10 @@ public class Security_Guard : Enemy
 
     public void Chase()
     {
+        if (target == null) return;
+
         float targerdirection = target.position.x - transform.position.x;
         float directionSign = Mathf.Sign(targerdirection);
-
 
         float distance = Mathf.Abs(targerdirection);
 
@@ -116,6 +117,10 @@ public class Security_Guard : Enemy
         gameObject.SetActive(false);
     }
 
+    public void guarddie()
+    {
+        Die();
+    }
     public void Move()
     {
         float M_direction = Mathf.Sign(transform.localScale.x);
@@ -133,10 +138,10 @@ public class Security_Guard : Enemy
     }
     public float DistanceToPlayer()
     {
-        if (target == null)
+        if (sightRange.PlayerInSight == null)
             return 100;
 
-        float distanceX = transform.position.x - target.position.x;
+        float distanceX = transform.position.x - sightRange.PlayerInSight.position.x;
 
         return Mathf.Abs(distanceX);
     }
@@ -149,6 +154,19 @@ public class Security_Guard : Enemy
         RaycastHit2D hit = Physics2D.Raycast(footPosition, Vector2.down, groundCheckDistance, groundLayer);
 
         return hit.collider == null;
+    }
+    public override void TakeDamage(float damage)
+    {
+        currnetHealth -= damage;
+
+        StartCoroutine(HitFlash());
+
+        if (currnetHealth <= 0)
+        {
+            ChangeState(Guardstates[GuardStateType.Dead]);
+            return;
+        }
+        ChangeState(Guardstates[GuardStateType.Hit]);
     }
     IEnumerator HitFlash()
     {

@@ -57,26 +57,26 @@ public class AimRange : MonoBehaviour
     }
     void OnDrawGizmos()
     {
-        //Gizmos.color = Color.yellow;
-        //Gizmos.DrawWireSphere(transform.position, viewRadius);
-        //
-        //Gizmos.color = Color.red;
-        //
-        //
-        //float dirMultiplier = Mathf.Sign(transform.localScale.x);
-        //float baseAngle = (dirMultiplier > 0) ? 0f : 180f;
-        //
-        //Vector3 viewAngleA = DirFromAngle(baseAngle - viewAngle / 2);
-        //Vector3 viewAngleB = DirFromAngle(baseAngle + viewAngle / 2);
-        //
-        //Gizmos.DrawLine(transform.position, transform.position + viewAngleA * viewRadius);
-        //Gizmos.DrawLine(transform.position, transform.position + viewAngleB * viewRadius);
-        //
-        //if (IsPlayerInSight && PlayerInSight != null)
-        //{
-        //    Gizmos.color = Color.green;
-        //    Gizmos.DrawLine(transform.position, PlayerInSight.position);
-        //}
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, viewRadius);
+        
+        Gizmos.color = Color.red;
+        
+        
+        float dirMultiplier = Mathf.Sign(transform.localScale.x);
+        float baseAngle = (dirMultiplier > 0) ? 0f : 180f;
+        
+        Vector3 viewAngleA = DirFromAngle(baseAngle - viewAngle / 2);
+        Vector3 viewAngleB = DirFromAngle(baseAngle + viewAngle / 2);
+        
+        Gizmos.DrawLine(transform.position, transform.position + viewAngleA * viewRadius);
+        Gizmos.DrawLine(transform.position, transform.position + viewAngleB * viewRadius);
+        
+        if (IsPlayerInSight && PlayerInSight != null)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawLine(transform.position, PlayerInSight.position);
+        }
     }
     public Vector3 DirFromAngle(float angleInDegrees)
     {
