@@ -26,13 +26,6 @@ public class ElecShockPattern : BossPattern
     private bool isShockTriggered = false;
     // ShockEvent 들어오면 true → 로직 진행
 
-    //public override async Task StartPattern()
-    //{
-    //    isShockTriggered = false;
-    //    await Execute();
-    //    // StartPattern은 보통 Setup → Execute 구조
-    //}
-
     /// <summary>
     /// 메인 패턴 동작
     /// - ShockEvent 올 때까지 대기
@@ -41,6 +34,22 @@ public class ElecShockPattern : BossPattern
     /// </summary>
     protected override async Awaitable Execute()
     {
+        float dist = boss.DistanceToPlayer();
+
+        if(dist < minRange)
+        {
+            boss.ChangeState(new TutoSwayState(boss, this));
+            return;
+        }
+
+        if(dist > maxRange) 
+        {
+            boss.ChangeState(new TutoDashState(boss, this));
+            return;
+        }
+
+        IsFinished = false;
+        isShockTriggered = false;
         boss.FaceTarget(boss.player.position);
         animator.SetTrigger("ElecShock");
         Debug.Log("[전충] 패턴 시작");
@@ -76,6 +85,7 @@ public class ElecShockPattern : BossPattern
     public override void ExitPattern()
     {
         isShockTriggered = false;  // 다음 실행 대비 초기화
+        IsFinished = true;
         Debug.Log("[전충] ExitPattern 호출됨");
     }
 

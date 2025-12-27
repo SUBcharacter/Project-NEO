@@ -9,33 +9,19 @@ public class TTEAnimationEvent : MonoBehaviour
         tte = GetComponentInParent<TungTungE>();
     }
 
-    public void OnLeft()
+    public void OnPunch(int index)
     {
-        tte.Punches[0].Init();
+        tte.Punches[index].Init();
     }
 
-    public void OffLeft()
+    public void OffPunch(int index)
     {
-        tte.Punches[0].gameObject.SetActive(false);
+        tte.Punches[index].gameObject.SetActive(false);
     }
 
-    public void OnRight()
+    public void Attacking(int value)
     {
-        tte.Punches[1].Init();
+        tte.Attacking = value == 1 ? true : false;
     }
 
-    public void OffRight()
-    {
-        tte.Punches[1].gameObject.SetActive(false);
-    }
-
-    public void StartAttack()
-    {
-        tte.Attacking = true;
-    }
-
-    public void EndAttack()
-    {
-        tte.Attacking = false;
-    }
 }

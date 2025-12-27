@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc1c481e289caa84588772c49c4135df, type: 3}
   m_Name: TutoBossPhase
   m_EditorClassIdentifier: 
-  phaseName: TutoBossPhase1
+  phaseName: TutoBossPhase
+  nextRatio: 0
   speedMultiplier: 1
   restTime: 1
   maxPoise: 100
   entryPattern: {fileID: 0}
   availablePatterns:
-  - {fileID: 11400000, guid: a19c11291e321434f98dee7b9f686324, type: 2}
+  - {fileID: 11400000, guid: 5348a9233790c844ba01447fce20d0be, type: 2}

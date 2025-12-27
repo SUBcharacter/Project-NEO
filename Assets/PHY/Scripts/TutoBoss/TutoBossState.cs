@@ -1,376 +1,243 @@
-﻿using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+﻿using UnityEngine;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEditor.Tilemaps;
-using UnityEngine;
+/// <summary>
+/// 2025-12-23
+/// TODO: 팀장 피드백 후 추가 수정 및 보스패턴+기본공격 작업 예정
+/// </summary>
 
-///////////////////////////////////////////////////////////////
-// [TutoBossState]
-// - 모든 튜토보스 상태의 공통 부모
-// - 상태 전환 요청 플래그, 이동속도 등 기본 기능 제공
-///////////////////////////////////////////////////////////////
-public class TutoBossState : BossState
+
+// #TODO
+// 1. BossAI에 플레이어와 보스의 X축 거리(float)를 반환하는 public 함수를 작성 -> 완료
+// 2. BossPattern을 상속한 패턴들의 Execute함수 초반에 거리 판단 로직을 작성 -> 완료
+// 3. 상태 전환 흐름 재정비 -> 의도대로 작동하는지 확인필요
+// ※ 모르는 것이 있다면 언제든 알릴 것!
+
+// BossIdleState를 상속 받는게 아닌 추상 클래스인 BossState를 상속 받아야함
+public class TutoIdleBattleState : BossState // 작업 완
 {
-    protected TutoBossAI tutoAI;
-    protected bool isRequestChange = false;
-    // 중복 상태 전환 방지용 플래그
+    BossPattern currentPattern;
 
-    protected float tutoBossSpeed = 3f;
-    // Idle 패트롤 이동에 사용됨 (상태별로 필요시 override 가능)
+    float timer;
 
-    public TutoBossState(BossAI boss) : base(boss)
+    public TutoIdleBattleState(BossAI boss) : base(boss) { }
+
+    public override void Start()
     {
-        tutoAI = boss as TutoBossAI;
-    }
-
-    public override void Start() { }
-    public override void Update() { }
-
-    // 상태 전환 요청 (중복 요청 방지)
-    public void RequestChange(TutoBossState tutoBossNext)
-    {
-        if (isRequestChange) return;
-        isRequestChange = true;
-        boss.ChangeState(tutoBossNext);
-    }
-
-    public override void Exit()
-    {
-        // 다음 상태 진입 시 다시 전환 가능하도록 초기화
-        isRequestChange = false;
-    }
-}
-
-
-///////////////////////////////////////////////////////////////
-// [TutoIdleState]
-// - 등장 후 기본 대기 상태
-// - 좌우 패트롤 + 플레이어 감지 후 Chase로 이동
-///////////////////////////////////////////////////////////////
-public class TutoIdleState : TutoBossState
-{
-    private bool isPatrolling = false;
-    private float distanceToPlayer = 99f;
-    // 플레이어 감지 거리 (임시값)
-
-    public TutoIdleState(BossAI boss) : base(boss) { }
-
-    public override async void Start()
-    {
-        isPatrolling = true;
-
-        Debug.Log("Idle 시작됨");
-
-        // Idle 애니메이션 재생
+        timer = 0f;
+        boss.rb.linearVelocity = Vector2.zero;
         boss.animator.SetTrigger("Idle");
 
-        // 패트롤 시작
-        // await을 붙지 않는 이유:
-        // → 비동기 루틴이 끝날 때까지 대기하지 않고, Start 흐름은 그대로 진행
-        await PatrolRoutine();
-    }
-
-    // 좌우로 자동 이동하는 루틴
-    private async Task PatrolRoutine()
-    {
-        Vector3 leftPos = boss.transform.position + Vector3.left * 2f;
-        Vector3 rightPos = boss.transform.position + Vector3.right * 3f;
-
-        while (isPatrolling)
-        {
-            // 왼쪽 이동
-            boss.FaceTarget(leftPos);
-            await MoveTo(leftPos);
-            if (!isPatrolling) return;
-
-            await Awaitable.WaitForSecondsAsync(1f, boss.DestroyCancellationToken);
-
-            // 오른쪽 이동
-            boss.FaceTarget(rightPos);
-            await MoveTo(rightPos);
-            if (!isPatrolling) return;
-
-            await Awaitable.WaitForSecondsAsync(1f, boss.DestroyCancellationToken);
-        }
-    }
-
-    // 목표 좌표까지 이동 (프레임 단위 이동)
-    private async Task MoveTo(Vector3 targetPos)
-    {
-        while (isPatrolling && Vector2.Distance(boss.transform.position, targetPos) > 0.05f)
-        {
-            boss.transform.position = Vector3.MoveTowards(
-                boss.transform.position,
-                targetPos,
-                tutoBossSpeed * Time.deltaTime);
-
-            await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
-        }
+        // 패턴만 미리 선택
+        currentPattern = boss.SelectBestPattern();
+        boss.SetCurrentPattern(currentPattern);
     }
 
     public override void Update()
     {
-        if (boss.player == null) return;
+        // restTime이 끝나면 AttackingState로 넘기기
 
-        float dist = Mathf.Abs(boss.player.position.x - boss.transform.position.x);
+        timer += Time.deltaTime;
+        if (timer < boss.CurrentPhase.restTime) return;
 
-        // Chase 전환 조건
-        if (dist < distanceToPlayer)
-        {
-            Debug.Log("[Idle → Chase] 플레이어 접근함, 상태 전환");
-            isPatrolling = false;  // 패트롤 종료
-            RequestChange(new TutoChaseState(boss));
-        }
+        boss.ChangeState(new TutoBossAttackingState(boss, currentPattern));
     }
 
     public override void Exit()
     {
-        // 상태 전환 시 패트롤 강제 종료
-        isPatrolling = false;
-        base.Exit();
+        
     }
 }
 
-
-///////////////////////////////////////////////////////////////
-// [TutoChaseState]
-// - 플레이어 좌우 위치 따라가며 추적
-// - 일정 텀마다 패턴 실행 가능 여부 평가
-// - 공격 간격 쿨타임도 여기서 관리
-///////////////////////////////////////////////////////////////
-public class TutoChaseState : TutoBossState
+public class TutoSwayState : BossState
 {
-    private float chaseSpeed = 2.5f;
+    BossPattern currentPattern;
 
-    // 패턴 평가 주기
-    private float patternCheckInterval = 0.7f;
-    private float patternCheckTimer = 0f;
+    Vector2 dir;
 
-    private TutoBossAI tuto;
+    // 상태패턴이 안정되면 SO로 뺄 예정
+    float speed = 30f; // 이 속도는 플레이어와 동일한 속도 => // 플레이어 이동 속도 기준으로 조정 예정 7
+    float decelSpeed = 3f;   // 감속 속도 (중간에서 컷 해주는거 인듯) 3
+    float stop = 0.5f;      // 0.5
 
-    public TutoChaseState(BossAI boss) : base(boss)
-    {
-        tuto = boss as TutoBossAI;
-    }
+    // 스웨이 연출법
+    // - 진행할 방향으로 X축 속도를 적정하게 준다 ex. rigid.linearVelocityX = direction(float 아니면 Vector2.x) * 30f
+    // - 현재 속도를 담아둘 speed 변수(이건 완료, 다만 Start에서 linearVelocity(현재속도)를 넣어줘야함) 생성 및 초기화
+    // - Mathf.Lerp를 이용해서 최종 타겟을 0으로 잡고, speed에 지속적으로 업데이트 시켜준후 linearVelocityX에다 덮어씌우기
+    // - 해당 프레임에 마지막으로 산출된 speed를 기준으로 상한선 설정(Lerp 특성상 설정한 타겟에는 도달하기 힘들기에, 중간에서 컷 해줘야한다)
+    // - 속도 업데이트가 중단됨과 동시에 다시 AttackingState로 전환
+
+    public TutoSwayState(BossAI boss, BossPattern _currentPattern) : base(boss) { currentPattern = _currentPattern; }
 
     public override void Start()
     {
-        Debug.Log("Idle -> Walk로 넘어감");
-        boss.animator.SetTrigger("Walk");
+        boss.animator.SetTrigger("Sway");
+        boss.FaceTarget(boss.player.position);
+
+        float dx = boss.player.position.x - boss.transform.position.x;
+        dir = dx > 0 ? Vector2.left : Vector2.right; // 후퇴
+
+        speed = Mathf.Abs(boss.rb.linearVelocity.x);
+        if (speed < 0.01f)
+            speed = 30f;
     }
 
     public override void Update()
     {
-        if (boss.player == null) return;
+        // 거리 판단은 CurrentPattern에 담겨 있는 Execute에서 진행
+        // 스웨이가 끝나면 바로 Attacking 상태로 넘겨버리면 됨
+        // 거리판단 로직은 필요하나 현재 사용되고 있는 DecideDistance로는 한계가 있음
+        // 스웨이 로직은 BisiliState의 BSSwayState.Update를 참고 할 것
 
-        // 공격 쿨타임이 남았으면 → 무조건 추적만
-        if (Time.time < tuto.lastAttackTime + tuto.minAttackInterval)
+        speed = Mathf.Lerp(speed, 0, Time.deltaTime * decelSpeed);
+
+        boss.rb.linearVelocityX = dir.x * speed;
+
+        if(speed <= stop)
         {
-            TrackPlayer();
-            return;
+            boss.rb.linearVelocity = Vector2.zero;
+            boss.ChangeState(new TutoBossAttackingState(boss, currentPattern));
         }
 
-        // 추적
-        TrackPlayer();
-
-        // 패턴 체크 타이머
-        patternCheckTimer += Time.deltaTime;
-
-        // 일정 텀마다 패턴 평가
-        if (patternCheckTimer >= patternCheckInterval)
-        {
-            patternCheckTimer = 0f;
-
-            if (HasExecutablePattern())
-            {
-                Debug.Log("[Chase → Attack] 실행 가능한 패턴 발견");
-                RequestChange(new TutoAttackingState(boss));
-            }
-        }
     }
 
-    // 플레이어 X좌표로 따라가기
-    private void TrackPlayer()
+    public override void Exit()
     {
-        float targetX = boss.player.position.x;
-        float bossY = boss.transform.position.y;
-
-        Vector3 targetPos = new Vector3(targetX, bossY, boss.transform.position.z);
-
-        boss.FaceTarget(boss.player.position);
-
-        boss.transform.position = Vector3.MoveTowards(
-            boss.transform.position,
-            targetPos,
-            chaseSpeed * Time.deltaTime);
+        boss.rb.linearVelocity = Vector2.zero;
     }
-
-    // 실행 가능한 패턴 있나 평가
-    private bool HasExecutablePattern()
-    {
-        // 1) 튜토리얼 패턴 (순서 고정)
-        if (tuto.tutorialIndex < tuto.tutorialSequence.Count)
-        {
-            var p = tuto.tutorialSequence[tuto.tutorialIndex];
-            if (p.EvaluateScore(boss) > 0)
-                return true;
-        }
-
-        // 2) 랜덤 패턴
-        foreach (var p in tuto.randomPatterns)
-        {
-            if (p.EvaluateScore(boss) > 0)
-                return true;
-        }
-
-        return false;
-    }
-
-    public override void Exit() { }
 }
 
-
-///////////////////////////////////////////////////////////////
-// [TutoAttackingState]
-// - 패턴 선정 → 실행 → 애니메이션 이벤트 종료 → CoolDown
-///////////////////////////////////////////////////////////////
-public class TutoAttackingState : TutoBossState
+public class TutoDashState : BossState
 {
-    private BossPattern currentPattern;
-    private TutoBossAI tuto;
+    BossPattern currentPattern;
 
-    public TutoAttackingState(BossAI boss) : base(boss)
-    {
-        tuto = tutoAI;
-    }
+    // 상태패턴이 안정되면 SO로 뺄 예정
+    float speed;
+    float decelSpeed = 4f;      // 4
+    float stop = 0.5f;          // 0.5
+
+    Vector2 dir;
+
+    // 대쉬 연출법
+    // - 진행할 방향으로 X축 속도를 적정하게 준다 ex. rigid.linearVelocityX = direction(float 아니면 Vector2.x) * 30f
+    // - 현재 속도를 담아둘 speed 변수(이건 완료, 다만 Start에서 linearVelocity(현재속도)를 넣어줘야함) 생성 및 초기화
+    // - Mathf.Lerp를 이용해서 최종 타겟을 0으로 잡고, speed에 지속적으로 업데이트 시켜준후 linearVelocityX에다 덮어씌우기
+    // - 해당 프레임에 마지막으로 산출된 speed를 기준으로 상한선 설정(Lerp 특성상 설정한 타겟에는 도달하기 힘들기에, 중간에서 컷 해줘야한다)
+    // - 속도 업데이트가 중단됨과 동시에 다시 AttackingState로 전환
+
+    public TutoDashState(BossAI boss, BossPattern _currentPattern) : base(boss) { currentPattern = _currentPattern; }
 
     public override void Start()
     {
-        // 실행할 패턴 선택
-        currentPattern = SelectPattern();
-        Debug.Log($"[Attack] Start — 선택된 패턴: {currentPattern}");
+        boss.animator.SetTrigger("Dash");
+        boss.FaceTarget(boss.player.position);
+
+        float dx = boss.player.position.x - boss.transform.position.x;
+        dir = dx > 0 ? Vector2.right : Vector2.left;
+
+        speed = boss.CurrentPhase.speedMultiplier * 30f;     // TODO: 플레이어 이동 속도 기준으로 튜닝이 필요할진 모르지만 일단 보류
+
+    }
+
+    public override void Update()
+    {
+        // 거리 판단은 CurrentPattern에 담겨 있는 Execute에서 진행
+        // 스웨이가 끝나면 바로 Attacking 상태로 넘겨버리면 됨
+        // 거리판단 로직은 필요하나 현재 사용되고 있는 DecideDistance로는 한계가 있음
+        // 대쉬 로직은 Player.Dodge와 PlayerDodgeState.Update를 참고 할 것
+
+        speed = Mathf.Lerp(speed, 0, Time.deltaTime * decelSpeed);
+
+        boss.rb.linearVelocityX = dir.x * speed;
+
+        if(Mathf.Abs(speed) <= stop)
+        {
+            boss.rb.linearVelocity = Vector2.zero;
+
+            boss.ChangeState(new TutoBossAttackingState(boss, currentPattern));
+        }
+        
+        
+    }
+
+    public override void Exit()
+    {
+        boss.rb.linearVelocity = Vector2.zero;
+    }
+}
+
+public class TutoBossAttackingState : BossState
+{
+    BossPattern currentPattern;
+
+    // 중요! 현재 거리 판단에 따른 Sway, Dash 상태전환과 큰 연관이 있음!
+    // 현재 Idle에서 뽑았던 패턴을 BossAI에 만들어둔 CurrentState에다 넣어서 참조 하는방식
+    // 문제가 있는 것은 아니지만 다른 방법으로도 옮길 수 있음
+
+    // 각 스테이트 별 생성자에 매개 변수로 Idle에서 뽑았던 패턴을 넘겨 주면 됨. 이 부분은 작업 해 두겠음
+    // ex. TutoBossAttackingState(BossAI boss, BossPattern currentPattern) : base(boss) { this.currentPattern = currentPattern; }
+
+    // AttackingState 진입 시 Initialize를 통해 뽑아놓은 패턴이 BossAI를 인식하고, 이를 통해 BossAI에 있는 거리 산출 함수를 사용할 수 있음
+    // StartPattern 실행시 Execute 초반 BossAI에 있는 거리 판단 함수를 이용해서 사거리 판단을 하고,
+    // 각 상황에 맞게 'Execute에서' Sway 혹은 Dash로 ChangeState를 호출 할 것임.
+    // Sway, Dash는 행동이 끝나면 바로 다시 AttackingState로 돌아올 것이고,
+    // Initialize와 StartPattern을 거쳐서 패턴이 실행 될 경우, 패턴이 끝났다면 다시 Idle로 돌려보내면 됨
+    // Idle에 진입하면 새로운 패턴을 뽑을 것이기 때문에 문제 없음.
+    // 거리 판단 로직은 현재 만들어둔 패턴에 가이드를 작성 해둘 것이니 참고 할 것
+    
+    public TutoBossAttackingState(BossAI boss, BossPattern currentPattern) : base(boss) { this.currentPattern = currentPattern; }
+
+    public override void Start()
+    {
+        boss.rb.linearVelocity = Vector2.zero;
+        boss.Attacking = true;
 
         if (currentPattern == null)
         {
-            // 조건 맞는 패턴 하나도 없음
-            Debug.Log("[Attack] 패턴 없음 → CoolDown");
-            RequestChange(new TutoCoolDownState(boss, 1f));
+            boss.ChangeState(new TutoIdleBattleState(boss));
             return;
         }
 
-        // 패턴 실행 준비
         currentPattern.Initialize(boss);
-
-        Debug.Log("[Attack] StartPattern 실행");
         currentPattern.StartPattern();
-    }
 
-    // 패턴 선택 로직
-    private BossPattern SelectPattern()
-    {
-        // 1) 튜토 순서 우선
-        if (tuto.tutorialIndex < tuto.tutorialSequence.Count)
-        {
-            BossPattern p = tuto.tutorialSequence[tuto.tutorialIndex];
-            if (p.EvaluateScore(boss) > 0)
-            {
-                tuto.tutorialIndex++;
-                return p;
-            }
-        }
-
-        // 2) 랜덤 패턴 중 조건 맞는 것만 후보로 가져오기
-        List<BossPattern> valid = new List<BossPattern>();
-
-        foreach (var p in tuto.randomPatterns)
-        {
-            if (p.EvaluateScore(boss) > 0)
-                valid.Add(p);
-        }
-
-        if (valid.Count == 0)
-            return null;
-
-        // 3) 가중치 기반 랜덤 선택
-        float total = 0;
-        foreach (var p in valid) total += p.EvaluateScore(boss);
-
-        float rand = Random.Range(0, total);
-        float sum = 0;
-
-        foreach (var p in valid)
-        {
-            sum += p.EvaluateScore(boss);
-            if (rand <= sum)
-                return p;
-        }  
-
-        return valid[0];
     }
 
     public override void Update()
     {
-        // 패턴 진행 중 호출
-        currentPattern?.UpdatePattern();
+        currentPattern.UpdatePattern();
+
+        if (currentPattern.IsFinished)
+        {
+            boss.Attacking = false;
+            boss.ChangeState(new TutoIdleBattleState(boss));
+        }
     }
 
     public override void OnAnimationEvent(string eventName)
     {
-        Debug.Log($"[Attack] AnimationEvent → {eventName}");
-
-        if (eventName == "AttackEnd")
-        {            
-            // 공격 쿨타임 기록
-            tuto.lastAttackTime = Time.time;
-            
-            Debug.Log("[Attack] AttackEnd → CoolDown");
-            currentPattern?.ExitPattern();
-            
-            RequestChange(new TutoCoolDownState(boss, 1f));
-        }
-        else
-        {
-            currentPattern?.OnAnimationEvent(eventName);
-        }
+        Debug.Log($"[State] Event: {eventName}, pattern = {currentPattern}");
+        currentPattern.OnAnimationEvent(eventName);
     }
 
     public override void Exit()
     {
-        currentPattern?.ExitPattern();
+       
+        boss.Attacking = false;
     }
 }
 
-
-///////////////////////////////////////////////////////////////
-// [TutoCoolDownState]
-// - 공격 종료 후 잠시 대기 상태
-// - 일정 시간 지나면 Chase로 복귀
-///////////////////////////////////////////////////////////////
-public class TutoCoolDownState : TutoBossState
+public class TutoBossDeathState : BossState
 {
-    private float timer;
-
-    public TutoCoolDownState(BossAI boss, float coolTime) : base(boss)
-    {
-        timer = coolTime;    // CoolDown 지속 시간
-    }
+    public TutoBossDeathState(BossAI boss) : base(boss) { }
 
     public override void Start()
     {
-        // Idle 포즈 유지
-        boss.animator.SetTrigger("Idle");
+        boss.rb.linearVelocity = Vector2.zero;
+        boss.animator.SetTrigger("Death");
     }
 
-    public override void Update()
-    {
-        timer -= Time.deltaTime;
-
-        if (timer <= 0)
-        {
-            Debug.Log("[CoolDown → Chase] 쿨타임 종료");
-            RequestChange(new TutoChaseState(boss));
-        }
-    }
+    public override void Update() { }
 
     public override void Exit() { }
 }

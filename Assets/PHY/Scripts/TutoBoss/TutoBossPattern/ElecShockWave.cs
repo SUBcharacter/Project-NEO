@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class ElecShockWave : MonoBehaviour
 {
-    [SerializeField] HitBox shockHitBox;
     public float lifeTime = 3.5f;
 
 

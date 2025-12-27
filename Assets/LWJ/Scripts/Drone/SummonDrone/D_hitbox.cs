@@ -16,24 +16,36 @@ public class D_hitbox : HitBox
 
     protected override void Triggered(GameObject collision)
     {
-        if(summondrone.currentStates is SD_Attackstate == false) return;
+        float damage = stats.damage;
+        if (summondrone.currentStates is SD_Attackstate == false) return;
 
         if (((1 << collision.gameObject.layer) & stats.attackable) == 0) return;
 
-
-        Player player = collision.GetComponent<Player>();
-
-        if (player != null)
+        switch (collision.layer)
         {
-            Debug.Log("플레이어에게 데미지 입힘");
-            player.TakeDamage(stats.damage);
-
+            case (int)Layers.terrain:
+                triggered = true;
+                Debug.Log("충돌");
+                break;
+            case (int)Layers.enviroment:
+                triggered = true;
+                Debug.Log("충돌");
+                break;
+            case (int)Layers.enemy:
+                triggered = true;
+                break;
+            case (int)Layers.player:
+                Debug.Log("플레이어 충돌");
+                collision.GetComponent<IDamageable>().TakeDamage(damage);
+                triggered = true;
+                break;
+            case (int)Layers.border:
+                triggered = true;
+                break;
+            case (int)Layers.invincible:
+                triggered = true;
+                break;
         }
-        else
-        {
-            Debug.Log("플레이어를 찾지 못햇습니다");
-        }
-
 
     }
 }

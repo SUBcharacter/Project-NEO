@@ -66,7 +66,7 @@ public class TTEAttackState : TungTungEState
 
     public override void Exit(TungTungE tte)
     {
-
+        tte.StopAttack();
     }
 }
 

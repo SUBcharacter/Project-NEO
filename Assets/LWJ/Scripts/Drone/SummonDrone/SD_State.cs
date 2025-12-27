@@ -34,14 +34,19 @@ public class SD_Idlestate : SD_State
 
 public class SD_Attackstate : SD_State
 {
+    float distance;
     public override void Start(SummonDrone summondrone)
     {
         Debug.Log("SummonDrone Attack State 시작");
-        summondrone.Attack();
       
     }
     public override void Update(SummonDrone summondrone)
     {
+        distance = Vector3.Distance(summondrone.transform.position, summondrone.Player_trans.position);
+        if(distance <= summondrone.explosionRadius)
+        {
+            summondrone.Attack();
+        }
         summondrone.Chase();
     }
     public override void Exit(SummonDrone summondrone) 
@@ -52,7 +57,7 @@ public class SD_Attackstate : SD_State
 
 public class SD_Summonstate : SD_State
 {
-   
+   float distance;
     public override void Start(SummonDrone summondrone)
     {
         Debug.Log("SummonDrone Summon State 시작");
@@ -61,7 +66,7 @@ public class SD_Summonstate : SD_State
     {
         Vector3 target = summondrone.Resear_trans.position + (Vector3)summondrone.offset;
 
-        // 드론이 타겟 위치를 향해 이동
+        // 드론이 타겟 위치를 향해 이동 
         if (target.x > summondrone.transform.position.x)
         {
 
@@ -81,12 +86,9 @@ public class SD_Summonstate : SD_State
         if (distanceToTarget < summondrone.arriveDistance) 
         {
             Debug.Log("소환 드론 목표 위치 도착. Idle 상태로 전환.");
-
-            if (summondrone.Rigid != null)
-            {
-                summondrone.Rigid.linearVelocity = Vector2.zero;
-            }
-
+ 
+            summondrone.Rigid.linearVelocity = Vector2.zero;
+            
             summondrone.ChangeState(summondrone.SD_states[SummonDroneStateType.Idle]);
         }
 
