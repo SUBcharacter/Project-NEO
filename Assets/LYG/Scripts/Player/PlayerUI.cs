@@ -16,32 +16,56 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] Image flashAttackIcon;
     [SerializeField] Image phantomBladeIcon;
     [SerializeField] Image autoTargetingIcon;
+
     [SerializeField] Image stamina;
     [SerializeField] Image overFlowEnergy;
     [SerializeField] Image lifeIcon;
     [SerializeField] Text bulletCount;
+    [SerializeField] Transform hpLifePanel;
 
     public Image playerCrossHair;
+
     public List<Image> targetCrossHair;
+    public List<Image> LifeIcons;
+
     public Canvas Cnvs { get => canvas; set => canvas = value; }
 
 
+    private int lifeCount = 5;
     private void Awake()
     {
         player = FindAnyObjectByType<Player>();
         canvas = GetComponent<Canvas>();
-        for(int i = 0; i< 12; i++)
+
+        for (int i = 0; i < 12; i++)
         {
             Image instance = Instantiate(targetCrossHairPrefab, transform);
             targetCrossHair.Add(instance);
             targetCrossHair[i].gameObject.SetActive(false);
         }
-        
+
+        for (int i = 0; i < 5; i++)
+        {
+            Image life = Instantiate(lifeIcon, hpLifePanel);
+
+            life.gameObject.SetActive(true);
+            LifeIcons.Add(life);
+
+        }
+
     }
 
     private void Update()
     {
         SkillUI();
+
+        // 체력이 잘 깎이는지 테스트용
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            LifeUI();
+            Debug.Log("체력 깎임");
+        }
+
     }
 
     void SkillUI()
@@ -75,7 +99,7 @@ public class PlayerUI : MonoBehaviour
 
     void PhantomBladeUI()
     {
-        if(player.SkMn.PhantomBladeUsable)
+        if (player.SkMn.PhantomBladeUsable)
         {
             phantomBladeIcon.transform.SetAsLastSibling();
             phantomBladeIcon.gameObject.SetActive(false);
@@ -89,7 +113,7 @@ public class PlayerUI : MonoBehaviour
 
     void ChargeAttackUI()
     {
-        if(player.SkMn.ChargeAttackUsable)
+        if (player.SkMn.ChargeAttackUsable)
         {
             Debug.Log("비활성화");
             chargeAttackIcon.transform.SetAsLastSibling();
@@ -140,7 +164,18 @@ public class PlayerUI : MonoBehaviour
 
     void LifeUI()
     {
-       
+        // 5개 다 까이면 바로 뒤지는건 TakeDamage랑 연동해야할듯
+        if (lifeCount <= 0)
+        {
+            Debug.Log("뒤짐");
+            return;
+        }
+        lifeCount--;
+
+        for (int i = 0; i < 5; i++)
+        {
+            LifeIcons[i].gameObject.SetActive(i < lifeCount);
+        }
     }
 
 }
