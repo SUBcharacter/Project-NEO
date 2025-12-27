@@ -38,8 +38,6 @@ public class BossAI : MonoBehaviour, IDamageable
     // 페이즈 이름이 "TutoBossPhase"이면 자동으로 TutoIdleBattleState로 넘어감. 자세한건  BossState 참고
 
     #endregion
-
-    private CancellationTokenSource _cts;                // 비동기 작업 취소용 토큰
     private CancellationTokenSource _patternCts;           // [추가] 패턴 중단용 12/25
 
 
