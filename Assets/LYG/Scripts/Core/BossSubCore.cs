@@ -23,7 +23,7 @@ public class BossSubCore : SubCore
         if (health <= 0)
         {
             health = 0;
-            //boss.TakeGroggyDamage(groggyDamage);
+            boss.TakeGroggyDamage(groggyDamage);
             gameObject.SetActive(false);
         }
     }

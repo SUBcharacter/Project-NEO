@@ -15,9 +15,9 @@ MonoBehaviour:
   noFriction: {fileID: 6200000, guid: 8f1d0ba2b3f662246977982ce974a96b, type: 2}
   fullFriction: {fileID: 6200000, guid: b993068c5ec364143971c3b87f05e2eb, type: 2}
   maxHealth: 10
-  speed: 7
+  speed: 8
   dodgeForce: 30
-  jumpForce: 13.5
+  jumpForce: 9.5
   airJumpForce: 8.5
   wallJumpX: 5
   wallJumpY: 10

@@ -133,12 +133,12 @@ public class Player : MonoBehaviour, IDamageable
     {
         if (!(isDead || hit || moveable))
         {
-            Move();
+            //Move();
+            Move1();
             SpriteControl();
         }
             
 
-        //Move1();
     }
 
     void StateInit()

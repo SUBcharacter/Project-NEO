@@ -49,7 +49,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -87,7 +87,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -128,10 +128,10 @@ TextureImporter:
       name: projetilNew_0
       rect:
         serializedVersion: 2
-        x: 30
-        y: 403
-        width: 214
-        height: 24
+        x: 0
+        y: 384
+        width: 256
+        height: 64
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -150,10 +150,10 @@ TextureImporter:
       name: projetilNew_1
       rect:
         serializedVersion: 2
-        x: 32
-        y: 341
-        width: 214
-        height: 22
+        x: 0
+        y: 320
+        width: 256
+        height: 64
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -172,10 +172,10 @@ TextureImporter:
       name: projetilNew_2
       rect:
         serializedVersion: 2
-        x: 32
-        y: 278
-        width: 214
-        height: 22
+        x: 0
+        y: 256
+        width: 256
+        height: 64
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -194,10 +194,10 @@ TextureImporter:
       name: projetilNew_3
       rect:
         serializedVersion: 2
-        x: 36
-        y: 212
-        width: 214
-        height: 22
+        x: 0
+        y: 192
+        width: 256
+        height: 64
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -216,10 +216,10 @@ TextureImporter:
       name: projetilNew_4
       rect:
         serializedVersion: 2
-        x: 36
-        y: 148
-        width: 212
-        height: 22
+        x: 0
+        y: 128
+        width: 256
+        height: 64
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -230,6 +230,50 @@ TextureImporter:
       bones: []
       spriteID: dd7849270d52cd2b0800000000000000
       internalID: -5558526262876272675
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: projetilNew_5
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 64
+        width: 256
+        height: 64
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3e6cb19e9452c0742bda28fdb31465a7
+      internalID: 1983089231
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: projetilNew_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 256
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1e0bb5a8310acd84f927dcf0c13279e8
+      internalID: -2144868935
       vertices: []
       indices: 
       edges: []
@@ -253,6 +297,8 @@ TextureImporter:
       projetilNew_2: 3695492288912404985
       projetilNew_3: 4833036727539891820
       projetilNew_4: -5558526262876272675
+      projetilNew_5: 1983089231
+      projetilNew_6: -2144868935
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
