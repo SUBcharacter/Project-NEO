@@ -41,7 +41,11 @@ public class BossAI : MonoBehaviour, IDamageable
             return _patternCts.Token;
         }
     }
-    [HideInInspector] public List<GameObject> activeLightWaves = new();
+    [HideInInspector] public List<GameObject> activeLightWaves = new();   // 코어 리스트
+
+    private bool isCoreActive = false;
+
+
     private void Awake()
     {
         _cts = new CancellationTokenSource();
@@ -64,7 +68,7 @@ public class BossAI : MonoBehaviour, IDamageable
         currentState?.Update();
 
         PhaseTestDamage();
-    }    
+    }
     public BossPattern SelectBestPattern() // 패턴 선택 알고리즘
     {
         if (currentPhase == null) return null;
@@ -100,21 +104,41 @@ public class BossAI : MonoBehaviour, IDamageable
     }
     public void TakeDamage(float damage)
     {
-        if (isGroggy) damage *= 1.5f; // 그로기 때는 더 아프게
+        if (isGroggy)
+        {
+            damage *= 1.5f;
+        }
 
-        currentHp = Mathf.Max(0, currentHp - damage);
-
-        // 강인도 깎기 (데미지에 비례하거나 고정값) <- 어째해야할지 논의해야 함
+        if (isCoreActive)
+        {
+            float sum = 0f;
+            foreach (var core in activeLightWaves)
+            {
+                if (core != null)
+                {                    
+                    sum += core.GetComponent<BossSubCore>().EnhancingAmount;
+                }
+            }
+            currentHp = Mathf.Max(0, currentHp - (damage * sum));
+            TakeGroggyDamage(3f);
+        }
+        else
+        {
+            currentHp = Mathf.Max(0, currentHp - damage);
+            TakeGroggyDamage(3f);
+        }
+        CheckPhaseTransition();
+    }
+    public void TakeGroggyDamage(float damage)          // 코어가 활성화가 되어있을 시 데미지가 경감이 되는 구조
+    {
         if (!isGroggy)
         {
-            currentPoise -= damage; // 여기다 변수하나 해서 넣어보기..정도? ex) 근접이면 1.5,원거리는 1.0? 이런느낌
+            currentPoise -= damage;
             if (currentPoise <= 0)
             {
                 StartGroggy();
             }
         }
-
-        CheckPhaseTransition();
     }
     void StartGroggy()
     {
@@ -171,11 +195,11 @@ public class BossAI : MonoBehaviour, IDamageable
         if (targetPos.x > transform.position.x) transform.localScale = new Vector3(scaleX, transform.localScale.y, 1);
         else transform.localScale = new Vector3(-scaleX, transform.localScale.y, 1);
     }
-    private void OnDestroy() 
+    private void OnDestroy()
     {
         StopCurrentPattern();
-        _cts?.Cancel(); 
-        _cts?.Dispose(); 
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
     private void PhaseTestDamage()
     {
@@ -185,7 +209,7 @@ public class BossAI : MonoBehaviour, IDamageable
             Debug.Log($"Test Damage Current HP: {currentHp}");
         }
     }
-    
+
     public void StopCurrentPattern() // 스테이트 변경 시 패턴 강제종료 시키는 함수
     {
         if (_patternCts != null)
