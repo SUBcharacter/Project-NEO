@@ -35,12 +35,12 @@ public class SmashPattern : BossPattern
             {
                 try
                 {
-                    await Awaitable.WaitForSecondsAsync(delayBetweenSmash, boss.DestroyCancellationToken);
+                    await Awaitable.WaitForSecondsAsync(delayBetweenSmash, boss.PatternCancellationToken);
                 }
                 catch (System.OperationCanceledException) { return; }
             }
         }
-        await Awaitable.WaitForSecondsAsync(0.5f, boss.DestroyCancellationToken);
+        await Awaitable.WaitForSecondsAsync(0.5f, boss.PatternCancellationToken);
 
         boss.OnAnimationTrigger("AttackEnd");
     }
@@ -50,7 +50,7 @@ public class SmashPattern : BossPattern
         animator.SetTrigger("ReadySmash");
         try
         {
-            await Awaitable.WaitForSecondsAsync(0.5f, boss.DestroyCancellationToken);
+            await Awaitable.WaitForSecondsAsync(0.5f, boss.PatternCancellationToken);
         }
         catch (System.OperationCanceledException) { return; }
 
@@ -83,7 +83,7 @@ public class SmashPattern : BossPattern
 
             rb.MovePosition(nextPos);
 
-            await Awaitable.FixedUpdateAsync(boss.DestroyCancellationToken);
+            await Awaitable.FixedUpdateAsync(boss.PatternCancellationToken);
         }
         rb.MovePosition(targetPos);
 

@@ -53,7 +53,7 @@ public class GrabPattern : BossPattern
 
         try
         {
-            await Awaitable.WaitForSecondsAsync(1f, boss.DestroyCancellationToken);
+            await Awaitable.WaitForSecondsAsync(1f, boss.PatternCancellationToken);
         }
         catch (OperationCanceledException) { ExitPattern(); return; }
 
@@ -72,7 +72,7 @@ public class GrabPattern : BossPattern
             animator.SetTrigger("GrabMiss");
             try
             {
-                await Awaitable.WaitForSecondsAsync(1.0f, boss.DestroyCancellationToken);
+                await Awaitable.WaitForSecondsAsync(1.0f, boss.PatternCancellationToken);
             }
             catch (OperationCanceledException) { }
         }
@@ -108,7 +108,7 @@ public class GrabPattern : BossPattern
                     break;
                 }
             }
-            await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
+            await Awaitable.NextFrameAsync(boss.PatternCancellationToken);
         }
     }
 
@@ -145,12 +145,12 @@ public class GrabPattern : BossPattern
         {
             liftTime += Time.deltaTime;
             targetRoot.localPosition = Vector3.Lerp(startLocalPos, targetLocalPos, liftTime / 0.3f);
-            await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
+            await Awaitable.NextFrameAsync(boss.PatternCancellationToken);
         }
 
         try
         {
-            await Awaitable.WaitForSecondsAsync(0.2f, boss.DestroyCancellationToken);
+            await Awaitable.WaitForSecondsAsync(0.2f, boss.PatternCancellationToken);
         }
         catch (OperationCanceledException) { ReleasePlayer(); return; } // 취소되면 놔주기
 
@@ -166,7 +166,7 @@ public class GrabPattern : BossPattern
             slamTime += Time.deltaTime;
             float t = slamTime / 0.1f;
             targetRoot.localPosition = Vector3.Lerp(peakLocalPos, groundLocalPos, t * t); // 가속 느낌
-            await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
+            await Awaitable.NextFrameAsync(boss.PatternCancellationToken);
         }
 
         // 데미지 입히기
@@ -175,7 +175,7 @@ public class GrabPattern : BossPattern
 
         // 5. 해방
         ReleasePlayer();
-        await Awaitable.WaitForSecondsAsync(0.5f, boss.DestroyCancellationToken);
+        await Awaitable.WaitForSecondsAsync(0.5f, boss.PatternCancellationToken);
     }
     private void ReleasePlayer()
     {

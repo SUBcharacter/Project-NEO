@@ -17,10 +17,10 @@ public class DebugManager : MonoBehaviour
             bulletObject = Instantiate(bulletPrefab, player.transform.position, Quaternion.identity);
         }
         IsPlayerVector();
-        bulletMove();
+        BulletMove();
     }
 
-    void bulletMove()
+    void BulletMove()
     {
         if (bulletObject != null)
         {

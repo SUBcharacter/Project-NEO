@@ -35,8 +35,8 @@ public abstract class BossPattern : ScriptableObject
         this.boss = boss;
         this.animator = boss.animator;
         this.rb = boss.GetComponent<Rigidbody2D>();
-    }  
-    
+    }
+
     public float EvaluateScore(BossAI boss)
     {
         // 쿨타임 체크 후
@@ -54,7 +54,7 @@ public abstract class BossPattern : ScriptableObject
         float distDiff = Mathf.Abs(distance - midRange);
 
         if (distDiff < 2.0f) // 가까울수록 가중치 증가
-            finalScore *= 1.5f; 
+            finalScore *= 1.5f;
 
         // 가중치 설정
         return finalScore;
@@ -64,7 +64,11 @@ public abstract class BossPattern : ScriptableObject
     {
         lastUsedTime = Time.time;
 
-        await Execute();
+        try { await Execute(); }            // 구조 튼튼하고 확실하게 수정 12/25
+        catch (System.OperationCanceledException)
+        {
+            ExitPattern();
+        }
     }
     protected abstract Awaitable Execute();
     public abstract void UpdatePattern();         // 패턴 진행 중일 때 필요한 로직 여따 짜셈

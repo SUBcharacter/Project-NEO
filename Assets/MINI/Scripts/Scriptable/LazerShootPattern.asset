@@ -13,15 +13,14 @@ MonoBehaviour:
   m_Name: LazerShootPattern
   m_EditorClassIdentifier: 
   minRange: 0
-  maxRange: 20
+  maxRange: 30
   cooldownTime: 2.5
   priorityWeight: 1
-  comboPatterns:
-  - {fileID: 11400000, guid: 181773eb8357dbe4f8041afa736829fe, type: 2}
+  comboPatterns: []
   comboChance: 0.5
   lazerPrefab: {fileID: 165814796086986629, guid: ed988140a1a9bcf468265299b5c603b1, type: 3}
   maxDistance: 30
   chargeTime: 1.5
   laserDuration: 1
   laserThickness: 1
-  muzzleOffset: {x: 0, y: 0.5}
+  muzzleOffset: {x: 0, y: 0}

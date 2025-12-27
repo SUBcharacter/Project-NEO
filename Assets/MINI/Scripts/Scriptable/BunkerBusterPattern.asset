@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cd523abc2e5d97499f9419f96f35ec2, type: 3}
+  m_Name: BunkerBusterPattern
+  m_EditorClassIdentifier: 
+  minRange: 0
+  maxRange: 30
+  cooldownTime: 3
+  priorityWeight: 1.3
+  comboPatterns: []
+  comboChance: 0.5
+  prepTime: 1
+  jumpSpeed: 50
+  maxJumpHeight: 20
+  ceilingStopDist: 3
+  warningPrefab: {fileID: 5872173232802487009, guid: 8a848c3b830f0df43848b2e7e82deac3, type: 3}
+  trackingTime: 1
+  lockOnTime: 0.5
+  dropSpeed: 60
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  explosionStat: {fileID: 11400000, guid: e6996dba06c59544ebf2e4bc0bf5756f, type: 2}
+  explosionSize: {x: 6, y: 3}
+  recoveryTime: 1.5

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DropTheRockPattern
   m_EditorClassIdentifier: 
   minRange: 0
-  maxRange: 20
+  maxRange: 30
   cooldownTime: 5
   priorityWeight: 1
   comboPatterns: []

@@ -27,14 +27,14 @@ public class LazerShootPattern : BossPattern
         boss.animator.SetTrigger("PointToPlayer"); // È¤Àº ChargeLazer
         try
         {
-            await Awaitable.WaitForSecondsAsync(0.2f, boss.DestroyCancellationToken);
+            await Awaitable.WaitForSecondsAsync(0.2f, boss.PatternCancellationToken);
         }
         catch (System.OperationCanceledException) { return; }
 
         boss.animator.SetTrigger("ChargeLazer");
         try
         {
-            await Awaitable.WaitForSecondsAsync(chargeTime, boss.DestroyCancellationToken);
+            await Awaitable.WaitForSecondsAsync(chargeTime, boss.PatternCancellationToken);
         }
         catch (System.OperationCanceledException) { return; }
 
@@ -85,7 +85,7 @@ public class LazerShootPattern : BossPattern
             float currentY = Mathf.Lerp(initialScale.y, 0f, progress);
             lazerObj.transform.localScale = new Vector3(initialScale.x, currentY, initialScale.z);
 
-            await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
+            await Awaitable.NextFrameAsync(boss.PatternCancellationToken);
         }
 
         if (lazerObj != null) Destroy(lazerObj);

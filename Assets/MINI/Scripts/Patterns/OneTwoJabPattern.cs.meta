@@ -1,2 +1,13 @@
 fileFormatVersion: 2
 guid: 4dfa07f6b78a6c94dbcb43011ad90bd3
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - jabStat: {fileID: 11400000, guid: ba8cb16476a333a47a9906c9f82ddde3, type: 2}
+  - straightStat: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

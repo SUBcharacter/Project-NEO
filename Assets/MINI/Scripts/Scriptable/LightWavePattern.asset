@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: LightWavePattern
   m_EditorClassIdentifier: 
   minRange: 0
-  maxRange: 20
+  maxRange: 33
   cooldownTime: 4
   priorityWeight: 1
   comboPatterns: []
   comboChance: 0.5
   lightWaveObject: {fileID: 1933580668229941274, guid: 372cb5b754d3a794c95cde5b74793b3b, type: 3}
-  objectSpawnOffset: {x: 3, y: 3}
+  objectSpawnOffset: {x: -1.5, y: 0}
   maxObejects: 2

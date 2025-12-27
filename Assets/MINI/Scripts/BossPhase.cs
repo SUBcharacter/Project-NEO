@@ -23,4 +23,8 @@ public class BossPhase : ScriptableObject
     [Header("Available Patterns")]
     [Tooltip("이 페이즈에서 사용 가능한 모든 패턴을 넣으세요")]
     public List<BossPattern> availablePatterns = new();
+
+    [Header("Attack Interval (공격 간 텀)")]
+    public float minDelay = 0.5f; // 최소 쉬는 시간
+    public float maxDelay = 0.8f; // 최대 쉬는 시간
 }

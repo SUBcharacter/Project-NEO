@@ -2,31 +2,36 @@ using UnityEngine;
 
 [CreateAssetMenu(fileName = "JabStraightPattern", menuName = "Boss/Patterns/JabStraight")]
 public class JabStraightPattern : BossPattern
-{    
+{
+    [Header("Pre")]
     [SerializeField] private float prepTime = 0.5f;
 
     [Header("Jab")]
-    [SerializeField] private float jabDuration = 0.5f;                      // 잽 총 시전시간
-    [SerializeField] private float jabImpactTime = 0.2f;                    // 선딜
-    [SerializeField] private float jabStepSpeed = 5f;                       // 잽 전진속도
+    [Tooltip("이동 시간")]
+    [SerializeField] private float jabStepDuration = 0.1f;
+    [Tooltip("전진 속도")]
+    [SerializeField] private float jabStepSpeed = 15f;
+    [Tooltip("총 대기 시간")]
+    [SerializeField] private float jabImpactTime = 0.25f;
+    [SerializeField] private float jabTotalDuration = 0.5f; // 전체 모션 시간
 
-    [SerializeField] private HitBoxStat jabStat;                            // HitBox SO
-        
-    [SerializeField] private float jabWidth = 1.5f;                         // 잽의 가로 길이
-    [SerializeField] private Vector2 jabOffset = new(1.0f, 0f);             // 잽 대강 위치
+    [SerializeField] private HitBoxStat jabStat;
+    [SerializeField] private float jabWidth = 1.5f;
+    [SerializeField] private Vector2 jabOffset = new(1.0f, 0f);
 
     [Header("Straight")]
-    [SerializeField] private float straightDuration = 0.8f;                 // 스트 총 시전시간
-    [SerializeField] private float straightImpactTime = 0.4f;               // 딜
-    [SerializeField] private float straightStepSpeed = 8f;                  // 잽 전진속도
+    [Tooltip("스텝 시간")]
+    [SerializeField] private float straightStepDuration = 0.15f;
+    [SerializeField] private float straightStepSpeed = 20f;
+    [SerializeField] private float straightImpactTime = 0.4f;
+    [SerializeField] private float straightTotalDuration = 0.8f;
 
-    [SerializeField] private HitBoxStat straightStat;                       // 스트 SO
+    [SerializeField] private HitBoxStat straightStat;
+    [SerializeField] private float straightWidth = 2.5f;
+    [SerializeField] private Vector2 straightOffset = new(1.5f, 0f);
 
-    [SerializeField] private float straightWidth = 2.5f;                    // 스트 가로 길이
-    [SerializeField] private Vector2 straightOffset = new(1.0f, 0f);        // 스트 대강 위치
-
-    
-    [SerializeField] private float recoveryTime = 1.0f;                     // 후딜
+    [Header("Recovery")]
+    [SerializeField] private float recoveryTime = 1.0f; // 후딜
 
     // 캐싱 변수
     private Collider2D bossCol;
@@ -42,85 +47,92 @@ public class JabStraightPattern : BossPattern
         if (boss == null) return;
 
         // 전조
-        animator.SetTrigger("PatternPrepare");      // 이름 변경할 수도?
+        animator.SetTrigger("JabPrep");
         boss.FaceTarget(boss.player.position);
-
-        try { await Awaitable.WaitForSecondsAsync(prepTime, boss.DestroyCancellationToken); }
-        catch (System.OperationCanceledException) { ExitPattern(); return; }
-
-        // 잽
-        animator.SetTrigger("DoJab");
-        MoveBoss(jabStepSpeed);
-
-        try { await Awaitable.WaitForSecondsAsync(jabImpactTime, boss.DestroyCancellationToken); }
+        try { await Awaitable.WaitForSecondsAsync(prepTime, boss.PatternCancellationToken); }
         catch (System.OperationCanceledException) { ExitPattern(); return; }
                 
-        CheckHitBox(jabOffset, jabWidth, jabStat);
+        // 잽 실행        
+        animator.SetTrigger("DoJab");        
+        await StepAndPunch(jabStepSpeed, jabStepDuration, jabImpactTime, jabStat, jabWidth, jabOffset);
 
-        float remainJabTime = Mathf.Max(0, jabDuration - jabImpactTime);
-        try { await Awaitable.WaitForSecondsAsync(remainJabTime, boss.DestroyCancellationToken); }
+        // 대기
+        float remainJab = Mathf.Max(0, jabTotalDuration - jabImpactTime);
+        try { await Awaitable.WaitForSecondsAsync(remainJab, boss.PatternCancellationToken); }
         catch (System.OperationCanceledException) { ExitPattern(); return; }
-
-        rb.linearVelocity = Vector2.zero;
-
-        // 스트레이트
+                
+        // 스트레이트 실행        
         animator.SetTrigger("DoStraight");
-        boss.FaceTarget(boss.player.position);
-        MoveBoss(straightStepSpeed);
+        boss.FaceTarget(boss.player.position);                
+        await StepAndPunch(straightStepSpeed, straightStepDuration, straightImpactTime, straightStat, straightWidth, straightOffset);
 
-        try { await Awaitable.WaitForSecondsAsync(straightImpactTime, boss.DestroyCancellationToken); }
+        // 남은 시간 대기
+        float remainStraight = Mathf.Max(0, straightTotalDuration - straightImpactTime);
+        try { await Awaitable.WaitForSecondsAsync(remainStraight, boss.PatternCancellationToken); }
         catch (System.OperationCanceledException) { ExitPattern(); return; }
-
         
-        CheckHitBox(straightOffset, straightWidth, straightStat);
-
-        float remainStraightTime = Mathf.Max(0, straightDuration - straightImpactTime);
-        try { await Awaitable.WaitForSecondsAsync(remainStraightTime, boss.DestroyCancellationToken); }
-        catch (System.OperationCanceledException) { ExitPattern(); return; }
-
-        rb.linearVelocity = Vector2.zero;
-
         // 후딜
-        try { await Awaitable.WaitForSecondsAsync(recoveryTime, boss.DestroyCancellationToken); }
+        try { await Awaitable.WaitForSecondsAsync(recoveryTime, boss.PatternCancellationToken); }
         catch (System.OperationCanceledException) { ExitPattern(); return; }
 
         boss.OnAnimationTrigger("AttackEnd");
     }
-
-    private void MoveBoss(float speed)
+        
+    private async Awaitable StepAndPunch(float speed, float stepTime, float impactTime, HitBoxStat stat, float width, Vector2 offset)
     {
         float facingDir = Mathf.Sign(boss.transform.localScale.x);
+
+        //  전진!
         rb.linearVelocity = new Vector2(facingDir * speed, 0f);
-    }    
-    private void CheckHitBox(Vector2 offset, float width, HitBoxStat stats)
-    {
-        if (stats == null)
+
+        try
         {
-            Debug.LogError("Stat할당안됨.");
-            return;
+            // 시간만큼만 이동
+            await Awaitable.WaitForSecondsAsync(stepTime, boss.PatternCancellationToken);
+        }
+        catch (System.OperationCanceledException) { throw; }
+
+        // 급정지 
+        rb.linearVelocity = Vector2.zero;
+        // 타격 판정
+        CheckHitBox(offset, width, stat);
+
+        // 타격 대기 (이미 스텝 시간만큼 지났으니, 남은 시간만 대기)
+        float remainWait = Mathf.Max(0, impactTime - stepTime);
+
+        if (remainWait > 0)
+        {
+            try
+            {
+                await Awaitable.WaitForSecondsAsync(remainWait, boss.PatternCancellationToken);
+            }
+            catch (System.OperationCanceledException) { throw; }
         }
 
-        float facingDir = Mathf.Sign(boss.transform.localScale.x);
+    }
+
+    private void CheckHitBox(Vector2 offset, float width, HitBoxStat stats)
+    {
+        if (stats == null) return;
+
+        float facingDir = Mathf.Sign(boss.transform.localScale.x)+ Mathf.Sign(boss.transform.localScale.x);
         Vector2 actualOffset = new(offset.x * facingDir, offset.y);
+
+        // 보스의 위치를 기준으로 박스 생성
         Vector2 centerPos = (Vector2)boss.transform.position + actualOffset;
 
         float autoHeight = bossCol != null ? bossCol.bounds.size.y : 2.0f;
         Vector2 boxSize = new(width, autoHeight);
 
-        DebugDrawBox(centerPos, boxSize, Color.red, 0.5f);
-                
+        // 디버깅
+        DebugDrawBox(centerPos, boxSize, Color.red, 0.2f);
+
         Collider2D[] hits = Physics2D.OverlapBoxAll(centerPos, boxSize, 0f, stats.attackable);
 
         foreach (var hit in hits)
-        {           
-            GameObject target = hit.gameObject;
-
-            IDamageable damageable = target.GetComponent<IDamageable>();
-            if (damageable != null)
-            {               
-                damageable.TakeDamage(stats.damage);
-                Debug.Log($"[Hit] {target.name}에게 {stats.damage} 데미지!");
-            }
+        {
+            IDamageable damageable = hit.GetComponent<IDamageable>();
+            damageable?.TakeDamage(stats.damage);
         }
     }
 

@@ -18,17 +18,19 @@ public class BossIdleState : BossState
 {
     public BossIdleState(BossAI boss) : base(boss) { }
 
+    public override  void Start()
+    {       
 
-    public override void Start()
-    {    
        if (boss.AllPhase[0].phaseName == "Phase 1")
        {
            boss.ChangeState(new AttackingState(boss));
        }
+
        else if (boss.AllPhase[0].phaseName == "TutoBossPhase")
        {
            boss.ChangeState(new TutoIdleBattleState(boss));
        }
+
     }
     public override void Update()
     {      
@@ -43,28 +45,38 @@ public class BossIdleState : BossState
 
 public class BossCoolDownState : BossState
 {
+    private float coolDownDuration;
     private float timer;
-    public BossCoolDownState(BossAI boss) : base(boss) { }
+    public BossCoolDownState(BossAI boss) : base(boss)
+    {
+        float min = boss.CurrentPhase.minDelay;
+        float max = boss.CurrentPhase.maxDelay;
+
+        if (max <= 0.01f) max = 1.0f;
+
+        this.coolDownDuration = Random.Range(min, max);
+        this.timer = 0f;
+    }
 
     public override void Start()
     {
-        // Phase에 설정된 휴식 시간 가져오기
-        timer = boss.CurrentPhase.restTime;
+               
 
-        // (선택) 여기서 플레이어와의 거리를 체크해서 너무 멀면 'ChasingState'로 갈 수도 있음      
+        // 여기서 플레이어와의 거리를 체크해서 너무 멀면 'ChasingState'로 갈 수도 있음      
     }
     public override void Update()
     {
-        timer -= Time.deltaTime;
+        timer += Time.deltaTime;
                 
         boss.FaceTarget(boss.player.position);
 
-        if (timer <= 0)
+        if (timer >= coolDownDuration)
         {        
             boss.ChangeState(new AttackingState(boss));
         }
     }
     public override void Exit() { }
+    public override void OnAnimationEvent(string eventName) { }
 }
 
 
