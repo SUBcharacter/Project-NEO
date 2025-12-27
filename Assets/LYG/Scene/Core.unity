@@ -1325,9 +1325,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6ebd3964bb1afb46ae498a6e39c33bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cm: {fileID: 0}
-  perlin: {fileID: 0}
-  shakeTimer: 0
 --- !u!114 &1344343579
 MonoBehaviour:
   m_ObjectHideFlags: 0

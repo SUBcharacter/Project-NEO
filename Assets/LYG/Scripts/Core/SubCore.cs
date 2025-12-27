@@ -3,16 +3,16 @@ using UnityEngine;
 public class SubCore : MonoBehaviour,IDamageable
 {
     [SerializeField] MainCore main;
-    [SerializeField] float health;
-    [SerializeField] float maxHealth;
+    [SerializeField] protected float health;
+    [SerializeField] protected float maxHealth;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         main = FindAnyObjectByType<MainCore>();
         health = maxHealth;
     }
 
-    public void TakeDamage(float damage)
+    public virtual void TakeDamage(float damage)
     {
         health -= damage;
 
