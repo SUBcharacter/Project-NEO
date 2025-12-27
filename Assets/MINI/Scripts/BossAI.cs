@@ -5,49 +5,50 @@ using UnityEngine.Rendering;
 
 public class BossAI : MonoBehaviour, IDamageable
 {
-    [Header("ÂüÁ¶ º¯¼ö")]
+    [Header("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½")]
     [SerializeField] public Transform player;
     public Animator animator;
     public Rigidbody2D rb;
     public GameObject tackleHitbox;
 
     [Header("State Info")]
-    [SerializeField] protected BossPhase currentPhase;        // º¸½º ÇöÀç ÆäÀÌÁî
+    [SerializeField] protected BossPhase currentPhase;        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     [SerializeField] protected List<BossPhase> allPhases = new();
     private int phaseIndex = 0;
 
 
     [Header("Status")]
-    [SerializeField] protected float maxHp = 10000f;          // ÀÓ½Ã Ã¼·Â
+    [SerializeField] protected float maxHp = 10000f;          // ï¿½Ó½ï¿½ Ã¼ï¿½ï¿½
     [SerializeField] protected float currentHp;
-    [SerializeField] protected float currentPoise;            // °­ÀÎµµ
+    [SerializeField] protected float currentPoise;            // ï¿½ï¿½ï¿½Îµï¿½
     protected bool isGroggy = false;
 
 
-    [SerializeField]private BossState currentState;        // º¸½º »óÅÂ    
-    protected CancellationTokenSource _cts;                // ºñµ¿±â ÀÛ¾÷ Ãë¼Ò¿ë ÅäÅ«
+    [SerializeField]private BossState currentState;        // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½    
+    protected CancellationTokenSource _cts;                // ï¿½ñµ¿±ï¿½ ï¿½Û¾ï¿½ ï¿½ï¿½Ò¿ï¿?ï¿½ï¿½Å«
+    private CancellationTokenSource _patternCts;           // [Ãß°¡] ÆÐÅÏ Áß´Ü¿ë 12/25
 
-    #region Æ©Åäº¸½º¿ë..
+    #region Æ©ï¿½äº¸ï¿½ï¿½ï¿½ï¿½..
     [Header("TutoBoss")]
-    public bool Attacking = false;      // °ø°Ý ÁßÀÎÁö ¿©ºÎ
+    public bool Attacking = false;      // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
     public BossPattern CurrentPattern { get; private set; }
 
-    // ÀÌ ºÎºÐÀº ÇÊ¿ä ¾øÀ½
-    // BossIdleState·Î ÁøÀÔ½Ã¿¡ ÆäÀÌÁî ÀÌ¸§(string)À¸·Î ºÐ±â¸¦ ³ª´²µÒ
-    // ÆäÀÌÁî ÀÌ¸§ÀÌ "TutoBossPhase"ÀÌ¸é ÀÚµ¿À¸·Î TutoIdleBattleState·Î ³Ñ¾î°¨. ÀÚ¼¼ÇÑ°Ç  BossState Âü°í
+    // ï¿½ï¿½ ï¿½Îºï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ ï¿½ï¿½ï¿½ï¿½
+    // BossIdleStateï¿½ï¿½ ï¿½ï¿½ï¿½Ô½Ã¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¸ï¿½(string)ï¿½ï¿½ï¿½ï¿½ ï¿½Ð±â¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¸ï¿½ï¿½ï¿½ "TutoBossPhase"ï¿½Ì¸ï¿½ ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ TutoIdleBattleStateï¿½ï¿½ ï¿½Ñ¾î°¨. ï¿½Ú¼ï¿½ï¿½Ñ°ï¿½  BossState ï¿½ï¿½ï¿½ï¿½
 
     #endregion
 
-    private CancellationTokenSource _patternCts;           // [Ãß°¡] ÆÐÅÏ Áß´Ü¿ë 12/25
 
 
 
-    // Ä¸½¶È­
+
+    // Ä¸ï¿½ï¿½È­
     public BossPhase CurrentPhase => currentPhase;
     public List<BossPhase> AllPhase => allPhases;
     public CancellationToken DestroyCancellationToken => _cts != null ? _cts.Token : CancellationToken.None;
-    public CancellationToken PatternCancellationToken // ÇÁ·ÎÆÛÆ¼
+    public CancellationToken PatternCancellationToken // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¼
     {
         get
         {
@@ -55,7 +56,11 @@ public class BossAI : MonoBehaviour, IDamageable
             return _patternCts.Token;
         }
     }
-    [HideInInspector] public List<GameObject> activeLightWaves = new();
+    [HideInInspector] public List<GameObject> activeLightWaves = new();   // ï¿½Ú¾ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®
+
+    private bool isCoreActive = false;
+
+
     private void Awake()
     {
         _cts = new CancellationTokenSource();
@@ -69,13 +74,13 @@ public class BossAI : MonoBehaviour, IDamageable
     {
         currentHp = maxHp;
         if (allPhases.Count > 0) SetPhase(0);
-        else Debug.LogError("BossAI: Phase¹Ì¼³Á¤»óÅÂ");
+        else Debug.LogError("BossAI: Phaseï¿½Ì¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
         ChangeState(new BossIdleState(this));
 
-        // Æ©Åä¸®¾ó º¸½º ºÐ±âÁ¶°Ç¶§¹®¿¡ ÀÌ·¸°Ô Çß½À´Ï´Ù.. 
-        // ÀÌ ºÎºÐÀº ÇÊ¿ä ¾øÀ½
-        // BossIdleState·Î ÁøÀÔ½Ã¿¡ ÆäÀÌÁî ÀÌ¸§(string)À¸·Î ºÐ±â¸¦ ³ª´²µÒ
-        // ÆäÀÌÁî ÀÌ¸§ÀÌ "TutoBossPhase"ÀÌ¸é ÀÚµ¿À¸·Î TutoIdleBattleState·Î ³Ñ¾î°¨. ÀÚ¼¼ÇÑ°Ç  BossState Âü°í
+        // Æ©ï¿½ä¸®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ð±ï¿½ï¿½ï¿½ï¿½Ç¶ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì·ï¿½ï¿½ï¿½ ï¿½ß½ï¿½ï¿½Ï´ï¿½.. 
+        // ï¿½ï¿½ ï¿½Îºï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ ï¿½ï¿½ï¿½ï¿½
+        // BossIdleStateï¿½ï¿½ ï¿½ï¿½ï¿½Ô½Ã¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¸ï¿½(string)ï¿½ï¿½ï¿½ï¿½ ï¿½Ð±â¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¸ï¿½ï¿½ï¿½ "TutoBossPhase"ï¿½Ì¸ï¿½ ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ TutoIdleBattleStateï¿½ï¿½ ï¿½Ñ¾î°¨. ï¿½Ú¼ï¿½ï¿½Ñ°ï¿½  BossState ï¿½ï¿½ï¿½ï¿½
         //if (isTutorialBoss)
         //    ChangeState(new TutoIdleBattleState(this));
         //else
@@ -87,25 +92,25 @@ public class BossAI : MonoBehaviour, IDamageable
         currentState?.Update();
 
         PhaseTestDamage();
-    }    
-    public BossPattern SelectBestPattern() // ÆÐÅÏ ¼±ÅÃ ¾Ë°í¸®Áò
+    }
+    public BossPattern SelectBestPattern() // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ë°ï¿½ï¿½ï¿½ï¿½ï¿½
     {
         if (currentPhase == null) return null;
 
-        List<BossPattern> candidates = currentPhase.availablePatterns;  // ÈÄº¸
-        float totalWeight = 0f;                                         // °¡ÁßÄ¡ º¯¼ö
+        List<BossPattern> candidates = currentPhase.availablePatterns;  // ï¿½Äºï¿½
+        float totalWeight = 0f;                                         // ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
 
-        // °¡ÁßÄ¡ ÇÕ»ê
+        // ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½Õ»ï¿½
         foreach (var p in candidates)
         {
             float score = p.EvaluateScore(this);
             if (score > 0) totalWeight += score;
         }
 
-        // °è»ê ÇØµµ ¾ø´Ù? => null
+        // ï¿½ï¿½ï¿?ï¿½Øµï¿½ ï¿½ï¿½ï¿½ï¿½? => null
         if (totalWeight <= 0) return null;
 
-        // ·ê·¿ ¹æ½Ä °¡Ã­ ÆÐÅÏ °¡ÁßÄ¡°¡ ³ôÀ»¼ö·Ï È®·ü UP
+        // ï¿½ê·¿ ï¿½ï¿½ï¿?ï¿½ï¿½Ã­ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È®ï¿½ï¿½ UP
         float randomValue = Random.Range(0, totalWeight);
         float currentSum = 0;
 
@@ -123,31 +128,51 @@ public class BossAI : MonoBehaviour, IDamageable
     }
     public void TakeDamage(float damage)
     {
-        if (isGroggy) damage *= 1.5f; // ±×·Î±â ¶§´Â ´õ ¾ÆÇÁ°Ô
+        if (isGroggy)
+        {
+            damage *= 1.5f;
+        }
 
-        currentHp = Mathf.Max(0, currentHp - damage);
-
-        // °­ÀÎµµ ±ð±â (µ¥¹ÌÁö¿¡ ºñ·ÊÇÏ°Å³ª °íÁ¤°ª) <- ¾îÂ°ÇØ¾ßÇÒÁö ³íÀÇÇØ¾ß ÇÔ
+        if (isCoreActive)
+        {
+            float sum = 0f;
+            foreach (var core in activeLightWaves)
+            {
+                if (core != null)
+                {                    
+                    sum += core.GetComponent<BossSubCore>().EnhancingAmount;
+                }
+            }
+            currentHp = Mathf.Max(0, currentHp - (damage * sum));
+            TakeGroggyDamage(3f);
+        }
+        else
+        {
+            currentHp = Mathf.Max(0, currentHp - damage);
+            TakeGroggyDamage(3f);
+        }
+        CheckPhaseTransition();
+    }
+    public void TakeGroggyDamage(float damage)          // ï¿½Ú¾î°¡ È°ï¿½ï¿½È­ï¿½ï¿½ ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½æ°¨ï¿½ï¿½ ï¿½Ç´ï¿½ ï¿½ï¿½ï¿½ï¿½
+    {
         if (!isGroggy)
         {
-            currentPoise -= damage; // ¿©±â´Ù º¯¼öÇÏ³ª ÇØ¼­ ³Ö¾îº¸±â..Á¤µµ? ex) ±ÙÁ¢ÀÌ¸é 1.5,¿ø°Å¸®´Â 1.0? ÀÌ·±´À³¦
+            currentPoise -= damage;
             if (currentPoise <= 0)
             {
                 StartGroggy();
             }
         }
-
-        CheckPhaseTransition();
     }
     void StartGroggy()
     {
         isGroggy = true;
-        // ±×·Î±â »óÅÂ·Î ÀüÈ¯ 
+        // ï¿½×·Î±ï¿½ ï¿½ï¿½ï¿½Â·ï¿½ ï¿½ï¿½È¯ 
         ChangeState(new GroggyState(this, 3.0f));
     }
     public void ChangeState(BossState newState)
     {
-        StopCurrentPattern(); // ÅäÅ« »èÁ¦ 
+        StopCurrentPattern(); // ï¿½ï¿½Å« ï¿½ï¿½ï¿½ï¿½ 
 
         currentState?.Exit();
         currentState = newState;
@@ -158,7 +183,7 @@ public class BossAI : MonoBehaviour, IDamageable
         isGroggy = false;
         currentPoise = currentPhase.maxPoise;
     }
-    void CheckPhaseTransition()     // ÆäÀÌÁî Ã¼Å© ÇÔ¼ö
+    void CheckPhaseTransition()     // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã¼Å© ï¿½Ô¼ï¿½
     {
         float ratio = currentHp / maxHp;
 
@@ -176,14 +201,14 @@ public class BossAI : MonoBehaviour, IDamageable
 
         currentPhase = allPhases[index];
         animator.speed = currentPhase.speedMultiplier;
-        currentPoise = currentPhase.maxPoise; // ÆäÀÌÁî ¹Ù²ð ¶§ °­ÀÎµµ ¸®¼Â
+        currentPoise = currentPhase.maxPoise; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù²ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½Îµï¿½ ï¿½ï¿½ï¿½ï¿½
 
         Debug.Log($"Phase : {currentPhase.phaseName}");
 
-        // ÆäÀÌÁî ÁøÀÔ ÆÐÅÏÀÌ ÀÖ´Ù¸é Áï½Ã ½ÇÇà (±â¹Í ÆÐÅÏ)
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ù¸ï¿½ ï¿½ï¿½ï¿?ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿?ï¿½ï¿½ï¿½ï¿½)
         if (currentPhase.entryPattern != null)
         {
-            // °­Á¦·Î AttackingState·Î ÀüÈ¯ÇÏ¸ç ±â¹Í ÆÐÅÏ ÁÖÀÔ
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ AttackingStateï¿½ï¿½ ï¿½ï¿½È¯ï¿½Ï¸ï¿½ ï¿½ï¿½ï¿?ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             ChangeState(new AttackingState(this, currentPhase.entryPattern));
         }
     }
@@ -194,11 +219,11 @@ public class BossAI : MonoBehaviour, IDamageable
         if (targetPos.x > transform.position.x) transform.localScale = new Vector3(scaleX, transform.localScale.y, 1);
         else transform.localScale = new Vector3(-scaleX, transform.localScale.y, 1);
     }
-    private void OnDestroy() 
+    private void OnDestroy()
     {
         StopCurrentPattern();
-        _cts?.Cancel(); 
-        _cts?.Dispose(); 
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
     private void PhaseTestDamage()
     {
@@ -208,27 +233,31 @@ public class BossAI : MonoBehaviour, IDamageable
             Debug.Log($"Test Damage Current HP: {currentHp}");
         }
     }
+
+
+
     
-    #region Æ©Åäº¸½º¿ë ÇÔ¼öµé
+    #region Æ©ï¿½äº¸ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½
     public void SetCurrentPattern(BossPattern pattern)
     {
         CurrentPattern = pattern;
     }
 
-    // ÆÐÅÏ¸¶´Ù °Å¸®°¡ ´Ù¸£´Ï±î Sway¶û DashÀÇ °Å¸®°Ë»ç¸¦ À§ÇØ ¸¸µé¾ú´Âµ¥.... »ì·ÁÁÖ¼¼¿ä
-    // º¹ÀâÇÏ°Ô »ý°¢ ÇÒ ÇÊ¿ä ¾øÀÌ ´Ü¼øÇÏ°Ô ÇÃ·¹ÀÌ¾î¿Í º¸½º°£ÀÇ xÃà °Å¸®¸¦ ±¸ÇØ¼­ float·Î ¹ÝÈ¯ÇÏ´Â ÇÔ¼ö¸¦ ¸¸µé¸é µÊ
-    // ÀÌ ÇÔ¼ö°¡ È£Ãâ µÉ °÷Àº °¢ ÆÐÅÏÀÌ ½ÃÀÛµÇ´Â ExecuteÀÇ ÃÊ¹Ý ºÎºÐÀÓ.
+    // ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ ï¿½Å¸ï¿½ï¿½ï¿½ ï¿½Ù¸ï¿½ï¿½Ï±ï¿½ Swayï¿½ï¿½ Dashï¿½ï¿½ ï¿½Å¸ï¿½ï¿½Ë»ç¸¦ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Âµï¿?... ï¿½ï¿½ï¿½ï¿½Ö¼ï¿½ï¿½ï¿?
+    // ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ê¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ü¼ï¿½ï¿½Ï°ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ï¿?ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ xï¿½ï¿½ ï¿½Å¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ø¼ï¿½ floatï¿½ï¿½ ï¿½ï¿½È¯ï¿½Ï´ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿?ï¿½ï¿½
+    // ï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ È£ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ÛµÇ´ï¿½ Executeï¿½ï¿½ ï¿½Ê¹ï¿½ ï¿½Îºï¿½ï¿½ï¿½.
 
     public float DistanceToPlayer()
     {
-        // xÃà¸¸ »ç¿ë
+        // xï¿½à¸¸ ï¿½ï¿½ï¿?
         return Mathf.Abs(player.position.x - transform.position.x);
     }
  
     #endregion
 
     
-    public void StopCurrentPattern() // ½ºÅ×ÀÌÆ® º¯°æ ½Ã ÆÐÅÏ °­Á¦Á¾·á ½ÃÅ°´Â ÇÔ¼ö
+
+    public void StopCurrentPattern() // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å°ï¿½ï¿½ ï¿½Ô¼ï¿½
     {
         if (_patternCts != null)
         {
