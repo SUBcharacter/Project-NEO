@@ -451,6 +451,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MeleeAndroid
       objectReference: {fileID: 0}
+    - target: {fileID: 342636115112975702, guid: 717db495bbca36849883726fbe4469dd, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2266184029860995612, guid: 717db495bbca36849883726fbe4469dd, type: 3}
       propertyPath: m_LocalPosition.x
       value: 8.84113
@@ -1183,7 +1187,7 @@ MonoBehaviour:
     ScreenPosition: {x: 0, y: 0}
     DeadZone:
       Enabled: 1
-      Size: {x: 0, y: 0.79592586}
+      Size: {x: 0, y: 0}
     HardLimits:
       Enabled: 0
       Size: {x: 1, y: 1.03}
@@ -1221,7 +1225,7 @@ MonoBehaviour:
     CustomLookAtTarget: 0
   Lens:
     FieldOfView: 60
-    OrthographicSize: 4.5
+    OrthographicSize: 7
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
@@ -1248,7 +1252,7 @@ Transform:
   m_GameObject: {fileID: 1038145544}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.21, y: -0.39259297, z: -7}
+  m_LocalPosition: {x: 2.21, y: 0.44, z: -7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1785,7 +1789,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 4.5
+  orthographic size: 7
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -1810,7 +1814,7 @@ Transform:
   m_GameObject: {fileID: 1137133610}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.21, y: -0.39259297, z: -7}
+  m_LocalPosition: {x: 2.21, y: 0.44, z: -7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

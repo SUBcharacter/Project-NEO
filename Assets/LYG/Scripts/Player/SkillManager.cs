@@ -154,7 +154,7 @@ public class SkillManager : MonoBehaviour
             Debug.Log("쿨다운");
             return;
         }
-        phantomBladeUsable = false;
+        
         casting = true;
         StartCoroutine(PhantomBlade(spawnPoint, dir));
     }
@@ -163,6 +163,7 @@ public class SkillManager : MonoBehaviour
     {
         if (player.BulletCount >= phantomBlade.bulletCost)
         {
+            phantomBladeUsable = false;
             player.BulletCount -= phantomBlade.bulletCost;
             int index;
             int enhancing = enhanced ? 2 : 1;
@@ -203,6 +204,7 @@ public class SkillManager : MonoBehaviour
         {
             Debug.Log("스태미나 부족");
             casting = false;
+            phantomBladeUsable = true;
         }
     }
 
@@ -230,7 +232,7 @@ public class SkillManager : MonoBehaviour
             Debug.Log("쿨다운");
             return;
         }
-        chargeAttackUsable = false;
+        
         casting = true;
         StartCoroutine(ChargeAttack(dir));
     }
@@ -239,6 +241,7 @@ public class SkillManager : MonoBehaviour
     {
         if (player.Stamina >= chargeAttack.staminaCost)
         {
+            chargeAttackUsable = false;
             player.GhTr.gameObject.SetActive(true);
             charging = true;
             player.Stamina -= chargeAttack.staminaCost;
@@ -282,9 +285,8 @@ public class SkillManager : MonoBehaviour
                     break;
                 }
 
-                if (Mathf.Abs(velocity) >= chargeAttack.chargeSpeed - 1f)
+                if (Mathf.Abs(velocity) >= chargeAttack.chargeSpeed -6f)
                 {
-                    player.Rigid.linearVelocity = Vector2.zero;
                     chargeHitBox.gameObject.SetActive(false);
                     break;
                 }
@@ -303,6 +305,7 @@ public class SkillManager : MonoBehaviour
         }
         else
         {
+            chargeAttackUsable = true;
             casting = false;
         }
     }
@@ -392,6 +395,7 @@ public class SkillManager : MonoBehaviour
         {
             openFire = false;
             casting = false;
+            Time.timeScale = 1f;
             return;
         }
 
@@ -509,7 +513,7 @@ public class SkillManager : MonoBehaviour
         }
 
         casting = true;
-        flashAttackUsable = false;
+        
         StartCoroutine(FlashAttack(facingRight));
     }
 
@@ -549,6 +553,7 @@ public class SkillManager : MonoBehaviour
     {
         if (player.Stamina >= flashAttack.staminaCost)
         {
+            flashAttackUsable = false;
             player.Stamina -= flashAttack.staminaCost;
             CameraManager.instance.Shake(4, 0.2f);
             Vector2 dir = facingRight ? Vector2.right : Vector2.left;
@@ -566,6 +571,7 @@ public class SkillManager : MonoBehaviour
         {
             Debug.Log("스태미나 부족");
             casting = false;
+            flashAttackUsable = true;
         }
     }
 

@@ -284,7 +284,7 @@ public class Player : MonoBehaviour, IDamageable
         if(!check.IsGround)
         {
             // 체공 상태 시 가속 이동 (가속 빠름)
-            float newX = Mathf.Lerp(rigid.linearVelocityX, moveVelocity.x, 1f);
+            float newX = Mathf.Lerp(rigid.linearVelocityX, moveVelocity.x, speed * 2 * Time.deltaTime);
             rigid.linearVelocityX = newX;
             return;
         }
@@ -306,7 +306,7 @@ public class Player : MonoBehaviour, IDamageable
         else
         {
             // 일반 지형
-            float newX = Mathf.Lerp(rigid.linearVelocityX, moveVelocity.x, 1f);
+            float newX = Mathf.Lerp(rigid.linearVelocityX, moveVelocity.x, speed * 2 * Time.deltaTime);
             rigid.linearVelocityX = newX;
         }
     }
