@@ -133,11 +133,11 @@ public class Researcher : Enemy
 
     public void Chase()
     {
-        float xDirection = Player_Trans.position.x - transform.position.x;
-        float directionSign = Mathf.Sign(xDirection);
+        float targerdirection = Player_Trans.position.x - transform.position.x;
+        float directionSign = Mathf.Sign(targerdirection);
 
 
-        float distance = Mathf.Abs(xDirection); 
+        float distance = Mathf.Abs(targerdirection); 
 
         if (distance > 1.0f)
         {
@@ -146,7 +146,6 @@ public class Researcher : Enemy
         }
         else
         {
-   
             Rigid.linearVelocity = new Vector2(0, Rigid.linearVelocity.y);
         }
 
@@ -256,17 +255,13 @@ public class Researcher : Enemy
 
         if (direction < 0) 
         {
-
             armLocalScale.x = -1;
             armLocalScale.y = -1;
-
         }
         else 
         {
-
             armLocalScale.x = 1;
             armLocalScale.y = 1;
-
         }
 
         arm.localScale = armLocalScale;

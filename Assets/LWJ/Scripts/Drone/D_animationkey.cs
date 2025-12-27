@@ -10,7 +10,6 @@ public class D_animationkey : MonoBehaviour
 
     public void Shot()
     {
-  
         drone.Shoot();
     }
 
@@ -18,6 +17,17 @@ public class D_animationkey : MonoBehaviour
     {
         drone.isattack = false;
     }
+
+    public void IsEnhance()
+    {
+        drone.Enhanced = true;
+    }
+
+    public void Isdeadend()
+    {
+        drone.waitgameobjectfalse();
+    }
+
 
 
 }

@@ -39,24 +39,29 @@ public class D_Idlestate : DroneState
 
 public class D_Walkstate : DroneState
 {
+    Vector3 nextPos;
     public override void Start(Drone drone)
     {
         Debug.Log("Walk State 시작");
         drone.animator.Play("D_Walk");
- 
+        nextPos = drone.PatrolPath.GetRandomPoint();
+        float dir = nextPos.x - drone.transform.position.x;
+        drone.FlipDrone(dir);
     }
     public override void Update(Drone drone)
     {
         if(drone.CheckForObstacle())
-        {
+        {   
             drone.ChangeState(drone.State[DroneStateType.Idle]);
+            return;
         }
 
         if(drone.sightrange.PlayerInSight)
         {
             drone.ChangeState(drone.State[DroneStateType.Chase]);
+            return;
         }
-        drone.Move();
+        drone.Move(nextPos);
     }
 
     public override void Exit(Drone drone) { }
@@ -102,7 +107,6 @@ public class D_Chasestate : DroneState
             drone.ChangeState(drone.State[DroneStateType.Attack]);
             return;
         }
-
         drone.Chase();
 
     }
@@ -116,6 +120,8 @@ public class D_Deadstate : DroneState
         Debug.Log("Dead State 시작");
         drone.Rigid.linearVelocity = Vector2.zero;
         drone.animator.Play("D_Dead");
+        drone.waitgameobjectfalse();
+        
     }
     public override void Update(Drone drone)
     {
@@ -156,17 +162,33 @@ public class D_Hitstate : DroneState
 }
 public class D_EnhancedDroneState : DroneState
 {
+    LayerMask origin;
     public override void Start(Drone drone)
     {
         Debug.Log("Enhanced Drone State 시작");
+        drone.Rigid.linearVelocity = Vector2.zero;
+        origin = drone.gameObject.layer;
+        drone.gameObject.layer = LayerMask.NameToLayer("Invincible");
+        drone.animator.Play("D_Enhance");
     }
     public override void Update(Drone drone)
     {
-        // 여기에 강화된 드론의 행동 로직을 추가하세요.
+        if (drone.Enhanced)
+        {
+             if (drone.aimrange.PlayerInSight)
+             {
+                 drone.ChangeState(drone.State[DroneStateType.Attack]);
+             }
+             else
+             {
+                 drone.ChangeState(drone.State[DroneStateType.Chase]);
+             }   
+        }
     }
     public override void Exit(Drone drone)
     {
         Debug.Log("Enhanced Drone State 종료");
+        drone.gameObject.layer = origin;
     }
 }
 public class D_Returnstate : DroneState
@@ -174,6 +196,7 @@ public class D_Returnstate : DroneState
     public override void Start(Drone drone)
     {
         drone.animator.Play("D_Walk");
+       
     }
     public override void Update(Drone drone)
     {
