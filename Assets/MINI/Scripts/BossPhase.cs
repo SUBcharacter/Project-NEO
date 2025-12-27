@@ -6,6 +6,7 @@ public class BossPhase : ScriptableObject
 {
     [Header("Phase Info")]
     public string phaseName;                        // 에디터에서 확인 할 용도   
+    public float nextRatio;
 
     [Header("Stats Modifiers")]
     [Tooltip("이 페이즈의 패턴 속도 배율 (애니메이션 속도)")]

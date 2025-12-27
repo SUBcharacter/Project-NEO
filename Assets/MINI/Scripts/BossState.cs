@@ -16,66 +16,27 @@ public abstract class BossState
 
 public class BossIdleState : BossState
 {
-    bool isPatrolling = false;
-    float distanceToPlayer = 99f;
     public BossIdleState(BossAI boss) : base(boss) { }
 
-    public override async void Start()
-    {
-        isPatrolling = true;
 
-        if (boss.player.transform != null && distanceToPlayer < 8f)
-        {
-            isPatrolling = false;
-            boss.ChangeState(new AttackingState(boss));
-            return;
-        }
-        await PatrolRoutine();
+    public override void Start()
+    {    
+       if (boss.AllPhase[0].phaseName == "Phase 1")
+       {
+           boss.ChangeState(new AttackingState(boss));
+       }
+       else if (boss.AllPhase[0].phaseName == "TutoBossPhase")
+       {
+           boss.ChangeState(new TutoIdleBattleState(boss));
+       }
     }
-    private async Task PatrolRoutine()
-    {
-        while (isPatrolling)
-        {
-            float timer = 0;
-            boss.FaceTarget(boss.transform.position + Vector3.left);
-            while (timer < 1f && isPatrolling)         // 좌로 패트롤
-            {
-                timer += Time.deltaTime;
-                boss.transform.position += bossSpeed * Time.deltaTime * Vector3.left;
-                await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
-            }
-            if (!isPatrolling) break;
-            await Awaitable.WaitForSecondsAsync(2f, boss.DestroyCancellationToken);
-
-
-            boss.FaceTarget(boss.transform.position + Vector3.right);
-            timer = 0;
-            while (timer < 1f && isPatrolling)         // 우로 패트롤
-            {
-                timer += Time.deltaTime;
-                boss.transform.position += bossSpeed * Time.deltaTime * Vector3.right;
-                await Awaitable.NextFrameAsync(boss.DestroyCancellationToken);
-            }
-            if (!isPatrolling) break;
-            await Awaitable.WaitForSecondsAsync(2f, boss.DestroyCancellationToken);
-        }
-    }
-
     public override void Update()
-    {
-        distanceToPlayer = Vector2.Distance(boss.transform.position, boss.player.position);
-        //Debug.Log(distanceToPlayer);
-        if (boss.player.transform != null && distanceToPlayer < 13f)
-        {
-            isPatrolling = false;
-            boss.ChangeState(new AttackingState(boss));
-            return;
-        }
+    {      
 
     }
     public override void Exit()
     {
-        isPatrolling = false;
+       
     }
 
 }
@@ -157,7 +118,7 @@ public class AttackingState : BossState
         {
             currentPattern.ExitPattern();
             TryComboOrExit();
-        }
+        }      
         else
         {
             currentPattern?.OnAnimationEvent(eventName);
@@ -191,9 +152,14 @@ public class AttackingState : BossState
 public class GroggyState : BossState
 {
     private float groggyTimer;
-    public GroggyState(BossAI boss,float time) : base(boss)
+    public GroggyState(BossAI boss, float time) : base(boss)
     {
         groggyTimer = time;
+    }
+
+    public override void Exit()
+    {
+        
     }
 
     public override void Start()
@@ -210,9 +176,5 @@ public class GroggyState : BossState
             // 시간 다 되면 ChangeState
             boss.ChangeState(new AttackingState(boss));
         }
-    }
-    public override void Exit() 
-    {
-        boss.RecoverPoise();
     }
 }

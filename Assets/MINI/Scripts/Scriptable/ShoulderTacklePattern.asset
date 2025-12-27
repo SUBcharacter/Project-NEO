@@ -12,14 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8de7494ddc32ff647999fb5c9c23ebef, type: 3}
   m_Name: ShoulderTacklePattern
   m_EditorClassIdentifier: 
-  minRange: 0
-  maxRange: 20
+  minRange: 8
+  maxRange: 23
   cooldownTime: 4
   priorityWeight: 1
   comboPatterns: []
   comboChance: 0.5
   preludeDuration: 2
   dashDuration: 1.2
+  postDuration: 1.5
   maxSpeed: 25
   speedCurve:
     serializedVersion: 2

@@ -12,12 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90af6b6f260d76940ba11770beda7ff0, type: 3}
   m_Name: DebrisPattern
   m_EditorClassIdentifier: 
-  minRange: 6
-  maxRange: 999
+  minRange: 4
+  maxRange: 10
   cooldownTime: 3
   priorityWeight: 1
   comboPatterns: []
   comboChance: 0.5
+  IsFinished: 1
   DebrisPrefab: {fileID: 1364414081881062150, guid: 4abbc4c05dac08347b640f0c638736f6, type: 3}
   throwSpeed: 25
   throwX: 0

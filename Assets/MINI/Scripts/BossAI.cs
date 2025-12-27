@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Threading;
+using UnityEngine.Rendering;
 
 public class BossAI : MonoBehaviour, IDamageable
 {
@@ -13,6 +14,8 @@ public class BossAI : MonoBehaviour, IDamageable
     [Header("State Info")]
     [SerializeField] protected BossPhase currentPhase;        // 보스 현재 페이즈
     [SerializeField] protected List<BossPhase> allPhases = new();
+    private int phaseIndex = 0;
+
 
     [Header("Status")]
     [SerializeField] protected float maxHp = 10000f;          // 임시 체력
@@ -23,11 +26,25 @@ public class BossAI : MonoBehaviour, IDamageable
     [SerializeField]private BossState currentState;        // 보스 상태    
     protected CancellationTokenSource _cts;                // 비동기 작업 취소용 토큰
 
-    public BossPhase CurrentPhase => currentPhase;
+    // 2025-12-21 효영 추가
+    #region 튜토보스용..
+    [Header("TutoBoss")]
+    public bool Attacking = false;      // 공격 중인지 여부
 
+    public BossPattern CurrentPattern { get; private set; }
+
+    // 이 부분은 필요 없음
+    // BossIdleState로 진입시에 페이즈 이름(string)으로 분기를 나눠둠
+    // 페이즈 이름이 "TutoBossPhase"이면 자동으로 TutoIdleBattleState로 넘어감. 자세한건  BossState 참고
+
+    #endregion
+
+
+    // 캡슐화
+    public BossPhase CurrentPhase => currentPhase;
+    public List<BossPhase> AllPhase => allPhases;
     public CancellationToken DestroyCancellationToken => _cts != null ? _cts.Token : CancellationToken.None;    
 
-    public List<BossPhase> AllPhase => allPhases;
 
     [HideInInspector] public List<GameObject> activeLightWaves = new();
 
@@ -45,6 +62,15 @@ public class BossAI : MonoBehaviour, IDamageable
         if (allPhases.Count > 0) SetPhase(0);
         else Debug.LogError("BossAI: Phase미설정상태");
         ChangeState(new BossIdleState(this));
+
+        // 튜토리얼 보스 분기조건때문에 이렇게 했습니다.. 
+        // 이 부분은 필요 없음
+        // BossIdleState로 진입시에 페이즈 이름(string)으로 분기를 나눠둠
+        // 페이즈 이름이 "TutoBossPhase"이면 자동으로 TutoIdleBattleState로 넘어감. 자세한건  BossState 참고
+        //if (isTutorialBoss)
+        //    ChangeState(new TutoIdleBattleState(this));
+        //else
+        //    ChangeState(new BossIdleState(this));
         //currentState.Star t();
     }
     void Update()
@@ -123,13 +149,15 @@ public class BossAI : MonoBehaviour, IDamageable
     }
     void CheckPhaseTransition()     // 페이즈 체크 함수
     {
-        float ratio = currentHp / maxHp;
-        int nextPhaseIndex = -1;
-
-        if (ratio <= 0.2f && currentPhase != allPhases[2]) nextPhaseIndex = 2; 
-        else if (ratio <= 0.5f && currentPhase != allPhases[1]) nextPhaseIndex = 1;
-
-        if (nextPhaseIndex != -1) SetPhase(nextPhaseIndex);
+        float ratio = currentHp / maxHp;     
+ 
+        float nextRatio = currentPhase.nextRatio;
+        
+        if (ratio <=nextRatio)
+        {
+            phaseIndex++;
+            SetPhase(phaseIndex);
+        }
     }
     public void SetPhase(int index)
     {
@@ -163,5 +191,26 @@ public class BossAI : MonoBehaviour, IDamageable
             TakeDamage(1000f);
             Debug.Log($"Test Damage Current HP: {currentHp}");
         }
-    }   
+    }
+
+
+    
+    #region 튜토보스용 함수들
+    public void SetCurrentPattern(BossPattern pattern)
+    {
+        CurrentPattern = pattern;
+    }
+
+    // 패턴마다 거리가 다르니까 Sway랑 Dash의 거리검사를 위해 만들었는데.... 살려주세요
+    // 복잡하게 생각 할 필요 없이 단순하게 플레이어와 보스간의 x축 거리를 구해서 float로 반환하는 함수를 만들면 됨
+    // 이 함수가 호출 될 곳은 각 패턴이 시작되는 Execute의 초반 부분임.
+
+    public float DistanceToPlayer()
+    {
+        // x축만 사용
+        return Mathf.Abs(player.position.x - transform.position.x);
+    }
+ 
+    #endregion
+
 }

@@ -13,22 +13,36 @@ public class DebrisPattern : BossPattern
     [Header("더미 오브젝트")]
     [SerializeField] private GameObject DebrisPrefab;
 
-    // 밑에 변수들 SO로 빼도 될 거같은데..
+    // SO로 뺄 예정
     [SerializeField] private float throwSpeed = 10f;    // 던지는 속도
     [SerializeField] private float throwX = 6f;        // 보스 기준 얼마나 떨어진 곳으로 던질지
     [SerializeField] private float throwY = 0.5f;      // 던지는 높이 (플레이어 몸통쪽으로)
 
     private bool isThrow = false;
 
-
-    //public override async Task StartPattern()
-    //{
-    //    Debug.Log("DebrisPattern StartPattern 실행됨");
-    //    await Execute();
-    //}
-
     protected override async Awaitable Execute()
     {
+        // 이곳에서 if 문(또는 다른 조건문)을 통해서 사거리 판단을 진행하면 됨
+        // BossAI에 만들어둔 거리 산출 함수를 이용할 것.
+        // 최소 사거리보다 거리가 작다면 Sway 상태로 ChangeState 후 return
+        // 최대 사거리보다 거리가 크다면 Dash 상태로 ChangeState 후 return
+        // 리턴만 잘 실행해 준다면, 패턴이 실행되지 않고, 곧바로 Sway나 Dash로 전환 할 수 있음
+
+        float dist = boss.DistanceToPlayer();
+
+        if(dist <minRange)
+        {
+            boss.ChangeState(new TutoSwayState(boss, this));
+            return;
+        }
+
+        if (dist > maxRange)
+        {
+            boss.ChangeState(new TutoDashState(boss, this));
+            return;
+        }
+
+        IsFinished = false;
         isThrow = false;
 
         // 1. 보스 방향 조정
@@ -61,14 +75,13 @@ public class DebrisPattern : BossPattern
         }
     }
 
-    public override void UpdatePattern()
-    {
-
-    }
+    public override void UpdatePattern() { }
+  
     public override void ExitPattern()
     {
         isThrow = false;
-    
+        IsFinished = true;
+        lastUsedTime = Time.time;
     }
 
 
@@ -135,3 +148,4 @@ public class DebrisPattern : BossPattern
         debrisProjectile.Launch(dir, throwSpeed);
     }
 }
+ 
