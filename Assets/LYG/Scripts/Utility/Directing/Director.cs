@@ -22,7 +22,7 @@ public abstract class Director : MonoBehaviour
         player = FindAnyObjectByType<Player>();
     }
 
-    public abstract void Play(int sceneIndex);
+    public abstract void Play(int sequanceIndex);
 
-    public abstract IEnumerator PlaySequance(int sceneIndex);
+    public abstract IEnumerator PlaySequance(int sequanceIndex);
 }

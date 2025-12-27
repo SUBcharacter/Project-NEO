@@ -9,7 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23662f8e5b2936b4ca37882b69d27784, type: 3}
-  m_Name: ToIdleState
+  m_Script: {fileID: 11500000, guid: 43155aebe92133d4c9c250e9890c078b, type: 3}
+  m_Name: Vel 1 Second 2
   m_EditorClassIdentifier: 
-  stateName: Idle
+  velocity: 1
+  moveTime: 2
+  moveRight: 1

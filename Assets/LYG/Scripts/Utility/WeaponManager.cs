@@ -9,7 +9,7 @@ public class WeaponManager : MonoBehaviour
 
     private void Awake()
     {
-        player = FindAnyObjectByType<Player>();
+        player = GetComponentInParent<Player>();
         foreach(var w in prefabs)
         {
             Weapon instance = Instantiate(w, transform);
