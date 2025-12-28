@@ -21,6 +21,13 @@ public class LRB_Idlestate : LongRobot_State
     public override void Update(LongRobot rb)
     {
         idleDuration += Time.deltaTime;
+
+        if (rb.sightrange.PlayerInSight != null)
+        {
+            rb.ChangeState(rb.states[LRBStateType.Chase]);
+            return;
+        }
+
         if (idleDuration >= waitTime)
         {
             float currentDir = Mathf.Sign(rb.transform.localScale.x);
@@ -28,6 +35,8 @@ public class LRB_Idlestate : LongRobot_State
             rb.ChangeState(rb.states[LRBStateType.Walk]);
             idleDuration = 0f;
         }
+
+ 
     }
     public override void Exit(LongRobot rb) { }
 }
@@ -46,7 +55,7 @@ public class LRB_Walkstate : LongRobot_State
             rb.ChangeState(rb.states[LRBStateType.Idle]);
             return;
         }
-        if (rb.sightrange.PlayerInSight)
+        if (rb.sightrange.PlayerInSight != null)
         {
             rb.ChangeState(rb.states[LRBStateType.Chase]);
             return;
@@ -74,14 +83,20 @@ public class LRB_Attackstate : LongRobot_State
 
 public class LRB_Deadstate : LongRobot_State
 {
+    LayerMask origin;
     public override void Start(LongRobot rb)
     {
         Debug.Log("Dead State ½ÃÀÛ");
         rb.Rigid.linearVelocity = Vector2.zero;
+        origin = rb.gameObject.layer;
+        rb.gameObject.layer = LayerMask.NameToLayer("Invincible");
         rb.animator.Play("LRB_Death");
     }
     public override void Update(LongRobot rb) { }
-    public override void Exit(LongRobot rb) { }
+    public override void Exit(LongRobot rb) 
+    {
+        rb.gameObject.layer = origin;
+    }
 }
 
 public class LRB_Hitstate : LongRobot_State
@@ -99,17 +114,21 @@ public class LRB_Hitstate : LongRobot_State
     {
         if (Time.time >= exitTime)
         {
-            rb.Rigid.linearVelocity = Vector2.zero;
-
-            if (rb.sightrange.PlayerInSight && rb.aimrange.PlayerInSight)
+            if(rb.Pl_trans != null)
             {
-                rb.ChangeState(rb.states[LRBStateType.Attack]);
-            }
-            else
-            {
-                rb.ChangeState(rb.states[LRBStateType.Chase]);
+                float direction = rb.Pl_trans.position.x - rb.transform.position.x;
+                rb.FlipRobot(direction);
+                if (rb.DistanceToPlayer() <= rb.Stat.moveDistance)
+                {
+                    rb.ChangeState(rb.states[LRBStateType.Attack]);
+                }
+                else
+                {
+                    rb.ChangeState(rb.states[LRBStateType.Chase]);
+                }
             }
         }
+
     }
     public override void Exit(LongRobot rb) { }
 }
@@ -129,7 +148,7 @@ public class LRB_EnhancedState : LongRobot_State
     {
         if (rb.Enhanced)
         {
-            if (rb.aimrange.PlayerInSight)
+            if (rb.DistanceToPlayer() <= rb.Stat.moveDistance)
             {
                 rb.ChangeState(rb.states[LRBStateType.Attack]);
             }
@@ -160,7 +179,7 @@ public class LRB_Chasestate : LongRobot_State
             return;
         }
 
-        if (rb.aimrange.PlayerInSight)
+        if (rb.DistanceToPlayer() <= rb.Stat.moveDistance)
         {
             rb.ChangeState(rb.states[LRBStateType.Attack]);
             return;

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Drone_Stat
   m_EditorClassIdentifier: 
   moveSpeed: 3
-  moveDistance: 1
+  moveDistance: 5
   MaxHp: 30
   bulletcount: 0
   fireCooldown: 1

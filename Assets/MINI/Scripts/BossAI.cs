@@ -39,7 +39,7 @@ public class BossAI : MonoBehaviour, IDamageable
 
     #endregion
 
-    private CancellationTokenSource _cts;                // 비동기 작업 취소용 토큰
+  
     private CancellationTokenSource _patternCts;           // [추가] 패턴 중단용 12/25
 
 

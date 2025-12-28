@@ -34,7 +34,6 @@ public class LongRobot : Enemy
 
     public int currentPatrolIndex = -1;
     public SightRange sightrange { get; private set; }
-    public AimRange aimrange { get; private set; }
     public Animator animator { get; private set; }
     public bool Enhanced { get => enhanced; set => enhanced = value; }
     public bool isattack { get; set; }
@@ -42,11 +41,11 @@ public class LongRobot : Enemy
     protected override void Awake()
     {
         sightrange = GetComponent<SightRange>();
-        aimrange = GetComponent<AimRange>();
         ren = GetComponentInChildren<SpriteRenderer>();
         animator = GetComponentInChildren<Animator>();
         Rigid = GetComponent<Rigidbody2D>();
         bulletPool = GetComponentInChildren<Magazine>();
+        Player_position = FindAnyObjectByType<Player>().transform;
         Stateinit();
 
         hitted = false;
@@ -171,28 +170,35 @@ public class LongRobot : Enemy
         gameObject.SetActive(false);
     }
     protected override void Die() { }
+    public float DistanceToPlayer()
+    {
+        if (sightrange.PlayerInSight == null)
+            return 100;
 
+        float distanceX = transform.position.x - sightrange.PlayerInSight.position.x;
+
+        return Mathf.Abs(distanceX);
+    }
     public override void Attack()
     {
         if (isattack) return;
 
-        if (!isattack)
+     
+        if (DistanceToPlayer() <= Stat.moveDistance)
         {
-            if (aimrange != null && aimrange.IsPlayerInSight)
+            if (Time.time >= nextFiretime)
             {
-                if (Time.time >= nextFiretime)
-                {
-                    isattack = true;
-                    nextFiretime = Time.time + Stat.fireCooldown;
-                    ChangeState(LRBstate[LRBStateType.Attack]);
-                }
-            }
-            else
-            {
-                Debug.Log("사격 범위 이탈. 추적으로 전환.");
-                ChangeState(LRBstate[LRBStateType.Chase]);
+                isattack = true;
+                nextFiretime = Time.time + Stat.fireCooldown;
+                ChangeState(LRBstate[LRBStateType.Attack]);
             }
         }
+        else
+        {
+            Debug.Log("사격 범위 이탈. 추적으로 전환.");
+            ChangeState(LRBstate[LRBStateType.Chase]);
+        }
+        
     }
 
     public void Shoot()

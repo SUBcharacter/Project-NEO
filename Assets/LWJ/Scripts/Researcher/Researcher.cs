@@ -33,11 +33,8 @@ public class Researcher : Enemy
     [SerializeField] public Animator Armanima { get; private set; }
 
     public ResearcherState currentStates { get; private set; }
-    public ResearcherState previousState { get; private set; }
 
     public SightRange sightRange { get; private set; }
-    public AimRange aimRange { get; private set; }
-
     public LayerMask groundLayer;
     public LayerMask wallLayer;
 
@@ -56,10 +53,8 @@ public class Researcher : Enemy
 
     protected override void Awake()
     {
-
         startPos = transform.position;
         sightRange = GetComponent<SightRange>();   
-        aimRange = GetComponent<AimRange>();
         animator = GetComponentInChildren<Animator>();
         Ren = GetComponentInChildren<SpriteRenderer>();
         Rigid = GetComponent<Rigidbody2D>();
@@ -116,8 +111,6 @@ public class Researcher : Enemy
     public void ChangeState(ResearcherState newState)
     {
         if (currentStates == newState) return;
-
-        previousState = currentStates;
 
         currentStates?.Exit(this);
         currentStates = newState;
@@ -288,7 +281,7 @@ public class Researcher : Enemy
     }
     public override void Attack()
     {
-        if (aimRange != null && aimRange.IsPlayerInSight)
+        if (DistanceToPlayer() <= Stat.moveDistance)
         {
             Aimatplayer();
             if (Time.time >= nextFireTime)
@@ -303,6 +296,15 @@ public class Researcher : Enemy
         }
     }
 
+    public float DistanceToPlayer()
+    {
+        if (sightRange.PlayerInSight == null)
+            return 100;
+
+        float distanceX = transform.position.x - sightRange.PlayerInSight.position.x;
+
+        return Mathf.Abs(distanceX);
+    }
     public void WallorLedgeFlip()
     {
         if (CheckForObstacle() || CheckForLedge())

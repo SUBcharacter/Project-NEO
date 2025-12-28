@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: LRB_Stat
   m_EditorClassIdentifier: 
   moveSpeed: 2
-  moveDistance: 2
+  moveDistance: 8
   MaxHp: 30
   bulletcount: 0
-  fireCooldown: 1
+  fireCooldown: 0.5
   Damage: 0

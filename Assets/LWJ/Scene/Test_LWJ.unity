@@ -709,9 +709,9 @@ Transform:
   m_GameObject: {fileID: 284531887}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.063, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 0.144, y: 0, z: 0}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 901294692}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1139,9 +1139,9 @@ GameObject:
   m_Component:
   - component: {fileID: 457892152}
   - component: {fileID: 457892151}
-  - component: {fileID: 457892150}
   - component: {fileID: 457892149}
   - component: {fileID: 457892153}
+  - component: {fileID: 457892154}
   m_Layer: 0
   m_Name: Robot_Bullet
   m_TagString: Untagged
@@ -1204,42 +1204,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!58 &457892150
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 457892148}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0.0047750473, y: 0.0023870468}
-  m_Radius: 0.06786001
 --- !u!50 &457892151
 Rigidbody2D:
   serializedVersion: 5
@@ -1297,6 +1261,57 @@ MonoBehaviour:
   parent: {fileID: 0}
   rigid: {fileID: 0}
   stats: {fileID: 11400000, guid: fa63194f144fc97468edcc11b6671f7f, type: 2}
+--- !u!60 &457892154
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 457892148}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.5, y: 0.06}
+    newSize: {x: 0.5, y: 0.06}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: -0.25, y: 0.03}
+      - {x: -0.25, y: -0.03}
+      - {x: 0.25, y: -0.03}
+      - {x: 0.25, y: 0.03}
+  m_UseDelaunayMesh: 0
 --- !u!1 &490041153
 GameObject:
   m_ObjectHideFlags: 0
@@ -1776,8 +1791,6 @@ GameObject:
   - component: {fileID: 901294690}
   - component: {fileID: 901294689}
   - component: {fileID: 901294688}
-  - component: {fileID: 901294687}
-  - component: {fileID: 901294693}
   m_Layer: 7
   m_Name: Drone
   m_TagString: Untagged
@@ -1785,26 +1798,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!114 &901294687
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 901294686}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 783f33a37e2637c43a47451327e4a3f3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  viewRadius: 3
-  viewAngle: 180
-  targetLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  obstacleLayer:
-    serializedVersion: 2
-    m_Bits: 72
 --- !u!114 &901294688
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1818,7 +1811,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   viewRadius: 4
-  viewAngle: 181
+  viewAngle: 73
   targetLayer:
     serializedVersion: 2
     m_Bits: 256
@@ -1844,8 +1837,8 @@ MonoBehaviour:
   rigid: {fileID: 0}
   ren: {fileID: 0}
   bulletPool: {fileID: 125463173}
-  Player_position: {fileID: 1101910543}
-  target: {x: 0, y: 0}
+  Player_position: {fileID: 0}
+  Target: {x: 0, y: 0, z: 0}
   hitFlash: {fileID: 2100000, guid: 6193ff678a87941489e60c7a713ac097, type: 2}
   playerLayer:
     serializedVersion: 2
@@ -1923,7 +1916,7 @@ CapsuleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.5, y: 1}
+  m_Size: {x: 0.8, y: 0.0001}
   m_Direction: 0
 --- !u!4 &901294692
 Transform:
@@ -1936,29 +1929,12 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 2.019, y: 3.12, z: -0.08406681}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 284531888}
   - {fileID: 125463174}
-  - {fileID: 2137409019}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &901294693
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 901294686}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe1755cedf8909845805f547d9713b3d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  detectable:
-    serializedVersion: 2
-    m_Bits: 0
-  radius: 0
 --- !u!1 &902153691
 GameObject:
   m_ObjectHideFlags: 0
@@ -2159,8 +2135,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.45, y: 0.11, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1464047588}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3115,7 +3091,7 @@ Transform:
   m_GameObject: {fileID: 1464047587}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.23, y: -1.47, z: 2.176212}
+  m_LocalPosition: {x: 1.23, y: -1.33, z: 2.176212}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3158,7 +3134,7 @@ CapsuleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1, y: 1.2}
+  m_Size: {x: 1.2, y: 1.5}
   m_Direction: 0
 --- !u!50 &1464047590
 Rigidbody2D:
@@ -3200,7 +3176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   viewRadius: 5
-  viewAngle: 90
+  viewAngle: 180
   targetLayer:
     serializedVersion: 2
     m_Bits: 256
@@ -3472,7 +3448,6 @@ GameObject:
   - component: {fileID: 1833951989}
   - component: {fileID: 1833951988}
   - component: {fileID: 1833951991}
-  - component: {fileID: 1833951993}
   - component: {fileID: 1833951992}
   m_Layer: 7
   m_Name: Longrange Robot
@@ -3581,7 +3556,7 @@ MonoBehaviour:
   rigid: {fileID: 0}
   ren: {fileID: 0}
   bulletPool: {fileID: 0}
-  Player_position: {fileID: 1101910543}
+  Player_position: {fileID: 0}
   target: {x: 0, y: 0}
   hitFlash: {fileID: 2100000, guid: 6193ff678a87941489e60c7a713ac097, type: 2}
   playerLayer:
@@ -3610,27 +3585,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   viewRadius: 7
-  viewAngle: 90
-  targetLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  obstacleLayer:
-    serializedVersion: 2
-    m_Bits: 8
---- !u!114 &1833951993
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1833951987}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 783f33a37e2637c43a47451327e4a3f3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  viewRadius: 5
-  viewAngle: 90
+  viewAngle: 181
   targetLayer:
     serializedVersion: 2
     m_Bits: 256
@@ -4173,7 +4128,7 @@ Transform:
   m_GameObject: {fileID: 2137409018}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -9.819, y: -0.5063515, z: 2.292665}
+  m_LocalPosition: {x: -7.8, y: 2.6136484, z: 2.2085981}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4181,7 +4136,7 @@ Transform:
   - {fileID: 1074455084}
   - {fileID: 1871735180}
   - {fileID: 440765797}
-  m_Father: {fileID: 901294692}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2137409020
 MonoBehaviour:
@@ -4210,6 +4165,7 @@ SceneRoots:
   - {fileID: 389824463}
   - {fileID: 996144279}
   - {fileID: 423234728}
+  - {fileID: 2137409019}
   - {fileID: 901294692}
   - {fileID: 1998588013}
   - {fileID: 1634638472}

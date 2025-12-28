@@ -65,7 +65,7 @@ public class R_WalkState : ResearcherState
                 return;
             }
 
-            if (researcher.aimRange != null && researcher.aimRange.IsPlayerInSight)
+            if (researcher.DistanceToPlayer() <= researcher.Stat.moveDistance)
             {
                 researcher.ChangeState(researcher.r_states[ResearcherStateType.Attack]);
                 return;
@@ -128,7 +128,7 @@ public class  R_ChaseState : ResearcherState
         }
       
 
-        if(researcher.aimRange != null && researcher.aimRange.IsPlayerInSight)
+        if(researcher.DistanceToPlayer() <= researcher.Stat.moveDistance)
         {
             researcher.ChangeState(researcher.r_states[ResearcherStateType.Attack]);
             return;
@@ -176,7 +176,6 @@ public class R_Hitstate : ResearcherState
     private float exitTime;
     public override void Start(Researcher researcher)
     {
-
         Debug.Log("Researcher Hit State 시작");
         exitTime = Time.time + hitDuration;
         researcher.Knockback();
@@ -187,14 +186,17 @@ public class R_Hitstate : ResearcherState
         {
             researcher.Rigid.linearVelocity = Vector2.zero;
 
-            // 이전 상태가 공격/추적이면 거기로 복귀
-            if (researcher.previousState is R_Attackstate || researcher.previousState is R_ChaseState)
+            if(researcher.DistanceToPlayer() <= researcher.Stat.moveDistance)
             {
-                researcher.ChangeState(researcher.previousState);
-                return;
+                float direction = researcher.Player_Trans.position.x - researcher.transform.position.x;
+                researcher.FlipResearcher(direction);
+                researcher.ChangeState(researcher.r_states[ResearcherStateType.Attack]);
+            }        
+            else
+            {
+                researcher.ChangeState(researcher.r_states[ResearcherStateType.Chase]);
             }
-
-            researcher.ChangeState(researcher.r_states[ResearcherStateType.Chase]);
+          
         }
     }
     public override void Exit(Researcher researcher)
@@ -205,15 +207,16 @@ public class R_Hitstate : ResearcherState
 
 public class R_Deadstate : ResearcherState
 {
-
+    LayerMask orgin;
     public override void Start(Researcher researcher)
     {
 
         Debug.Log("Researcher Dead State 시작");
         researcher.Rigid.linearVelocity = Vector2.zero;
+        orgin = researcher.gameObject.layer;    
+        researcher.gameObject.layer = LayerMask.NameToLayer("Invincible");
         researcher.animator.Play("R_Death");
 
-        
     }
     public override void Update(Researcher researcher)
     {
@@ -222,6 +225,7 @@ public class R_Deadstate : ResearcherState
     public override void Exit(Researcher researcher)
     {
         Debug.Log("Researcher Dead State 종료");
+        researcher.gameObject.layer = orgin;
     }
 }
 

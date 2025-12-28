@@ -14,15 +14,14 @@ public class SightRange : MonoBehaviour
     [SerializeField] private LayerMask obstacleLayer;  
 
 
+
     void Update()
     {
         FindTargetsInFOV();
     }
 
-    private void FindTargetsInFOV()
-    {
-
-      
+    private Transform FindTargetsInFOV()
+    { 
         float dirMultiplier = Mathf.Sign(transform.localScale.x); // 방향에 따른 조정 : 왼쪽 : 음수 오른쪽 : 양수
         Vector2 fovDirection = Vector2.right * dirMultiplier; // 시야 방향 설정
         IsPlayerInSight = false; 
@@ -34,7 +33,7 @@ public class SightRange : MonoBehaviour
 
         if (targetcollider == null)
         {
-            return; // 목표물이 없으면 함수 종료
+            return PlayerInSight; // 목표물이 없으면 함수 종료
         }
 
         Transform target = targetcollider.transform;// 타겟의 Transform 가져오기
@@ -57,6 +56,7 @@ public class SightRange : MonoBehaviour
 
     
         }
+        return PlayerInSight;
     }
 
     void OnDrawGizmos()

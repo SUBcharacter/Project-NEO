@@ -14,9 +14,10 @@ public class Drone : Enemy
 
     [SerializeField] Transform Player_position;
     public Transform Pl_trans => Player_position;
-    [SerializeField] Vector2 target;
+ 
+    [SerializeField] private Vector3 Target;
 
-
+    public Vector3 target => Target;
     [SerializeField] Material hitFlash;
     [SerializeField] Dictionary<DroneStateType, DroneState> Dronestate = new(); 
     public Dictionary<DroneStateType, DroneState> State => Dronestate;
@@ -24,10 +25,7 @@ public class Drone : Enemy
     [SerializeField] LayerMask playerLayer;
     [SerializeField] public LayerMask groundLayer;
     [SerializeField] public LayerMask wallLayer;
-    public float Movedistance => Stat.moveDistance;
-    public float D_Speed => Stat.moveSpeed;
-    public float wallCheckDistance = 1.0f; // 전방 벽 감지 거리
-    private float nextFiretime;
+    public float wallCheckDistance = 1.5f; // 전방 벽 감지 거리
 
     [SerializeField] bool enhanced;
     [SerializeField] bool hitted;
@@ -37,28 +35,23 @@ public class Drone : Enemy
 
     public int currentPatrolIndex = -1;
     public SightRange sightrange { get; private set; }
-    public AimRange aimrange { get; private set; } 
     public Animator animator { get; private set; }
     public bool Enhanced { get => enhanced; set => enhanced = value; }
     public bool isattack { get; set; }
 
     protected override void Awake()
     {
-       
         sightrange = GetComponent<SightRange>();
-        aimrange = GetComponent<AimRange>();
         ren = GetComponentInChildren<SpriteRenderer>();
         animator = GetComponentInChildren<Animator>();
         Rigid = GetComponent<Rigidbody2D>();
-        patrolPath = GetComponentInChildren<PatrolPoints>();
+        patrolPath = FindAnyObjectByType<PatrolPoints>();
         if (patrolPath != null)
         {
             patrolPath.Initialize();
         }
-        else
-        {
-            Debug.LogError("자식 오브젝트에서 PatrolPoints를 찾을 수 없습니다!");
-        }
+
+        Player_position= FindAnyObjectByType<Player>().transform;
         Stateinit();
         currnetHealth = Stat.MaxHp;
         hitted = false;
@@ -153,28 +146,23 @@ public class Drone : Enemy
     {
         float lookDir = Mathf.Sign(transform.localScale.x);
         Vector2 checkDirection = (lookDir > 0) ? Vector2.right : Vector2.left;
-
         Vector2 origin = (Vector2)transform.position + (checkDirection * 0.3f);
 
+        RaycastHit2D hit = Physics2D.Raycast(origin, checkDirection, wallCheckDistance, wallLayer);
 
-        RaycastHit2D hit = Physics2D.CircleCast(origin, wallCheckDistance, checkDirection, 0.1f, wallLayer);
-
-        Debug.DrawRay(origin, checkDirection * 0.5f, Color.green);
 
         return hit.collider != null;
     }
 
     public void ReturnToStartPoint()
     {
-        Vector3 targetPos = patrolPath.GetRandomPoint();
-        float distance = Vector2.Distance(transform.position, targetPos);
 
-        if (distance > 0.2f)
+        float distance = Vector2.Distance(transform.position, startPos);
+
+        if (distance > 0.3f)
         {
-            Vector2 moveDir = ((Vector2)patrolPath.GetRandomPoint() - (Vector2)transform.position).normalized;
-
+            Vector2 moveDir = ((Vector2)startPos - (Vector2)transform.position).normalized;
             FlipDrone(moveDir.x);
-
             Rigid.linearVelocity = moveDir * Stat.moveSpeed;
         }
         else
@@ -211,7 +199,6 @@ public class Drone : Enemy
     public void waitgameobjectfalse()
     {
         StartCoroutine(Dead());
-
     }
 
     IEnumerator Dead()
@@ -225,42 +212,48 @@ public class Drone : Enemy
     {
         if (isattack) return;
 
-        if (!isattack)
+     
+        if (DistanceToPlayer() <= Stat.moveDistance)
         {
-            if (aimrange != null && aimrange.IsPlayerInSight)
-            {
-                if (Time.time >= nextFiretime)
-                {
-                    isattack = true;
-                    nextFiretime = Time.time + Stat.fireCooldown;
-
-                    Resetplayerposition();
-                    ChangeState(Dronestate[DroneStateType.Attack]);
-                }
-            }
-            else
-            {
-                Debug.Log("사격 범위 이탈. 추적으로 전환.");
-                ChangeState(Dronestate[DroneStateType.Chase]);
-            }        
+            ChangeState(State[DroneStateType.Attack]);
         }
+        else
+        {     
+             ChangeState(State[DroneStateType.Chase]);
+
+        }           
+       
+
+
+    }
+    public float DistanceToPlayer()
+    {
+        if (sightrange.PlayerInSight == null)
+            return 100;
+
+        float distanceX = transform.position.x - sightrange.PlayerInSight.position.x;
+
+        return Mathf.Abs(distanceX);
     }
     public void Resetplayerposition()
     {
-        target = Pl_trans.position;
-        float direction = target.x - transform.position.x;
-        FlipDrone(direction);
+        if (sightrange.PlayerInSight != null)
+        {
+            Target = sightrange.PlayerInSight.position; 
+            float direction = Target.x - transform.position.x;
+            FlipDrone(direction);
+        }
     }
 
     public void Shoot()
     {
-        Vector2 firedir = (target - (Vector2)transform.position).normalized;
+        Vector2 firedir = ((Vector2)Target - (Vector2)transform.position).normalized;
         bulletPool.Fire(firedir, transform.position, false);
 
     }
 
     public void Chase()
-    {
+    {    
         float enhancing = enhanced ? 2f : 1f;   
 
         Vector2 direction = (Pl_trans.position - transform.position).normalized;

@@ -6,14 +6,14 @@ using UnityEngine.InputSystem.LowLevel;
 
 public enum SummonDroneStateType
 {
-    Idle, Summon, Attack, Dead
+    Idle, Summon, Attack, Dead,Chase
 }
 public class SummonDrone : Enemy
 {
     Dictionary<SummonDroneStateType, SD_State> Summonstates = new();
     public Dictionary<SummonDroneStateType, SD_State> SD_states => Summonstates;
     public SD_State currentStates { get; private set; }
-
+    [SerializeField] private float acceleration = 10f;
     public Transform Resear_trans { get; private set; }
     public Transform Player_trans { get; private set; }
 
@@ -25,7 +25,6 @@ public class SummonDrone : Enemy
 
     [SerializeField] private float ArriveDistance = 0.1f;
     public float arriveDistance => ArriveDistance;
-    [SerializeField] public SightRange sightRange { get; private set; }
     [SerializeField] public Animator animator { get; private set; }
 
     [SerializeField] public Material hitFlash;
@@ -39,7 +38,6 @@ public class SummonDrone : Enemy
     protected override void Awake()
     {
         startPos = transform.position;
-        sightRange = GetComponent<SightRange>();
         animator = GetComponentInChildren<Animator>();
         Ren = GetComponentInChildren<SpriteRenderer>();
         Rigid = GetComponent<Rigidbody2D>();
@@ -56,12 +54,12 @@ public class SummonDrone : Enemy
         SD_states[SummonDroneStateType.Summon] = new SD_Summonstate();
         SD_states[SummonDroneStateType.Attack] = new SD_Attackstate();
         SD_states[SummonDroneStateType.Dead] = new SD_DeadState();
+        SD_states[SummonDroneStateType.Chase] = new SD_ChaseState();
     }
 
     private void OnEnable()
     {
         Init();
-
     }
 
     public override void Init()
@@ -123,20 +121,16 @@ public class SummonDrone : Enemy
         Debug.Log("Summondrone »ç¸Á");
     }
 
-    public void R_directiontoDrone()
-    {
-        float researcherSign = Mathf.Sign(Resear_trans.localScale.x);
-        float currentAbsX = Mathf.Abs(transform.localScale.x);
-        float newScaleX = currentAbsX * researcherSign;
 
-        transform.localScale = new Vector3(newScaleX, transform.localScale.y, transform.localScale.z);
-    }
     public void Chase()
     {
-        Vector2 targetPosition = (Player_trans.position - transform.position).normalized;
-        Flip(this, targetPosition.x);
-        Rigid.linearVelocity = targetPosition * Stat.moveSpeed;
+        Vector2 targetDir = (Player_trans.position - transform.position).normalized;
 
+        Vector2 targetVelocity = targetDir * Stat.moveSpeed;
+
+        Flip(this, targetDir.x);
+
+        Rigid.linearVelocity = Vector2.MoveTowards(Rigid.linearVelocity,targetVelocity,acceleration * Time.deltaTime);
     }
     public void Flip(SummonDrone drone,float direction)
     {
@@ -162,7 +156,7 @@ public class SummonDrone : Enemy
     
     IEnumerator Explosion_timer()
     {
-        yield return CoroutineCasher.Wait(3f);
+        yield return CoroutineCasher.Wait(0.5f);
         ChangeState(SD_states[SummonDroneStateType.Dead]);
        
     }

@@ -1,5 +1,6 @@
 using UnityEditor.Searcher;
 using UnityEngine;
+using static UnityEngine.UI.Image;
 
 public abstract class DroneState 
 {
@@ -10,25 +11,27 @@ public abstract class DroneState
 
 public class D_Idlestate : DroneState
 {
-    float idleDuration = 0f;
+    float idleDuration;
     float waitTime = 1f;
     public override void Start(Drone drone) 
     {
         Debug.Log("Idle State 시작");
+        idleDuration = 0f;
         drone.Rigid.linearVelocity = Vector2.zero;
         drone.animator.Play("D_idle");
     }
     public override void Update(Drone drone)
     {
+        if (drone.sightrange.PlayerInSight != null)
+        {
+            drone.ChangeState(drone.State[DroneStateType.Chase]);
+            return;
+        }
+
         idleDuration += Time.deltaTime;
         if (idleDuration >= waitTime)
         {
-            Debug.Log("Idle State 종료, Walk State로 전환");
-            float currentDir = Mathf.Sign(drone.transform.localScale.x);
-            drone.FlipDrone(-currentDir);
             drone.ChangeState(drone.State[DroneStateType.Walk]);
-
-            idleDuration = 0f;
         }
     }
 
@@ -56,7 +59,7 @@ public class D_Walkstate : DroneState
             return;
         }
 
-        if(drone.sightrange.PlayerInSight)
+        if(drone.sightrange.PlayerInSight != null)
         {
             drone.ChangeState(drone.State[DroneStateType.Chase]);
             return;
@@ -74,6 +77,8 @@ public class D_Attackstate : DroneState
     {
         Debug.Log("Attack State 시작");
         drone.Rigid.linearVelocity = Vector2.zero;
+        drone.Resetplayerposition();
+        drone.isattack = true;
         drone.animator.Play("D_Attack");
     }
     public override void Update(Drone drone) 
@@ -98,11 +103,12 @@ public class D_Chasestate : DroneState
     {
         if(drone.CheckForObstacle())
         {
+            drone.Rigid.linearVelocity = Vector2.zero;
             drone.ChangeState(drone.State[DroneStateType.Return]);
             return;
         }
 
-        if(drone.aimrange.PlayerInSight)
+        if (drone.DistanceToPlayer() <= drone.Stat.moveDistance)
         {
             drone.ChangeState(drone.State[DroneStateType.Attack]);
             return;
@@ -115,10 +121,13 @@ public class D_Chasestate : DroneState
 
 public class D_Deadstate : DroneState
 {
+    LayerMask origin;
     public override void Start(Drone drone)
     {
         Debug.Log("Dead State 시작");
         drone.Rigid.linearVelocity = Vector2.zero;
+        origin = drone.gameObject.layer;
+        drone.gameObject.layer = LayerMask.NameToLayer("Invincible");
         drone.animator.Play("D_Dead");
         drone.waitgameobjectfalse();
         
@@ -128,7 +137,7 @@ public class D_Deadstate : DroneState
 
 
     }
-    public override void Exit(Drone drone) { }
+    public override void Exit(Drone drone) { drone.gameObject.layer = origin; }
 }
 public class D_Hitstate : DroneState
 {
@@ -138,21 +147,21 @@ public class D_Hitstate : DroneState
     {
         Debug.Log("HIt State 시작");
         exitTime = hitDuration + Time.time;
-
+        drone.Rigid.linearVelocity = Vector2.zero;
     }
     public override void Update(Drone drone)
     {
         if (Time.time >= exitTime)
         {
-            drone.Rigid.linearVelocity = Vector2.zero;
-
-            if (drone.sightrange.PlayerInSight && drone.aimrange.PlayerInSight)
+            if (drone.Pl_trans != null)
             {
-                drone.ChangeState(drone.State[DroneStateType.Attack]);
+                float direction = drone.Pl_trans.position.x - drone.transform.position.x;
+                drone.FlipDrone(direction);
+                drone.ChangeState(drone.State[DroneStateType.Chase]);
             }
             else
             {
-                drone.ChangeState(drone.State[DroneStateType.Chase]);
+                drone.ChangeState(drone.State[DroneStateType.Idle]);
             }
         }
 
@@ -175,7 +184,7 @@ public class D_EnhancedDroneState : DroneState
     {
         if (drone.Enhanced)
         {
-             if (drone.aimrange.PlayerInSight)
+             if (drone.DistanceToPlayer() <= drone.Stat.moveDistance)
              {
                  drone.ChangeState(drone.State[DroneStateType.Attack]);
              }
@@ -193,21 +202,21 @@ public class D_EnhancedDroneState : DroneState
 }
 public class D_Returnstate : DroneState
 {
+
     public override void Start(Drone drone)
     {
+        Debug.Log("Return State 시작");
         drone.animator.Play("D_Walk");
-       
+
     }
     public override void Update(Drone drone)
     {
         drone.ReturnToStartPoint();
-        if (!drone.CheckForObstacle())
+        if (drone.sightrange.PlayerInSight)
         {
-            if (drone.sightrange.PlayerInSight)
-            {
-                drone.ChangeState(drone.State[DroneStateType.Chase]);
-            }
+            drone.ChangeState(drone.State[DroneStateType.Chase]);
         }
+      
     }
     public override void Exit(Drone drone)
     {
