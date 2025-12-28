@@ -9,9 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 43155aebe92133d4c9c250e9890c078b, type: 3}
-  m_Name: Vel 1 Second 2
+  m_Script: {fileID: 11500000, guid: bf457d982e921264cb0cc571216fded6, type: 3}
+  m_Name: Deadzone(0.91, 0.76)
   m_EditorClassIdentifier: 
-  velocity: 1
-  moveTime: 4
-  moveRight: 1
+  size: {x: 0.91, y: 0.76}

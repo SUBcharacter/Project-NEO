@@ -34,6 +34,11 @@ public class CameraManager : MonoBehaviour
         shake = StartCoroutine(CameraShake(intensity, time));
     }
 
+    public void SetDamping(Vector2 value)
+    {
+        cmp.Damping = value;
+    }
+
     public void DeadZoneControl(Vector2 size)
     {
         size.x = Mathf.Clamp(size.x, 0, 2);

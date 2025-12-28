@@ -135,8 +135,8 @@ public class Player : MonoBehaviour, IDamageable
         {
             //Move();
             Move1();
-            SpriteControl();
         }
+        SpriteControl();
             
 
     }

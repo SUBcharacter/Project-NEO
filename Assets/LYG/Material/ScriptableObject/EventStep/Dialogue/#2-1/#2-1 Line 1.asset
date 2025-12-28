@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 43155aebe92133d4c9c250e9890c078b, type: 3}
-  m_Name: Vel 1 Second 2
+  m_Script: {fileID: 11500000, guid: 74caf15fcfae68740bbf982f437f82b3, type: 3}
+  m_Name: '#2-1 Line 1'
   m_EditorClassIdentifier: 
-  velocity: 1
-  moveTime: 4
-  moveRight: 1
+  prefab: {fileID: 4869992056530640006, guid: 74044dd998f136245a78c2fa3b2b6350, type: 3}
+  actorName: "\uC8FC\uC778\uACF5 \uC774\uB984"
+  line: "(\uC774\uB984) \uC785\uB2C8\uB2E4."
