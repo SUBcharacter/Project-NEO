@@ -30,8 +30,6 @@ public class PlayerUI : MonoBehaviour
 
     public Canvas Cnvs { get => canvas; set => canvas = value; }
 
-
-    private int lifeCount = 5;
     private void Awake()
     {
         player = FindAnyObjectByType<Player>();
@@ -62,6 +60,7 @@ public class PlayerUI : MonoBehaviour
         // 체력이 잘 깎이는지 테스트용
         if (Input.GetKeyDown(KeyCode.L))
         {
+            player.TakeDamage(1f);
             LifeUI();
             Debug.Log("체력 깎임");
         }
@@ -164,18 +163,22 @@ public class PlayerUI : MonoBehaviour
 
     void LifeUI()
     {
-        // 5개 다 까이면 바로 뒤지는건 TakeDamage랑 연동해야할듯
-        if (lifeCount <= 0)
+        
+        // 
+        if (player.Health <= 0)
         {
             Debug.Log("뒤짐");
             return;
         }
-        lifeCount--;
+      
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < LifeIcons.Count; i++)
         {
-            LifeIcons[i].gameObject.SetActive(i < lifeCount);
+            LifeIcons[i].gameObject.SetActive(i < player.Health);
+            Debug.Log(i + " : " + LifeIcons[i].gameObject.activeSelf);
         }
+
+        //Canvas.ForceUpdateCanvases();
     }
 
 }
