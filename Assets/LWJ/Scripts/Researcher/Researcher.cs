@@ -6,10 +6,6 @@ using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
 using static UnityEditor.VersionControl.Asset;
 
-public enum ResearcherStateType
-{
-    Idle, Walk, Chase, Summon, Attack, Hit, Dead
-}
 
 
 public class Researcher : Enemy
@@ -26,8 +22,8 @@ public class Researcher : Enemy
     [SerializeField] Magazine bulletpool;
     [SerializeField] Material hitFlash;
 
-    [SerializeField] Dictionary<ResearcherStateType, ResearcherState> R_States = new();
-    public Dictionary<ResearcherStateType, ResearcherState> r_states => R_States;
+    [SerializeField] Dictionary<EnemyTypeState, ResearcherState> R_States = new();
+    public Dictionary<EnemyTypeState, ResearcherState> r_states => R_States;
 
     [SerializeField] public Animator animator { get; private set; }
     [SerializeField] public Animator Armanima { get; private set; }
@@ -73,7 +69,7 @@ public class Researcher : Enemy
         isDroneSummoned = false;
         isarmlock = false;
         isbodylock = false;
-        ChangeState(r_states[ResearcherStateType.Idle]);
+        ChangeState(r_states[EnemyTypeState.Idle]);
     }
 
     void InitArm()
@@ -94,13 +90,13 @@ public class Researcher : Enemy
     }
     void R_State()
     {
-        r_states[ResearcherStateType.Idle] = new R_IdleState();
-        r_states[ResearcherStateType.Walk] = new R_WalkState();
-        r_states[ResearcherStateType.Summon] = new R_SummonDroneState();
-        r_states[ResearcherStateType.Attack] = new R_Attackstate();
-        r_states[ResearcherStateType.Hit] = new R_Hitstate();
-        r_states[ResearcherStateType.Chase] = new R_ChaseState();
-        r_states[ResearcherStateType.Dead] = new R_Deadstate();
+        r_states[EnemyTypeState.Idle] = new R_IdleState();
+        r_states[EnemyTypeState.Walk] = new R_WalkState();
+        r_states[EnemyTypeState.Summon] = new R_SummonDroneState();
+        r_states[EnemyTypeState.Attack] = new R_Attackstate();
+        r_states[EnemyTypeState.Hit] = new R_Hitstate();
+        r_states[EnemyTypeState.Chase] = new R_ChaseState();
+        r_states[EnemyTypeState.Dead] = new R_Deadstate();
     }
 
     void Update()
@@ -157,7 +153,7 @@ public class Researcher : Enemy
     
     public void summontoattack()
     {
-        ChangeState(R_States[ResearcherStateType.Attack]);
+        ChangeState(R_States[EnemyTypeState.Attack]);
     }
     public void PlayShot()
     {
@@ -292,7 +288,7 @@ public class Researcher : Enemy
         }
         else
         {
-            ChangeState(r_states[ResearcherStateType.Chase]);
+            ChangeState(r_states[EnemyTypeState.Chase]);
         }
     }
 
@@ -355,11 +351,11 @@ public class Researcher : Enemy
 
         if (currnetHealth <= 0)
         {
-            ChangeState(r_states[ResearcherStateType.Dead]);
+            ChangeState(r_states[EnemyTypeState.Dead]);
             return;
         }
       
-        ChangeState(r_states[ResearcherStateType.Hit]);
+        ChangeState(r_states[EnemyTypeState.Hit]);
    
     }
 

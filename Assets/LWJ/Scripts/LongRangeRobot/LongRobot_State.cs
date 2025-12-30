@@ -24,15 +24,15 @@ public class LRB_Idlestate : LongRobot_State
 
         if (rb.sightrange.PlayerInSight != null)
         {
-            rb.ChangeState(rb.states[LRBStateType.Chase]);
+            rb.ChangeState(rb.states[EnemyTypeState.Chase]);
             return;
         }
 
         if (idleDuration >= waitTime)
         {
-            float currentDir = Mathf.Sign(rb.transform.localScale.x);
-            rb.FlipRobot(-currentDir);
-            rb.ChangeState(rb.states[LRBStateType.Walk]);
+            float randomDir = Random.value > 0.5f ? 1f : -1f;
+            rb.FlipRobot(randomDir);
+            rb.ChangeState(rb.states[EnemyTypeState.Walk]);
             idleDuration = 0f;
         }
 
@@ -43,8 +43,11 @@ public class LRB_Idlestate : LongRobot_State
 
 public class LRB_Walkstate : LongRobot_State
 {
+    private Vector2 startpos;
+    private float movedistance = 2.0f;
     public override void Start(LongRobot rb)
     {
+        startpos = rb.transform.position;
         Debug.Log("·Îº¿ Walk State ½ÃÀÛ");
         rb.animator.Play("LRB_Walk");
     }
@@ -52,12 +55,19 @@ public class LRB_Walkstate : LongRobot_State
     {
         if (rb.CheckForObstacle())
         {
-            rb.ChangeState(rb.states[LRBStateType.Idle]);
+            rb.ChangeState(rb.states[EnemyTypeState.Idle]);
             return;
         }
         if (rb.sightrange.PlayerInSight != null)
         {
-            rb.ChangeState(rb.states[LRBStateType.Chase]);
+            rb.ChangeState(rb.states[EnemyTypeState.Chase]);
+            return;
+        }
+
+        float movedDistance = Vector2.Distance(startpos, rb.transform.position);
+        if (movedDistance >= movedistance)
+        {
+            rb.ChangeState(rb.states[EnemyTypeState.Idle]);
             return;
         }
         rb.Move();
@@ -120,11 +130,11 @@ public class LRB_Hitstate : LongRobot_State
                 rb.FlipRobot(direction);
                 if (rb.DistanceToPlayer() <= rb.Stat.moveDistance)
                 {
-                    rb.ChangeState(rb.states[LRBStateType.Attack]);
+                    rb.ChangeState(rb.states[EnemyTypeState.Attack]);
                 }
                 else
                 {
-                    rb.ChangeState(rb.states[LRBStateType.Chase]);
+                    rb.ChangeState(rb.states[EnemyTypeState.Chase]);
                 }
             }
         }
@@ -150,11 +160,11 @@ public class LRB_EnhancedState : LongRobot_State
         {
             if (rb.DistanceToPlayer() <= rb.Stat.moveDistance)
             {
-                rb.ChangeState(rb.states[LRBStateType.Attack]);
+                rb.ChangeState(rb.states[EnemyTypeState.Attack]);
             }
             else
             {
-                rb.ChangeState(rb.states[LRBStateType.Chase]);
+                rb.ChangeState(rb.states[EnemyTypeState.Chase]);
             }
         }
     }
@@ -175,13 +185,13 @@ public class LRB_Chasestate : LongRobot_State
     {
         if (rb.CheckForObstacle())
         {
-            rb.ChangeState(rb.states[LRBStateType.Idle]);
+            rb.ChangeState(rb.states[EnemyTypeState.Idle]);
             return;
         }
 
         if (rb.DistanceToPlayer() <= rb.Stat.moveDistance)
         {
-            rb.ChangeState(rb.states[LRBStateType.Attack]);
+            rb.ChangeState(rb.states[EnemyTypeState.Attack]);
             return;
         }
         rb.Chase();

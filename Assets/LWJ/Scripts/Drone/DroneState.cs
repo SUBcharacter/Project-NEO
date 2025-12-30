@@ -24,14 +24,14 @@ public class D_Idlestate : DroneState
     {
         if (drone.sightrange.PlayerInSight != null)
         {
-            drone.ChangeState(drone.State[DroneStateType.Chase]);
+            drone.ChangeState(drone.State[EnemyTypeState.Chase]);
             return;
         }
 
         idleDuration += Time.deltaTime;
         if (idleDuration >= waitTime)
         {
-            drone.ChangeState(drone.State[DroneStateType.Walk]);
+            drone.ChangeState(drone.State[EnemyTypeState.Walk]);
         }
     }
 
@@ -55,13 +55,13 @@ public class D_Walkstate : DroneState
     {
         if(drone.CheckForObstacle())
         {   
-            drone.ChangeState(drone.State[DroneStateType.Idle]);
+            drone.ChangeState(drone.State[EnemyTypeState.Idle]);
             return;
         }
 
         if(drone.sightrange.PlayerInSight != null)
         {
-            drone.ChangeState(drone.State[DroneStateType.Chase]);
+            drone.ChangeState(drone.State[EnemyTypeState.Chase]);
             return;
         }
         drone.Move(nextPos);
@@ -104,13 +104,13 @@ public class D_Chasestate : DroneState
         if(drone.CheckForObstacle())
         {
             drone.Rigid.linearVelocity = Vector2.zero;
-            drone.ChangeState(drone.State[DroneStateType.Return]);
+            drone.ChangeState(drone.State[EnemyTypeState.Return]);
             return;
         }
 
         if (drone.DistanceToPlayer() <= drone.Stat.moveDistance)
         {
-            drone.ChangeState(drone.State[DroneStateType.Attack]);
+            drone.ChangeState(drone.State[EnemyTypeState.Attack]);
             return;
         }
         drone.Chase();
@@ -157,11 +157,11 @@ public class D_Hitstate : DroneState
             {
                 float direction = drone.Pl_trans.position.x - drone.transform.position.x;
                 drone.FlipDrone(direction);
-                drone.ChangeState(drone.State[DroneStateType.Chase]);
+                drone.ChangeState(drone.State[EnemyTypeState.Chase]);
             }
             else
             {
-                drone.ChangeState(drone.State[DroneStateType.Idle]);
+                drone.ChangeState(drone.State[EnemyTypeState.Idle]);
             }
         }
 
@@ -186,11 +186,11 @@ public class D_EnhancedDroneState : DroneState
         {
              if (drone.DistanceToPlayer() <= drone.Stat.moveDistance)
              {
-                 drone.ChangeState(drone.State[DroneStateType.Attack]);
+                 drone.ChangeState(drone.State[EnemyTypeState.Attack]);
              }
              else
              {
-                 drone.ChangeState(drone.State[DroneStateType.Chase]);
+                 drone.ChangeState(drone.State[EnemyTypeState.Chase]);
              }   
         }
     }
@@ -214,7 +214,7 @@ public class D_Returnstate : DroneState
         drone.ReturnToStartPoint();
         if (drone.sightrange.PlayerInSight)
         {
-            drone.ChangeState(drone.State[DroneStateType.Chase]);
+            drone.ChangeState(drone.State[EnemyTypeState.Chase]);
         }
       
     }

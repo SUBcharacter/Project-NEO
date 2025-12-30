@@ -2,10 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Collections;
 
-public enum LRBStateType
-{
-    Idle, Attack, Dead, Hit, Walk, Chase, Enhance
-}
+
 public class LongRobot : Enemy
 {
     public LongRobot_State currentstates;
@@ -18,8 +15,8 @@ public class LongRobot : Enemy
 
 
     [SerializeField] Material hitFlash;
-    [SerializeField] Dictionary<LRBStateType, LongRobot_State> LRBstate = new();
-    public Dictionary<LRBStateType, LongRobot_State> states => LRBstate;
+    [SerializeField] Dictionary<EnemyTypeState, LongRobot_State> LRBstate = new();
+    public Dictionary<EnemyTypeState, LongRobot_State> states => LRBstate;
 
     [SerializeField] LayerMask playerLayer;
     [SerializeField] public LayerMask groundLayer;
@@ -47,7 +44,6 @@ public class LongRobot : Enemy
         bulletPool = GetComponentInChildren<Magazine>();
         Player_position = FindAnyObjectByType<Player>().transform;
         Stateinit();
-
         hitted = false;
         startPos = transform.position;
     }
@@ -64,13 +60,13 @@ public class LongRobot : Enemy
     }
     private void Stateinit()
     {
-        LRBstate[LRBStateType.Idle] = new LRB_Idlestate();
-        LRBstate[LRBStateType.Attack] = new LRB_Attackstate();
-        LRBstate[LRBStateType.Dead] = new LRB_Deadstate();
-        LRBstate[LRBStateType.Hit] = new LRB_Hitstate();
-        LRBstate[LRBStateType.Chase] = new LRB_Chasestate();
-        LRBstate[LRBStateType.Walk] = new LRB_Walkstate();
-        LRBstate[LRBStateType.Enhance] = new LRB_EnhancedState();
+        LRBstate[EnemyTypeState.Idle] = new LRB_Idlestate();
+        LRBstate[EnemyTypeState.Attack] = new LRB_Attackstate();
+        LRBstate[EnemyTypeState.Dead] = new LRB_Deadstate();
+        LRBstate[EnemyTypeState.Hit] = new LRB_Hitstate();
+        LRBstate[EnemyTypeState.Chase] = new LRB_Chasestate();
+        LRBstate[EnemyTypeState.Walk] = new LRB_Walkstate();
+        LRBstate[EnemyTypeState.Enhance] = new LRB_EnhancedState();
     }
     void Update()
     {
@@ -83,7 +79,7 @@ public class LongRobot : Enemy
         Rigid.linearVelocity = Vector2.zero;
         transform.position = startPos;
         isattack = false;
-        ChangeState(LRBstate[LRBStateType.Idle]);
+        ChangeState(LRBstate[EnemyTypeState.Idle]);
     }
 
     public void ChangeState(LongRobot_State newstate)
@@ -103,7 +99,7 @@ public class LongRobot : Enemy
     void Enhance()
     {
         if (currentstates is LRB_Deadstate) return;
-        ChangeState(LRBstate[LRBStateType.Enhance]);
+        ChangeState(LRBstate[EnemyTypeState.Enhance]);
         StartCoroutine(Enhancing());
     }
     IEnumerator Enhancing()
@@ -145,11 +141,11 @@ public class LongRobot : Enemy
 
         if (currnetHealth <= 0)
         {
-            ChangeState(LRBstate[LRBStateType.Dead]);
+            ChangeState(LRBstate[EnemyTypeState.Dead]);
             return;
         }
 
-        ChangeState(LRBstate[LRBStateType.Hit]);
+        ChangeState(LRBstate[EnemyTypeState.Hit]);
     }
 
     public void FlipRobot(float direction)
@@ -190,13 +186,13 @@ public class LongRobot : Enemy
             {
                 isattack = true;
                 nextFiretime = Time.time + Stat.fireCooldown;
-                ChangeState(LRBstate[LRBStateType.Attack]);
+                ChangeState(LRBstate[EnemyTypeState.Attack]);
             }
         }
         else
         {
             Debug.Log("사격 범위 이탈. 추적으로 전환.");
-            ChangeState(LRBstate[LRBStateType.Chase]);
+            ChangeState(LRBstate[EnemyTypeState.Chase]);
         }
         
     }

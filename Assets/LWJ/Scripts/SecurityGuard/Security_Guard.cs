@@ -2,14 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum GuardStateType
-{
-    Idle, Walk, Chase, Attack, Hit, Dead
-}
 public class Security_Guard : Enemy
 {
-    [SerializeField] Dictionary<GuardStateType, Security_State> Guardstates = new();
-    public Dictionary<GuardStateType, Security_State> states => Guardstates;
+    [SerializeField] Dictionary<EnemyTypeState, Security_State> Guardstates = new();
+    public Dictionary<EnemyTypeState, Security_State> states => Guardstates;
 
     private Security_State currentState;
 
@@ -48,17 +44,17 @@ public class Security_Guard : Enemy
     {
         currnetHealth = Stat.MaxHp;
         isattack = false;
-        ChangeState(Guardstates[GuardStateType.Idle]);
+        ChangeState(Guardstates[EnemyTypeState.Idle]);
     }
     
     public void StateInit()
     {
-        Guardstates[GuardStateType.Idle] = new Security_Idle();
-        Guardstates[GuardStateType.Walk] = new Security_Walk();
-        Guardstates[GuardStateType.Chase] = new Security_Chase();
-        Guardstates[GuardStateType.Attack] = new Security_Attack();
-        Guardstates[GuardStateType.Hit] = new Security_Hit();
-        Guardstates[GuardStateType.Dead] = new Security_Death();
+        Guardstates[EnemyTypeState.Idle] = new Security_Idle();
+        Guardstates[EnemyTypeState.Walk] = new Security_Walk();
+        Guardstates[EnemyTypeState.Chase] = new Security_Chase();
+        Guardstates[EnemyTypeState.Attack] = new Security_Attack();
+        Guardstates[EnemyTypeState.Hit] = new Security_Hit();
+        Guardstates[EnemyTypeState.Dead] = new Security_Death();
     }
     void Update()
     {
@@ -163,10 +159,10 @@ public class Security_Guard : Enemy
 
         if (currnetHealth <= 0)
         {
-            ChangeState(Guardstates[GuardStateType.Dead]);
+            ChangeState(Guardstates[EnemyTypeState.Dead]);
             return;
         }
-        ChangeState(Guardstates[GuardStateType.Hit]);
+        ChangeState(Guardstates[EnemyTypeState.Hit]);
     }
     IEnumerator HitFlash()
     {

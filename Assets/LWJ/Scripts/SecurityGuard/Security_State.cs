@@ -23,15 +23,15 @@ public class Security_Idle : Security_State
         idleDuration += Time.deltaTime;
         if (idleDuration >= waitTime)
         {
-            float currentDir = Mathf.Sign(guard.transform.localScale.x);
-            guard.FlipGuard(-currentDir);
-            if(guard.sightRange.PlayerInSight)
+            float currentDir = Random.value > 0.5f ? 1f : -1f;
+            guard.FlipGuard(currentDir);
+            if(guard.sightRange.PlayerInSight != null)
             {
                 guard.target = guard.sightRange.PlayerInSight;
-                guard.ChangeState(guard.states[GuardStateType.Chase]);
+                guard.ChangeState(guard.states[EnemyTypeState.Chase]);
                 return; 
             }
-            guard.ChangeState(guard.states[GuardStateType.Walk]);
+            guard.ChangeState(guard.states[EnemyTypeState.Walk]);
 
             idleDuration = 0f;
         }
@@ -45,8 +45,11 @@ public class Security_Idle : Security_State
 
 public class Security_Walk : Security_State
 {
+    float movedistance = 2.0f;
+    Vector2 startpos;
     public override void Start(Security_Guard guard)
     {
+        startpos = guard.transform.position;
         Debug.Log("보안 요원 walk State 시작");
         guard.animator.Play("Security_Walk");
     }
@@ -54,17 +57,23 @@ public class Security_Walk : Security_State
     {
         if(guard.CheckForObstacle() || guard.CheckForLedge())
         {   
-            guard.ChangeState(guard.states[GuardStateType.Idle]);
+            guard.ChangeState(guard.states[EnemyTypeState.Idle]);
             return;
         }
 
         if(guard.sightRange.PlayerInSight)
         {
             guard.target = guard.sightRange.PlayerInSight;
-            guard.ChangeState(guard.states[GuardStateType.Chase]);
+            guard.ChangeState(guard.states[EnemyTypeState.Chase]);
             return; 
         }
 
+        float distance = Vector2.Distance(startpos, guard.transform.position);
+        if (distance >= movedistance)
+        {
+            guard.ChangeState(guard.states[EnemyTypeState.Idle]);
+            return;
+        }
         guard.Move();
     }
     public override void Exit(Security_Guard guard)
@@ -85,13 +94,13 @@ public class Security_Chase : Security_State
     {
         if(guard.CheckForObstacle() || guard.CheckForLedge())
         {
-            guard.ChangeState(guard.states[GuardStateType.Idle]);
+            guard.ChangeState(guard.states[EnemyTypeState.Idle]);
             return;
         }
 
        if(guard.DistanceToPlayer() <= guard.Stat.moveDistance)
        {
-            guard.ChangeState(guard.states[GuardStateType.Attack]);
+            guard.ChangeState(guard.states[EnemyTypeState.Attack]);
             return;
        }
        else
@@ -129,18 +138,18 @@ public class Security_Attack : Security_State
                {
                    if (guard.DistanceToPlayer() <= guard.Stat.moveDistance)
                    {
-                       guard.ChangeState(guard.states[GuardStateType.Attack]);
+                       guard.ChangeState(guard.states[EnemyTypeState.Attack]);
 
                    }
                    else
                    {
-                       guard.ChangeState(guard.states[GuardStateType.Chase]);
+                       guard.ChangeState(guard.states[EnemyTypeState.Chase]);
 
                   }
                }
                else
                {
-                   guard.ChangeState(guard.states[GuardStateType.Idle]);
+                   guard.ChangeState(guard.states[EnemyTypeState.Idle]);
                     return;
                }
            }
@@ -194,11 +203,11 @@ public class Security_Hit : Security_State
             {
                 if(guard.DistanceToPlayer() <= guard.Stat.moveDistance)
                 {
-                    guard.ChangeState(guard.states[GuardStateType.Attack]);
+                    guard.ChangeState(guard.states[EnemyTypeState.Attack]);
                 }
                 else
                 {
-                    guard.ChangeState(guard.states[GuardStateType.Chase]);
+                    guard.ChangeState(guard.states[EnemyTypeState.Chase]);
                 }
 
             }             

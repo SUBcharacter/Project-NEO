@@ -25,7 +25,7 @@ public class R_IdleState : ResearcherState
             if (researcher.sightRange != null && researcher.sightRange.IsPlayerInSight)
             {
                 Debug.Log("플레이어 감지!");
-                researcher.ChangeState(researcher.r_states[ResearcherStateType.Summon]);
+                researcher.ChangeState(researcher.r_states[EnemyTypeState.Summon]);
                 return;
             }     
         }
@@ -33,7 +33,7 @@ public class R_IdleState : ResearcherState
         {
             if (researcher.sightRange != null && researcher.sightRange.IsPlayerInSight)
             {         
-                researcher.ChangeState(researcher.r_states[ResearcherStateType.Chase]);
+                researcher.ChangeState(researcher.r_states[EnemyTypeState.Chase]);
                 return;
             }
         }      
@@ -50,8 +50,11 @@ public class R_IdleState : ResearcherState
 
 public class R_WalkState : ResearcherState
 {
+    float movedistance = 2.0f;
+    Vector2 startpos;
     public override void Start(Researcher researcher)
     {
+        startpos = researcher.transform.position;
         Debug.Log("Researcher Walk State 시작");
         researcher.animator.Play("R_Move");
     }
@@ -61,19 +64,21 @@ public class R_WalkState : ResearcherState
         {
             if (!researcher.isDroneSummoned)
             {
-                researcher.ChangeState(researcher.r_states[ResearcherStateType.Summon]);
+                researcher.ChangeState(researcher.r_states[EnemyTypeState.Summon]);
                 return;
             }
 
             if (researcher.DistanceToPlayer() <= researcher.Stat.moveDistance)
             {
-                researcher.ChangeState(researcher.r_states[ResearcherStateType.Attack]);
+                researcher.ChangeState(researcher.r_states[EnemyTypeState.Attack]);
                 return;
             }
 
-            researcher.ChangeState(researcher.r_states[ResearcherStateType.Chase]);
+            researcher.ChangeState(researcher.r_states[EnemyTypeState.Chase]);
             return;
         }
+
+        float distance = Vector2.Distance(startpos, researcher.transform.position);
 
         researcher.WallorLedgeFlip();
 
@@ -123,14 +128,14 @@ public class  R_ChaseState : ResearcherState
 
         if (researcher.CheckForObstacle() || researcher.CheckForLedge())
         {
-            researcher.ChangeState(researcher.r_states[ResearcherStateType.Walk]);
+            researcher.ChangeState(researcher.r_states[EnemyTypeState.Walk]);
             return;
         }
       
 
         if(researcher.DistanceToPlayer() <= researcher.Stat.moveDistance)
         {
-            researcher.ChangeState(researcher.r_states[ResearcherStateType.Attack]);
+            researcher.ChangeState(researcher.r_states[EnemyTypeState.Attack]);
             return;
         }
         researcher.Chase();
@@ -190,11 +195,11 @@ public class R_Hitstate : ResearcherState
             {
                 float direction = researcher.Player_Trans.position.x - researcher.transform.position.x;
                 researcher.FlipResearcher(direction);
-                researcher.ChangeState(researcher.r_states[ResearcherStateType.Attack]);
+                researcher.ChangeState(researcher.r_states[EnemyTypeState.Attack]);
             }        
             else
             {
-                researcher.ChangeState(researcher.r_states[ResearcherStateType.Chase]);
+                researcher.ChangeState(researcher.r_states[EnemyTypeState.Chase]);
             }
           
         }

@@ -1,5 +1,9 @@
 using UnityEngine;
 
+public enum EnemyTypeState
+{
+    Idle, Attack, Dead, Hit, Walk, Chase, Enhance, Return, Summon
+}
 public abstract class Enemy : MonoBehaviour, IResetable, IDamageable
 {
     [Header("Enemy ตฅภฬลอ")]

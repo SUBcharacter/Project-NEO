@@ -11,7 +11,7 @@ public  abstract class SD_State
 public class SD_Idlestate : SD_State
 {
     float idleDuration;
-    float waitTime = 1f;
+    float waitTime = 0.5f;
     public override void Start(SummonDrone summondrone) 
     {
         Debug.Log("SummonDrone Idle State ½ÃÀÛ");
@@ -23,7 +23,7 @@ public class SD_Idlestate : SD_State
         idleDuration += Time.deltaTime;
         if (idleDuration >= waitTime)
         {
-            summondrone.ChangeState(summondrone.SD_states[SummonDroneStateType.Chase]);
+            summondrone.ChangeState(summondrone.SD_states[EnemyTypeState.Chase]);
         }
     }
     public override void Exit(SummonDrone summondrone) 
@@ -45,7 +45,7 @@ public class SD_ChaseState : SD_State
 
         if (distance <= summondrone.explosionRadius)
         {
-            summondrone.ChangeState(summondrone.SD_states[SummonDroneStateType.Attack]);
+            summondrone.ChangeState(summondrone.SD_states[EnemyTypeState.Attack]);
             return;
         }
         
@@ -111,7 +111,7 @@ public class SD_Summonstate : SD_State
  
             summondrone.Rigid.linearVelocity = Vector2.zero;
             
-            summondrone.ChangeState(summondrone.SD_states[SummonDroneStateType.Idle]);
+            summondrone.ChangeState(summondrone.SD_states[EnemyTypeState.Idle]);
         }
 
     }

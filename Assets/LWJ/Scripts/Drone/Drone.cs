@@ -2,10 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public enum DroneStateType
-{
-    Idle, Attack, Dead, Hit, Walk, Chase, Enhance, Return
-}
+
 public class Drone : Enemy
 {
     public DroneState currentstates;
@@ -19,8 +16,8 @@ public class Drone : Enemy
 
     public Vector3 target => Target;
     [SerializeField] Material hitFlash;
-    [SerializeField] Dictionary<DroneStateType, DroneState> Dronestate = new(); 
-    public Dictionary<DroneStateType, DroneState> State => Dronestate;
+    [SerializeField] Dictionary<EnemyTypeState, DroneState> Dronestate = new(); 
+    public Dictionary<EnemyTypeState, DroneState> State => Dronestate;
 
     [SerializeField] LayerMask playerLayer;
     [SerializeField] public LayerMask groundLayer;
@@ -75,14 +72,14 @@ public class Drone : Enemy
     }
     private void Stateinit()
     {
-        Dronestate[DroneStateType.Idle] = new D_Idlestate();
-        Dronestate[DroneStateType.Attack] = new D_Attackstate();
-        Dronestate[DroneStateType.Dead] = new D_Deadstate();
-        Dronestate[DroneStateType.Hit] = new D_Hitstate();
-        Dronestate[DroneStateType.Chase] = new D_Chasestate();
-        Dronestate[DroneStateType.Walk] = new D_Walkstate();
-        Dronestate[DroneStateType.Enhance] = new D_EnhancedDroneState();
-        Dronestate[DroneStateType.Return] = new D_Returnstate();
+        Dronestate[EnemyTypeState.Idle] = new D_Idlestate();
+        Dronestate[EnemyTypeState.Attack] = new D_Attackstate();
+        Dronestate[EnemyTypeState.Dead] = new D_Deadstate();
+        Dronestate[EnemyTypeState.Hit] = new D_Hitstate();
+        Dronestate[EnemyTypeState.Chase] = new D_Chasestate();
+        Dronestate[EnemyTypeState.Walk] = new D_Walkstate();
+        Dronestate[EnemyTypeState.Enhance] = new D_EnhancedDroneState();
+        Dronestate[EnemyTypeState.Return] = new D_Returnstate();
     }
     void Update()
     {
@@ -95,7 +92,7 @@ public class Drone : Enemy
         Rigid.linearVelocity = Vector2.zero;
         transform.position = startPos;
         isattack = false;
-        ChangeState(Dronestate[DroneStateType.Idle]);
+        ChangeState(Dronestate[EnemyTypeState.Idle]);
     }
 
     public void ChangeState(DroneState drone)
@@ -116,14 +113,14 @@ public class Drone : Enemy
         else
         {
             Rigid.linearVelocity = Vector2.zero;
-            ChangeState(State[DroneStateType.Idle]);
+            ChangeState(State[EnemyTypeState.Idle]);
         }
     }
 
     void Enhance()
     {
         if (currentstates is D_Deadstate) return;
-        ChangeState(Dronestate[DroneStateType.Enhance]);
+        ChangeState(Dronestate[EnemyTypeState.Enhance]);
         StartCoroutine(Enhancing());
     }
     IEnumerator Enhancing()
@@ -168,7 +165,7 @@ public class Drone : Enemy
         else
         {
             Rigid.linearVelocity = Vector2.zero;
-            ChangeState(Dronestate[DroneStateType.Idle]);
+            ChangeState(Dronestate[EnemyTypeState.Idle]);
         }
     }
 
@@ -181,11 +178,11 @@ public class Drone : Enemy
 
         if (currnetHealth <= 0)
         {
-            ChangeState(Dronestate[DroneStateType.Dead]);
+            ChangeState(Dronestate[EnemyTypeState.Dead]);
             return;
         }
 
-        ChangeState(Dronestate[DroneStateType.Hit]);
+        ChangeState(Dronestate[EnemyTypeState.Hit]);
 
     }
 
@@ -215,11 +212,11 @@ public class Drone : Enemy
      
         if (DistanceToPlayer() <= Stat.moveDistance)
         {
-            ChangeState(State[DroneStateType.Attack]);
+            ChangeState(State[EnemyTypeState.Attack]);
         }
         else
         {     
-             ChangeState(State[DroneStateType.Chase]);
+             ChangeState(State[EnemyTypeState.Chase]);
 
         }           
        

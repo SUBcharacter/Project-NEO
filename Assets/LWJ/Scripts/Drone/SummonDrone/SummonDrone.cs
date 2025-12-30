@@ -4,14 +4,11 @@ using UnityEditor.Searcher;
 using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
 
-public enum SummonDroneStateType
-{
-    Idle, Summon, Attack, Dead,Chase
-}
+
 public class SummonDrone : Enemy
 {
-    Dictionary<SummonDroneStateType, SD_State> Summonstates = new();
-    public Dictionary<SummonDroneStateType, SD_State> SD_states => Summonstates;
+    Dictionary<EnemyTypeState, SD_State> Summonstates = new();
+    public Dictionary<EnemyTypeState, SD_State> SD_states => Summonstates;
     public SD_State currentStates { get; private set; }
     [SerializeField] private float acceleration = 10f;
     public Transform Resear_trans { get; private set; }
@@ -50,11 +47,11 @@ public class SummonDrone : Enemy
     }
     void StateInit()
     {
-        SD_states[SummonDroneStateType.Idle] = new SD_Idlestate();
-        SD_states[SummonDroneStateType.Summon] = new SD_Summonstate();
-        SD_states[SummonDroneStateType.Attack] = new SD_Attackstate();
-        SD_states[SummonDroneStateType.Dead] = new SD_DeadState();
-        SD_states[SummonDroneStateType.Chase] = new SD_ChaseState();
+        SD_states[EnemyTypeState.Idle] = new SD_Idlestate();
+        SD_states[EnemyTypeState.Summon] = new SD_Summonstate();
+        SD_states[EnemyTypeState.Attack] = new SD_Attackstate();
+        SD_states[EnemyTypeState.Dead] = new SD_DeadState();
+        SD_states[EnemyTypeState.Chase] = new SD_ChaseState();
     }
 
     private void OnEnable()
@@ -82,7 +79,7 @@ public class SummonDrone : Enemy
     {
         Resear_trans = researcher;
         Player_trans = player;
-        ChangeState(SD_states[SummonDroneStateType.Summon]);
+        ChangeState(SD_states[EnemyTypeState.Summon]);
     }
     public override void TakeDamage(float damage)
     {
@@ -93,7 +90,7 @@ public class SummonDrone : Enemy
         StartCoroutine(HitFlash());
         if (currnetHealth <= 0)
         {
-            ChangeState(SD_states[SummonDroneStateType.Dead]);
+            ChangeState(SD_states[EnemyTypeState.Dead]);
         }
     }
 
@@ -157,7 +154,7 @@ public class SummonDrone : Enemy
     IEnumerator Explosion_timer()
     {
         yield return CoroutineCasher.Wait(0.5f);
-        ChangeState(SD_states[SummonDroneStateType.Dead]);
+        ChangeState(SD_states[EnemyTypeState.Dead]);
        
     }
 
