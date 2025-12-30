@@ -71,14 +71,15 @@ public class Knife : Bullet
                 gameObject.SetActive(false);
                 break;
             case (int)Layers.enviroment:
+                collision.GetComponent<IDamageable>()?.TakeDamage(stats.damage * enhancing);
                 break;
             case (int)Layers.enemy:
-                collision.GetComponent<IDamageable>().TakeDamage(stats.damage * enhancing);
+                collision.GetComponent<IDamageable>()?.TakeDamage(stats.damage * enhancing);
                 transform.SetParent(parent);
                 gameObject.SetActive(false);
                 break;
             case (int)Layers.boss:
-                collision.GetComponent<IDamageable>().TakeDamage(stats.damage * enhancing);
+                collision.GetComponent<IDamageable>()?.TakeDamage(stats.damage * enhancing);
                 transform.SetParent(parent);
                 gameObject.SetActive(false);
                 break;

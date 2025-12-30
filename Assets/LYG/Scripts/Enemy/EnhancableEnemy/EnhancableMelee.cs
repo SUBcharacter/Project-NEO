@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using Unity.Cinemachine;
+using Unity.VisualScripting;
 using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -17,13 +18,14 @@ public class EnhancableMelee : Enemy
     [SerializeField] EnhancableMeleeState currentState;
     [SerializeField] Dictionary<string, EnhancableMeleeState> state = new();
     CancellationTokenSource _cts;
+    MaterialPropertyBlock mpb;
+    Coroutine hit;
 
     [SerializeField] LayerMask groundMask;
     [SerializeField] Vector2 playerDirection;
 
     [SerializeField] bool attacking;
     [SerializeField] bool enhanced;
-    [SerializeField] bool hitted;
     [SerializeField] bool isDead;
 
     public Transform Target => target;
@@ -44,7 +46,10 @@ public class EnhancableMelee : Enemy
         detector = GetComponent<Detector>();
         ren = GetComponentInChildren<SpriteRenderer>();
         animator = GetComponentInChildren<Animator>();
-        hitted = false;
+        mpb = new MaterialPropertyBlock();
+        ren.GetPropertyBlock(mpb);
+        mpb.SetFloat("_FlashAmount", 0.5f);
+        ren.SetPropertyBlock(mpb);
         currnetHealth = stat.MaxHp;
         StateInit();
     }
@@ -85,6 +90,15 @@ public class EnhancableMelee : Enemy
             return;
         ChangeState(state["Enhance"]);
         StartCoroutine(Enhancing());
+    }
+
+    void Hit()
+    {
+        if(hit != null)
+        {
+            StopCoroutine(hit);
+        }
+        hit = StartCoroutine(HitFlash());
     }
 
     public bool CheckWall()
@@ -169,7 +183,7 @@ public class EnhancableMelee : Enemy
     public override void TakeDamage(float damage)
     {
         currnetHealth -= damage;
-        StartCoroutine(HitFlash());
+        Hit();
         if(currnetHealth <= 0)
         {
             currnetHealth = 0;
@@ -210,15 +224,26 @@ public class EnhancableMelee : Enemy
 
     IEnumerator HitFlash()
     {
-        if(hitted == false)
+        Material origin = ren.material;
+        
+        ren.material = hitFlash;
+        
+        mpb.SetFloat("_FlashAmount", 0.5f);
+        ren.SetPropertyBlock(mpb);
+
+        float t = 0;
+        float duration = 0.15f;
+
+        while (t <= duration)
         {
-            hitted = true;
-            Material origin = ren.material;
-            ren.material = hitFlash;
-            yield return CoroutineCasher.Wait(0.1f);
-            ren.material = origin;
-            hitted = false;
+            t += Time.deltaTime;
+            float flash = Mathf.SmoothStep(0.5f, 0f, t / duration);
+            mpb.SetFloat("_FlashAmount", flash);
+            ren.SetPropertyBlock(mpb);
+            yield return null;
         }
+
+        ren.material = origin;
     }
 
     IEnumerator Enhancing()

@@ -276,17 +276,17 @@ public class TerrainCheck : MonoBehaviour
             player.Rigid.sharedMaterial = player.Stats.fullFriction;
         }
     }
-    private void OnDrawGizmosSelected()
-    {
-        // 레이캐스트 시각화
-        CapsuleCollider2D col = GetComponent<CapsuleCollider2D>();
-
-        float radius = col.size.x / 2f;
-        float bottomY = -col.size.y / 2f + radius;
-
-        Vector2 bottomCenter = (Vector2)transform.position + new Vector2(0, bottomY);
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(bottomCenter + Vector2.down * 0.05f, radius);
-    }
+    //private void OnDrawGizmosSelected()
+    //{
+    //    // 레이캐스트 시각화
+    //    CapsuleCollider2D col = GetComponent<CapsuleCollider2D>();
+    //
+    //    float radius = col.size.x / 2f;
+    //    float bottomY = -col.size.y / 2f + radius;
+    //
+    //    Vector2 bottomCenter = (Vector2)transform.position + new Vector2(0, bottomY);
+    //
+    //    Gizmos.color = Color.red;
+    //    Gizmos.DrawWireSphere(bottomCenter + Vector2.down * 0.05f, radius);
+    //}
 }

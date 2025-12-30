@@ -35,14 +35,15 @@ public class BasicHitBox : HitBox
             case (int)Layers.enviroment:
                 triggered = true;
                 Debug.Log("충돌");
+                collision.GetComponent<IDamageable>()?.TakeDamage(damage);
                 break;
             case (int)Layers.enemy:
-                collision.GetComponent<IDamageable>().TakeDamage(damage);
+                collision.GetComponent<IDamageable>()?.TakeDamage(damage);
                 triggered = true;
                 break;
             case (int)Layers.player:
                 Debug.Log("플레이어 충돌");
-                collision.GetComponent<IDamageable>().TakeDamage(damage);
+                collision.GetComponent<IDamageable>()?.TakeDamage(damage);
                 triggered = true;
                 break;
             case (int)Layers.border:

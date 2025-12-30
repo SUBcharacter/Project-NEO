@@ -10,6 +10,7 @@ public class MovePlayer : EventStep
 
     public override IEnumerator Execute(Player player)
     {
+        // player.AniCon.Play("Walk");
         if(moveRight)
         {
             player.Rigid.linearVelocityX = velocity;
@@ -21,6 +22,7 @@ public class MovePlayer : EventStep
 
         yield return CoroutineCasher.Wait(moveTime);
 
+        // player.AniCon.Play("Idle");
         player.Rigid.linearVelocity = Vector2.zero;
     }
 }

@@ -76,12 +76,16 @@ public class Bullet : MonoBehaviour
                 gameObject.SetActive(false);
                 break;
             case (int)Layers.enviroment:
-                
-                gameObject.SetActive(false);
+                collision.GetComponent<IDamageable>()?.TakeDamage(damage);
                 break;
             case (int)Layers.enemy:
                 transform.SetParent(parent);
-                collision.GetComponent<IDamageable>().TakeDamage(damage);
+                collision.GetComponent<IDamageable>()?.TakeDamage(damage);
+                gameObject.SetActive(false);
+                break;
+            case (int)Layers.boss:
+                transform.SetParent(parent);
+                collision.GetComponent<IDamageable>()?.TakeDamage(damage);
                 gameObject.SetActive(false);
                 break;
             case (int)Layers.player:

@@ -28,7 +28,7 @@ MonoBehaviour:
   staminaRecoveryAmount: 3.2
   groundMask:
     serializedVersion: 2
-    m_Bits: 72
+    m_Bits: 8
   maxSlopeAngle: 45
   slopeRayLength: 2
   slopeLostDuration: 0.1

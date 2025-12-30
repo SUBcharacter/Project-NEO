@@ -469,9 +469,11 @@ MonoBehaviour:
   player: {fileID: 0}
   sequance:
   - eventSteps:
-    - {fileID: 11400000, guid: 951a5323e8d3f324fa33af7862b18bc3, type: 2}
-    - {fileID: 11400000, guid: ac6c0e259e045274594a70d5d2207776, type: 2}
     - {fileID: 11400000, guid: a0d9295b28c00684fb799721dc446f68, type: 2}
+    - {fileID: 11400000, guid: b35ba6e8edcb0344c9dd24474585aedc, type: 2}
+    - {fileID: 11400000, guid: 99d60cbeae732d744b202e0e4ee8c07d, type: 2}
+    - {fileID: 11400000, guid: ac6c0e259e045274594a70d5d2207776, type: 2}
+    - {fileID: 11400000, guid: 951a5323e8d3f324fa33af7862b18bc3, type: 2}
     - {fileID: 11400000, guid: 545427ca1418f5c41848c65da37bf009, type: 2}
     - {fileID: 11400000, guid: 37687c5d3b1e9f4458448079c247f6aa, type: 2}
     - {fileID: 11400000, guid: 2852b369487573a4c85bfa2b15dd8f11, type: 2}
@@ -510,7 +512,9 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 0beb97e6a2841fb4aa6e8cd13a8400d2, type: 2}
     - {fileID: 11400000, guid: 1fb6d63ce2274ed41821ed376a2a8144, type: 2}
     - {fileID: 11400000, guid: 80f70f43e421708438cdb7fe322d0eac, type: 2}
+    - {fileID: 11400000, guid: 99a8c97957ebe614e8277bdfae1d0367, type: 2}
     - {fileID: 11400000, guid: 21f41010c66e1524aa0803ad3b620482, type: 2}
+    - {fileID: 11400000, guid: 8433a564b59906d45a095e6b03df9b49, type: 2}
     - {fileID: 11400000, guid: cb8d0962bb3ae1042999d26475ca40e6, type: 2}
 --- !u!95 &1074805677
 Animator:
