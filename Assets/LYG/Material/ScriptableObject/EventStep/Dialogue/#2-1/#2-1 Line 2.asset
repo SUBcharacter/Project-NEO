@@ -14,4 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefab: {fileID: 4869992056530640006, guid: 74044dd998f136245a78c2fa3b2b6350, type: 3}
   actorName: ???
-  line: ......
+  line: "......<wait=1> \uB9CE\uC740 \uC0AC\uB78C\uB4E4\uC774 \uC548\uB77D\uD55C
+    \uC740\uD1F4 \uC0DD\uD65C\uC744 \uAFC8\uAFB8\uC9C0."
+  speed: 0.03

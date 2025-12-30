@@ -10,6 +10,7 @@ public class Dialogue : MonoBehaviour
     [SerializeField] Text line;
     [SerializeField] Image dialoguePoint;
 
+    bool skipRequested = false;
     public bool isFinished { get; private set; }
 
     private void Awake()
@@ -20,47 +21,125 @@ public class Dialogue : MonoBehaviour
         isFinished = true;
     }
 
-    public void Init(string actorName, string dialogue)
+    public void Init(string actorName, string dialogue, float speed)
     {
         isFinished = false;
+        skipRequested = false;
         nameLabel.text = actorName;
         line.text = "";
         canvas.enabled = true;
-        StartCoroutine(TypeText(dialogue));
+        StartCoroutine(TypeText(dialogue, speed));
     }
 
-    IEnumerator TypeText(string dialogue)
+    bool DialogueInput()
+    {
+        return (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse0) || Input.GetKeyDown(KeyCode.Return));
+    }
+
+    string RemoveTag(string dialogue)
+    {
+        while(true)
+        {
+            int start = dialogue.IndexOf('<');
+            if (start == -1) break;
+            int end = dialogue.IndexOf('>',start);
+            if (end == -1) break;
+
+            dialogue = dialogue.Remove(start, end - start + 1);
+        }
+        return dialogue;
+    }
+
+    IEnumerator WaitWithSkip(float time)
+    {
+        float timer = 0;
+
+        while(timer < time)
+        {
+            if(DialogueInput())
+            {
+                skipRequested = true;
+                yield break;
+            }
+
+            timer += Time.deltaTime;
+            yield return null;
+        }
+    }
+
+    IEnumerator TypeText(string dialogue, float speed)
     {
         dialogue = dialogue.Replace("\\n", "\n");
-        int count = 0;
+        int index = 0;
+        float timer = 0;
 
-        while (count <= dialogue.Length)
+        while (index < dialogue.Length)
         {
-            line.text = dialogue.Substring(0, count);
-            count++;
+            yield return null;
 
-            if(Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse0) || Input.GetKeyDown(KeyCode.Return))
+            if (DialogueInput())
+            {
+                skipRequested = true;
+            }
+
+            if (dialogue[index] == '<')
+            {
+                int end = dialogue.IndexOf('>', index);
+
+                if(end == -1)
+                {
+                    Debug.LogError("Wait 태그 에러");
+                    break;
+                }
+
+                string tag = dialogue.Substring(index + 1, end - index - 1);
+
+                if(tag.StartsWith("wait="))
+                {
+                    float waitTime = float.Parse(tag.Replace("wait=", ""));
+                    yield return WaitWithSkip(waitTime);
+                }
+                index = end + 1;
+
+                if (skipRequested)
+                {
+                    break;
+                }
+
+                continue;
+            }
+
+            if (skipRequested)
             {
                 break;
             }
 
-            yield return CoroutineCasher.Wait(0.01f);
+            timer += Time.deltaTime;
+
+            if(timer >= speed)
+            {
+                timer = 0;
+                line.text += dialogue[index++];
+            }
+            
         }
 
-        line.text = dialogue;
+        line.text = RemoveTag(dialogue);
 
         dialoguePoint.enabled = true;
 
         while(true)
         {
-            if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Mouse0) || Input.GetKeyDown(KeyCode.Return))
+            yield return null;
+
+            if (DialogueInput())
             {
                 canvas.enabled = false;
                 isFinished = true;
+                skipRequested = false;
                 break;
             }
             
-            yield return null;
         }
     }
 }

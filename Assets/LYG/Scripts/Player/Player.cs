@@ -79,6 +79,7 @@ public class Player : MonoBehaviour, IDamageable
     public LayerMask OriginMask => originMask;
     public WeaponState CrWp => currentWeapon;
 
+    public float Health => health;
     public float Stamina { get => stamina; set => stamina = value; }
     public float OverFlowEnergy { get => overFlowEnergy; set => overFlowEnergy = value; }
 

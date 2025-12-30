@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf457d982e921264cb0cc571216fded6, type: 3}
   m_Name: Deadzone(0, 0.76)
   m_EditorClassIdentifier: 
-  size: {x: 0, y: 0.76}
+  size: {x: 0, y: 0.28}
