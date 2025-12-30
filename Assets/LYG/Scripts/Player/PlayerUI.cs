@@ -42,7 +42,7 @@ public class PlayerUI : MonoBehaviour
             targetCrossHair[i].gameObject.SetActive(false);
         }
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < player.Stats.maxHealth; i++)
         {
             Image life = Instantiate(lifeIcon, hpLifePanel);
 
@@ -57,13 +57,19 @@ public class PlayerUI : MonoBehaviour
     {
         SkillUI();
 
-        // 체력이 잘 깎이는지 테스트용
+        // 체력이 잘 깎이는지 테스트용 코드
         if (Input.GetKeyDown(KeyCode.L))
         {
             player.TakeDamage(1f);
             LifeUI();
             Debug.Log("체력 깎임");
         }
+
+        // OverFlowEnergy 채워지는지 테스트용 코드
+        //if(Input.GetKeyDown(KeyCode.K))
+        //{
+        //    player.OverFlowEnergy += 5f;
+        //}
 
     }
 
@@ -114,13 +120,13 @@ public class PlayerUI : MonoBehaviour
     {
         if (player.SkMn.ChargeAttackUsable)
         {
-            Debug.Log("비활성화");
+            //Debug.Log("비활성화");
             chargeAttackIcon.transform.SetAsLastSibling();
             chargeAttackIcon.gameObject.SetActive(false);
         }
         else
         {
-            Debug.Log("활성화");
+           // Debug.Log("활성화");
 
             chargeAttackIcon.gameObject.SetActive(true);
             chargeAttackIcon.fillAmount = player.SkMn.ChargeAttackTimer / player.SkMn.ChargeAttackStat.coolTime;
@@ -131,13 +137,13 @@ public class PlayerUI : MonoBehaviour
     {
         if (player.SkMn.FlashAttackUsable)
         {
-            Debug.Log("비활성화");
+            //Debug.Log("비활성화");
             flashAttackIcon.transform.SetAsLastSibling();
             flashAttackIcon.gameObject.SetActive(false);
         }
         else
         {
-            Debug.Log("활성화");
+            //Debug.Log("활성화");
 
             flashAttackIcon.gameObject.SetActive(true);
             flashAttackIcon.fillAmount = player.SkMn.FlashAttackTimer / player.SkMn.FlashAttackStat.coolTime;
@@ -148,13 +154,13 @@ public class PlayerUI : MonoBehaviour
     {
         if (player.SkMn.AutoTargetingUsable)
         {
-            Debug.Log("비활성화");
+            //Debug.Log("비활성화");
             autoTargetingIcon.transform.SetAsLastSibling();
             autoTargetingIcon.gameObject.SetActive(false);
         }
         else
         {
-            Debug.Log("활성화");
+           //S Debug.Log("활성화");
 
             autoTargetingIcon.gameObject.SetActive(true);
             autoTargetingIcon.fillAmount = player.SkMn.AutoTargetingTimer / player.SkMn.AutoTargetingStat.coolTime;
@@ -163,19 +169,22 @@ public class PlayerUI : MonoBehaviour
 
     void LifeUI()
     {
-        
-        // 
-        if (player.Health <= 0)
-        {
-            Debug.Log("뒤짐");
-            return;
-        }
+        // 밑에거 써도 안되느넫 뭐지
+        //int hp = Mathf.FloorToInt(player.Health);
+
       
 
         for (int i = 0; i < LifeIcons.Count; i++)
         {
             LifeIcons[i].gameObject.SetActive(i < player.Health);
-            Debug.Log(i + " : " + LifeIcons[i].gameObject.activeSelf);
+            Debug.Log($"Health: {player.Health}");
+            //Debug.Log(i + " : " + LifeIcons[i].gameObject.activeSelf);
+        }
+
+        if (player.Health <= 0)
+        {
+            Debug.Log("뒤짐");
+            return;
         }
 
         //Canvas.ForceUpdateCanvases();
